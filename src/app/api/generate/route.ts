@@ -130,6 +130,66 @@ Generate the following schema types as valid JSON-LD:
 
 Format as clean, copy-pasteable JSON-LD blocks with a <script type="application/ld+json"> wrapper for each. Add a note on which page each block should go on.`,
 
+  directories: (b, _) => `
+You are a UK SEO and link-building expert. List 30 specific UK online directories, citation sites and listing platforms where "${b!.name}" (${b!.url}) should submit their business RIGHT NOW to build backlinks and climb Google.
+
+Business: ${b!.description}
+Niche: ${b!.niche}
+Location: ${b!.location}
+
+For each directory provide:
+1. Directory name
+2. Exact URL to submit (the submission/add listing page, not just the homepage)
+3. Cost (Free / Paid / Freemium)
+4. Why it matters for SEO (domain authority, niche relevance, local signal)
+5. What category/section to list under
+
+Include a mix of:
+- Universal UK directories (Yell, Yelp UK, Thomson Local, FreeIndex, etc.)
+- Industry-specific directories for this niche
+- Local/regional directories for ${b!.location}
+- Google Business Profile (always first)
+- Review platforms (Trustpilot, Google Reviews, etc.)
+- Social profiles that count as citations (LinkedIn Company Page, Facebook Business, etc.)
+
+Mark the top 10 as PRIORITY — do these first for fastest ranking impact.
+Be specific — give real working URLs not placeholders.`,
+
+  actionplan: (b, _) => `
+You are a UK SEO consultant. Create a detailed 90-day action plan to help "${b!.name}" (${b!.url}) climb Google search rankings.
+
+Business: ${b!.description}
+Niche: ${b!.niche}
+Location: ${b!.location}
+Target audience: ${b!.audience}
+Competitors: ${b!.competitors.join(", ")}
+
+Structure it as:
+
+## WEEK 1-2: FOUNDATIONS (Quick wins, takes 2-3 hours total)
+- Exact tasks to do immediately
+- Technical fixes
+- Free directory submissions
+
+## WEEK 3-4: CONTENT LAUNCH
+- First blog posts to write (give exact titles)
+- Where to publish them
+- On-page SEO fixes
+
+## MONTH 2: LINK BUILDING
+- Guest post strategy
+- Outreach targets
+- Social signals
+
+## MONTH 3: SCALE & TRACK
+- Content calendar
+- How to measure progress (which tools, which metrics)
+- Next 90-day priorities
+
+For each task: say exactly what to do, how long it takes, and what Google ranking impact to expect (low/medium/high).
+
+Be specific to this business — mention their actual URL, niche and location throughout. No generic advice.`,
+
   googlebusiness: (b, _) => `
 You are a local SEO expert. Write all the content needed to fully optimise a Google Business Profile for ${b!.name} (${b!.url}).
 

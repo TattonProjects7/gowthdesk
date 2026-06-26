@@ -6,18 +6,21 @@ import { useParams } from "next/navigation";
 import { BUSINESSES } from "@/lib/businesses";
 import {
   ArrowLeft, Copy, Check, Loader2, Sparkles, TrendingUp,
-  FileText, Globe, Mail, ExternalLink, Building2, Code, Search
+  FileText, Globe, Mail, ExternalLink, Building2, Code, Search,
+  ListChecks, CalendarDays
 } from "lucide-react";
 
 const TOOLS = [
-  { key: "keywords",       label: "Keywords",        icon: TrendingUp,  desc: "20 target SEO keywords with search volume and difficulty",  hasExtra: false },
-  { key: "blog",           label: "Blog post",        icon: FileText,    desc: "Full 1,500-word SEO blog post ready to publish on your site", hasExtra: true,  extraLabel: "Topic or keyword to target (optional)" },
-  { key: "guest",          label: "Guest post",       icon: Globe,       desc: "900-word article to publish on OTHER websites for backlinks", hasExtra: true,  extraLabel: "Topic focus (optional)" },
-  { key: "sites",          label: "Target sites",     icon: Search,      desc: "15 real websites and blogs that could link to or feature you", hasExtra: false },
-  { key: "outreach",       label: "Outreach emails",  icon: Mail,        desc: "3 cold pitch emails to send to site editors and journalists", hasExtra: true,  extraLabel: "Target site type (optional, e.g. 'trade magazine')" },
-  { key: "metatags",       label: "Meta tags",        icon: FileText,    desc: "SEO title tags and meta descriptions for your 6 key pages",  hasExtra: false },
-  { key: "schema",         label: "Schema markup",    icon: Code,        desc: "JSON-LD structured data to paste into your site's <head>",   hasExtra: false },
-  { key: "googlebusiness", label: "Google Business",  icon: Building2,   desc: "Full Google Business Profile — description, posts & Q&As",   hasExtra: false },
+  { key: "actionplan",     label: "90-Day Plan",      icon: CalendarDays, desc: "Exact weekly SEO action plan to climb Google in 90 days",    hasExtra: false, highlight: true },
+  { key: "keywords",       label: "Keywords",          icon: TrendingUp,  desc: "20 target SEO keywords with search volume and difficulty",   hasExtra: false },
+  { key: "directories",    label: "UK Directories",    icon: ListChecks,  desc: "30 directories to submit to now — free backlinks, fast wins", hasExtra: false, highlight: true },
+  { key: "blog",           label: "Blog post",         icon: FileText,    desc: "Full 1,500-word SEO blog post ready to publish on your site", hasExtra: true,  extraLabel: "Topic or keyword to target (optional)" },
+  { key: "guest",          label: "Guest post",        icon: Globe,       desc: "900-word article to publish on OTHER websites for backlinks", hasExtra: true,  extraLabel: "Topic focus (optional)" },
+  { key: "sites",          label: "Target sites",      icon: Search,      desc: "15 real websites and blogs that could link to or feature you", hasExtra: false },
+  { key: "outreach",       label: "Outreach emails",   icon: Mail,        desc: "3 cold pitch emails to send to site editors and journalists", hasExtra: true,  extraLabel: "Target site type (optional, e.g. 'trade magazine')" },
+  { key: "metatags",       label: "Meta tags",         icon: FileText,    desc: "SEO title tags and meta descriptions for your 6 key pages",  hasExtra: false },
+  { key: "schema",         label: "Schema markup",     icon: Code,        desc: "JSON-LD structured data to paste into your site's <head>",   hasExtra: false },
+  { key: "googlebusiness", label: "Google Business",   icon: Building2,   desc: "Full Google Business Profile — description, posts & Q&As",   hasExtra: false },
 ];
 
 export default function BusinessPage() {
@@ -90,21 +93,25 @@ export default function BusinessPage() {
         {/* Left sidebar — tool picker */}
         <aside className="w-56 shrink-0 border-r border-ink-800 bg-ink-900 flex flex-col py-4">
           <p className="px-4 mb-3 text-xs font-semibold uppercase tracking-widest text-ink-500">Tools</p>
-          {TOOLS.map(({ key, label, icon: Icon }) => {
+          {TOOLS.map(({ key, label, icon: Icon, highlight }) => {
             const done = !!results[key];
+            const active = activeKey === key;
             return (
               <button
                 key={key}
                 onClick={() => setActiveKey(key)}
                 className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-left transition-colors ${
-                  activeKey === key
+                  active
                     ? "bg-ink-800 text-white border-r-2 border-violet-500"
+                    : highlight
+                    ? "text-emerald-400 hover:text-white hover:bg-ink-800"
                     : "text-ink-400 hover:text-white hover:bg-ink-800"
                 }`}
               >
-                <Icon className={`h-4 w-4 shrink-0 ${activeKey === key ? "text-violet-400" : done ? "text-emerald-500" : "text-ink-500"}`} />
+                <Icon className={`h-4 w-4 shrink-0 ${active ? "text-violet-400" : done ? "text-emerald-500" : highlight ? "text-emerald-500" : "text-ink-500"}`} />
                 <span>{label}</span>
-                {done && activeKey !== key && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+                {highlight && !done && !active && <span className="ml-auto rounded-full bg-emerald-900 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">START</span>}
+                {done && !active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-500" />}
               </button>
             );
           })}
@@ -210,12 +217,14 @@ export default function BusinessPage() {
           <div className="mt-auto rounded-xl bg-ink-800 border border-ink-700 p-4">
             <p className="text-xs font-semibold text-violet-400 mb-2">How to use</p>
             <ol className="text-xs text-ink-300 space-y-1.5 list-decimal list-inside">
-              <li>Start with Keywords</li>
-              <li>Write a Blog post for your site</li>
-              <li>Find Target sites for links</li>
-              <li>Write a Guest post for each</li>
+              <li>Run <strong className="text-emerald-400">90-Day Plan</strong> first</li>
+              <li>Submit to <strong className="text-emerald-400">UK Directories</strong></li>
+              <li>Get Keywords to target</li>
+              <li>Publish a Blog post weekly</li>
+              <li>Find Target sites + Guest post</li>
               <li>Send Outreach emails</li>
               <li>Fix Meta tags + Schema</li>
+              <li>Optimise Google Business</li>
             </ol>
           </div>
         </aside>
