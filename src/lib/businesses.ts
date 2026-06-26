@@ -32,15 +32,15 @@ export const BUSINESSES: Business[] = [
     slug: "silopod",
     name: "SiloPod",
     url: "https://silopod.co.uk",
-    tagline: "Acoustic office pods and quiet workspace solutions",
+    tagline: "Quiet Spaces. Better Work. Acoustic office pods for focus, calls and meetings.",
     description:
-      "SiloPod manufactures and sells acoustic office pods and soundproofed quiet pods for workplaces. Products include solo focus pods, phone booth pods, and multi-person meeting pods — all acoustically engineered to block out open-plan office noise. Used by offices, co-working spaces, schools and businesses across the UK.",
-    niche: "Acoustic pods / Office pods / Soundproofed workspace / Quiet rooms / Office furniture",
+      "SiloPod designs and sells acoustic office pods for open-plan workplaces. Five sizes: SiloPod S (private phone booth, 1 person, from £3,995), SiloPod M (focus pod, 1 person, from £4,495), SiloPod L (2-person meeting pod, from £4,795), SiloPod XL (1-4 people collaboration pod, from £5,195), SiloPod XXL (1-6 person meeting room, from £5,995). All include acoustic insulation, ventilation, LED lighting, USB-A/USB-C power, toughened glass, premium finishes and a 5-year warranty. No planning permission needed, installed in hours not weeks, moveable as office layouts change. Nationwide delivery and installation across the UK. Based in Altrincham, Cheshire. Trusted by corporate offices, technology companies, educational facilities, healthcare providers, financial services and local authorities.",
+    niche: "Acoustic office pods / Soundproof pods / Office phone booths / Meeting pods / Quiet workspace solutions / Open plan office noise",
     audience:
-      "Office managers, HR teams, facilities managers and business owners looking to solve open-plan office noise problems with acoustic pods or quiet workspace solutions",
-    location: "United Kingdom",
-    competitors: ["Framery", "Hana", "ROOM", "Zenbooth", "SnapCab", "Pod Works"],
-    accent: "#16a34a", // green
+      "Facilities managers, office managers, HR directors and business owners across the UK who need to solve open-plan office noise — for focus work, private calls, Zoom meetings, HR conversations and confidential discussions. Also procurement teams buying 5, 10 or 60+ pods for multi-site rollouts.",
+    location: "Altrincham, Cheshire — nationwide delivery and installation across the UK",
+    competitors: ["Framery", "Hana", "ROOM", "Zenbooth", "SnapCab", "BuzziSpace", "Kvadrat"],
+    accent: "#d97706", // amber/gold matching their branding
     emoji: "🔇",
   },
   {
