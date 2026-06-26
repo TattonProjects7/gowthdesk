@@ -17,7 +17,7 @@ export default function Home() {
           <p className="text-ink-300 text-lg">AI-written SEO content, blog posts, guest articles and outreach — one click per tool, all three businesses.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 w-full max-w-3xl">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 w-full max-w-5xl">
           {BUSINESSES.map(biz => (
             <Link
               key={biz.slug}

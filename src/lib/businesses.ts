@@ -44,6 +44,21 @@ export const BUSINESSES: Business[] = [
     emoji: "🔇",
   },
   {
+    slug: "primo-vending",
+    name: "Primo Vending",
+    url: "https://www.primo-vending.com",
+    tagline: "Free vending machines for your workplace — fully managed, zero cost.",
+    description:
+      "Primo Vending supplies and fully manages vending machines for businesses across the North West at zero cost to the business. Services include free installation and delivery, regular restocking, cashless card and mobile payment systems, 24/7 local support, and modern energy-efficient machines stocked with premium snacks and drinks including healthy options. Based in Trafford Park, Manchester. Revenue model: profit-share on product sales — the business pays nothing upfront or ongoing.",
+    niche: "Vending machines / Workplace refreshments / Managed vending / Free vending / North West Manchester",
+    audience:
+      "Business owners, office managers, facilities managers and HR teams across Greater Manchester and the North West looking to provide free or paid refreshments for employees with zero hassle and zero cost",
+    location: "Trafford Park, Manchester — serving Greater Manchester and the North West",
+    competitors: ["Selecta", "Compass Group", "Autobar", "Crown Vending", "local independent vending operators"],
+    accent: "#dc2626", // red
+    emoji: "🥤",
+  },
+  {
     slug: "tatton-projects",
     name: "Tatton Projects",
     url: "https://tatton-projects.co.uk",
