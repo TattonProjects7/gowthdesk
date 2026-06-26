@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BUSINESSES } from "@/lib/businesses";
-import { ArrowRight, TrendingUp, FileText, Globe, Mail } from "lucide-react";
+import { ArrowRight, TrendingUp, FileText, Globe, Mail, Zap } from "lucide-react";
 
 export default function Home() {
   return (
@@ -12,6 +12,9 @@ export default function Home() {
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
+        <Link href="/schedule" className="mb-8 flex items-center gap-2 rounded-full border border-violet-700 bg-violet-950 px-5 py-2.5 text-sm font-semibold text-violet-300 hover:bg-violet-900 transition-colors">
+          <Zap className="h-4 w-4 text-violet-400" /> Run the bot — auto-generate &amp; email all 4 businesses
+        </Link>
         <div className="text-center mb-12 max-w-xl">
           <h1 className="text-4xl font-bold mb-3">Your marketing engine</h1>
           <p className="text-ink-300 text-lg">AI-written SEO content, blog posts, guest articles and outreach — one click per tool, all three businesses.</p>
