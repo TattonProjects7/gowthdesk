@@ -22,13 +22,32 @@ For each keyword provide:
 
 Format as a clean numbered list. Include a mix of: short-tail, long-tail, local, and question-based keywords. Focus on UK searches.`,
 
-  blog: (b, extra) => `
+  blog: (b, extra) => {
+    const ANGLES = [
+      `Write a practical HOW-TO GUIDE. Pick a specific task or process the target audience regularly faces and walk them through it step by step. Use numbered steps, real specifics, and expert tips. Title format: "How to [do X]: A Step-by-Step Guide"`,
+      `Write a BUYER'S GUIDE. Help the target audience make a smart purchasing or hiring decision. Cover what to look for, what questions to ask, red flags to avoid, and how to compare options. Title format: "How to Choose the Right [X]: A Complete Buyer's Guide"`,
+      `Write a COST GUIDE. Break down the realistic costs the audience will encounter, with price ranges, what affects pricing, hidden costs, and money-saving tips. Title format: "How Much Does [X] Cost in ${new Date().getFullYear()}? UK Price Guide"`,
+      `Write a COMMON MISTAKES post. Identify 7–10 mistakes the target audience regularly makes and explain how to avoid each one. Be specific and use real examples. Title format: "X Mistakes to Avoid When [doing X]"`,
+      `Write a COMPARISON post. Compare two or three approaches, products, or services the audience typically chooses between. Give an honest verdict on which suits different situations. Title format: "[Option A] vs [Option B]: Which is Right for You?"`,
+      `Write a LOCAL / REGIONAL guide. Focus on the specific location (${b!.location}) and make the content hyper-relevant to local readers — local regulations, local considerations, local suppliers or providers. Title format: "The Complete Guide to [X] in [location]"`,
+      `Write a SEASONAL / TIMELY post. Choose a topic that's relevant to the current season or time of year and explain why the audience should act now. Title format: "[Season] [X]: What You Need to Know"`,
+      `Write a FREQUENTLY ASKED QUESTIONS post. Identify 8–10 real questions the target audience searches for and answer each one thoroughly. Format as a proper FAQ with H3 question headers. Title format: "[X]: Your Most Common Questions Answered"`,
+      `Write a CHECKLIST post. Give the audience a practical, actionable checklist they can actually use. Explain each item briefly. Title format: "The Ultimate [X] Checklist: [N] Things to Check"`,
+      `Write a SIGNS YOU NEED post. Help readers diagnose a problem or recognise they need a product/service. Use specific, recognisable symptoms. Title format: "[N] Signs You Need [X] (And What to Do Next)"`,
+      `Write a BEGINNER'S GUIDE. Assume the reader knows nothing. Explain the fundamentals clearly, define jargon, and build their confidence. Title format: "[X] for Beginners: Everything You Need to Know"`,
+      `Write a CASE STUDY / TRANSFORMATION post. Describe a realistic before-and-after scenario (a typical customer situation). Walk through the problem, the solution, and the outcome with specific details. Title format: "How [type of customer] [achieved outcome] with [solution]"`,
+      `Write a TRENDS post. Explore 5–7 current trends shaping the industry in ${new Date().getFullYear()}. Explain what each trend means for the target audience and what they should do about it. Title format: "[N] [Industry] Trends in ${new Date().getFullYear()} You Need to Know"`,
+      `Write a QUESTIONS TO ASK post. Help readers feel empowered when speaking to a provider or making a decision by giving them the right questions. Title format: "[N] Questions to Ask Your [Provider] Before You [commit/buy/hire]"`,
+      `Write a PROCESS EXPLAINER post. Pull back the curtain on how something works — a process, a system, a service. Demystify it. Help readers understand what actually happens so they feel informed and less anxious. Title format: "What Actually Happens When You [X]: The Process Explained"`,
+    ];
+    const angle = extra ? `Additional instruction: ${extra}` : `CONTENT ANGLE TO USE THIS TIME:\n${ANGLES[Math.floor(Math.random() * ANGLES.length)]}\n\nUse this angle — do not default to a generic overview post.`;
+    return `
 You are an expert SEO content writer. Write a full, publish-ready SEO blog post for the website ${b!.url} (${b!.name}).
 
 Business: ${b!.description}
 Target audience: ${b!.audience}
 Location: ${b!.location}
-${extra ? `Additional instruction: ${extra}` : "Choose the best keyword topic yourself based on search demand."}
+${angle}
 
 Requirements:
 - 1,200–1,500 words
@@ -40,7 +59,8 @@ Requirements:
 - End with a clear call to action
 - Include an SEO meta title (under 60 chars) and meta description (under 155 chars) at the top
 
-Write the full post now.`,
+Write the full post now.`;
+  },
 
   guest: (b, extra) => `
 You are an expert content marketer. Write a guest post article that can be pitched to and published on OTHER websites to build backlinks to ${b!.url} (${b!.name}).
@@ -227,7 +247,7 @@ export async function POST(req: NextRequest) {
     model: "gpt-4o",
     messages: [{ role: "user", content: promptFn(biz, extra) }],
     max_tokens: 2500,
-    temperature: 0.7,
+    temperature: type === "blog" ? 0.9 : 0.7,
   });
 
   return NextResponse.json({ content: completion.choices[0].message.content });
