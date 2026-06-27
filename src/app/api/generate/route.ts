@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import OpenAI from "openai";
 import { getBusiness } from "@/lib/businesses";
 
 const PROMPTS: Record<string, (b: ReturnType<typeof getBusiness>, extra: string) => string> = {
@@ -216,25 +217,18 @@ export async function POST(req: NextRequest) {
   const promptFn = PROMPTS[type];
   if (!promptFn) return NextResponse.json({ error: "Unknown type" }, { status: 400 });
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "OPENAI_API_KEY not set" }, { status: 500 });
-
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "gpt-4o",
-      messages: [{ role: "user", content: promptFn(biz, extra) }],
-      max_tokens: 2500,
-      temperature: 0.7,
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    return NextResponse.json({ error: err.error?.message ?? "OpenAI error" }, { status: 500 });
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json({ error: "OPENAI_API_KEY not set" }, { status: 500 });
   }
 
-  const data = await res.json();
-  return NextResponse.json({ content: data.choices[0].message.content });
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: promptFn(biz, extra) }],
+    max_tokens: 2500,
+    temperature: 0.7,
+  });
+
+  return NextResponse.json({ content: completion.choices[0].message.content });
 }
