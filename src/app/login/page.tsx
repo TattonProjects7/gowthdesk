@@ -75,7 +75,7 @@ export default function Login() {
               Shortlist runs in local mode — your tracked shorts live in this browser. Add Supabase keys (see SETUP.md) to
               turn on cloud accounts.
             </p>
-            <Link href="/" className="text-rose-400 hover:underline text-sm">
+            <Link href="/scan" className="text-rose-400 hover:underline text-sm">
               ← Back to the scanner
             </Link>
           </div>

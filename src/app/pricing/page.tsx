@@ -52,7 +52,7 @@ export default function Pricing() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <Plan name="Free" price="£0" tagline="Everything you need to find and track shorts." features={FREE} cta={<Link href="/" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Open the scanner</Link>} />
+          <Plan name="Free" price="£0" tagline="Everything you need to find and track shorts." features={FREE} cta={<Link href="/scan" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Open the scanner</Link>} />
 
           <div className="rounded-2xl border border-rose-800 bg-gradient-to-br from-rose-950/40 to-ink-900 p-6 relative">
             <span className="absolute -top-3 left-6 rounded-full bg-rose-600 px-3 py-0.5 text-xs font-bold text-white">PRO</span>

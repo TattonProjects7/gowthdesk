@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/lib/subscription";
 
 const LINKS = [
-  { href: "/", label: "Scanner", icon: Radar },
+  { href: "/scan", label: "Scanner", icon: Radar },
   { href: "/tracker", label: "My shorts", icon: ListChecks },
 ];
 

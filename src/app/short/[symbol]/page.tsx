@@ -34,7 +34,7 @@ export default function ShortDetail() {
         <Nav />
         <main className="mx-auto max-w-3xl px-6 py-20 text-center">
           <p className="text-ink-300">No coverage for “{symbol}”.</p>
-          <Link href="/" className="mt-4 inline-block text-rose-400 hover:underline">
+          <Link href="/scan" className="mt-4 inline-block text-rose-400 hover:underline">
             ← Back to scanner
           </Link>
         </main>
@@ -46,7 +46,7 @@ export default function ShortDetail() {
     <div className="min-h-screen bg-ink-950">
       <Nav />
       <main className="mx-auto max-w-3xl px-5 sm:px-8 py-8">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-ink-400 hover:text-white mb-6">
+        <Link href="/scan" className="inline-flex items-center gap-1.5 text-sm text-ink-400 hover:text-white mb-6">
           <ArrowLeft className="h-4 w-4" /> Scanner
         </Link>
 

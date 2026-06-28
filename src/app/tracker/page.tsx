@@ -41,7 +41,7 @@ export default function Tracker() {
             <Radar className="mx-auto h-8 w-8 text-ink-500 mb-3" />
             <p className="text-ink-300 font-medium">No shorts tracked yet.</p>
             <p className="text-ink-500 text-sm mb-5">Pick a setup from the scanner and watch it run.</p>
-            <Link href="/" className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
+            <Link href="/scan" className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
               <Radar className="h-4 w-4" /> Open the scanner
             </Link>
           </div>
