@@ -8,11 +8,13 @@ import {
   END_CONDITIONS, STRUT_CURVES,
 } from "@/lib/sitecalc/column-design";
 import { Card, Field, Result, SelectField, fmt } from "@/components/sitecalc/ui";
+import { PrintBar, CalcSheet } from "@/components/sitecalc/CalcSheet";
 
 export default function ColumnPage() {
   const [p, setP] = useState<ColumnParams>({
-    height: 3, axial: 500, py: 275, k: 1.0, a: 5.5,
+    height: 3, axial: 500, moment: 0, py: 275, k: 1.0, a: 5.5,
   });
+  const [projectRef, setProjectRef] = useState("");
   const [types, setTypes] = useState<Record<"UB" | "UC" | "PFC", boolean>>({
     UB: false, UC: true, PFC: false,
   });
@@ -35,13 +37,20 @@ export default function ColumnPage() {
   );
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
+    <>
+    <div className="space-y-4">
+    <PrintBar projectRef={projectRef} onRef={setProjectRef} />
+    <div className="no-print grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
       <div className="space-y-4">
         <Card title="Column & load">
           <div className="grid grid-cols-2 gap-3">
             <Field label="Height (L)" unit="m" value={p.height} onChange={set("height")} min={0} />
             <Field label="Axial load (N)" unit="kN" value={p.axial} onChange={set("axial")} min={0} />
+            <div className="col-span-2">
+              <Field label="Applied moment (Mx)" unit="kNm" value={p.moment} onChange={set("moment")} min={0} />
+            </div>
           </div>
+          <p className="mt-2 text-xs text-ink-500">Add a moment for an eccentric beam reaction (≈ reaction × eccentricity) to check combined axial + bending.</p>
         </Card>
 
         <Card title="Design settings">
@@ -142,13 +151,23 @@ export default function ColumnPage() {
                 <Result label="Slenderness λ" value={fmt(check.slenderness, 0)} />
                 <Result label="Strength pc" value={fmt(check.pc, 0)} unit="N/mm²" />
                 <Result label="Resistance Pc" value={fmt(check.Pc, 0)} unit="kN" />
-                <Result label="Applied N" value={fmt(p.axial, 0)} unit="kN" />
+                <Result label="Moment cap. Mcx" value={fmt(check.Mcx, 0)} unit="kNm" />
               </div>
+              {p.moment > 0 && (
+                <div className="mt-3 rounded-lg border border-ink-800 bg-ink-950/60 px-4 py-2 font-mono text-sm">
+                  <span className="text-ink-400">Interaction: </span>
+                  <span className="text-white">N/Pc</span> ({fmt(check.axialUtil * 100, 0)}%) +{" "}
+                  <span className="text-white">Mx/Mcx</span> ({fmt(check.momentUtil * 100, 0)}%) ={" "}
+                  <span className={check.util > 1 ? "text-rose-400" : "text-emerald-400"}>{fmt(check.util * 100, 0)}%</span>
+                </div>
+              )}
               <div className={`mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
                 check.pass ? "bg-emerald-950/50 text-emerald-300" : "bg-rose-950/50 text-rose-300"
               }`}>
                 {check.pass ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-                {check.pass ? `Adequate — ${fmt(check.util * 100, 0)}% utilised` : `Not adequate — ${fmt(check.util * 100, 0)}% (overstressed)`}
+                {check.pass
+                  ? `Adequate — ${fmt(check.util * 100, 0)}% utilised${p.moment > 0 ? " (combined)" : ""}`
+                  : `Not adequate — ${fmt(check.util * 100, 0)}% (overstressed)`}
               </div>
               {check.slenderness > 180 && (
                 <p className="mt-2 text-xs text-amber-400">λ &gt; 180 — very slender; BS 5950 limits load-bearing members to λ ≤ 180.</p>
@@ -182,11 +201,50 @@ export default function ColumnPage() {
         )}
 
         <p className="text-xs text-ink-500">
-          Concentric axial compression only (Perry-Robertson, BS 5950). Applied
-          moments, combined axial+bending, local buckling and baseplate/connection
+          Compression buckling (Perry-Robertson, BS 5950) with a simplified
+          axial+bending interaction (N/Pc + Mx/Mcx ≤ 1). Lateral-torsional
+          buckling of the moment term, local buckling and baseplate/connection
           design are not checked. Confirm with a qualified structural engineer.
         </p>
       </div>
     </div>
+
+    {shown && check && (
+      <CalcSheet
+        title="Column Design"
+        subtitle={`${shown.name} ${shown.type} — ${fmt(p.height, 2)} m, LE = ${fmt(p.k * p.height, 2)} m`}
+        projectRef={projectRef}
+        groups={[
+          { heading: "Loading", rows: [
+            ["Height L", `${fmt(p.height, 2)} m`],
+            ["Axial load N", `${fmt(p.axial, 1)} kN`],
+            ["Applied moment Mx", `${fmt(p.moment, 1)} kNm`],
+            ["Effective length LE", `${fmt(p.k * p.height, 2)} m (k = ${p.k})`],
+            ["Steel grade", `py = ${p.py} N/mm²`],
+          ]},
+          { heading: `Section ${shown.name} ${shown.type}`, rows: [
+            ["Mass", `${shown.mass} kg/m`],
+            ["Depth × Width", `${fmt(shown.D, 1)} × ${fmt(shown.B, 1)} mm`],
+            ["Area", `${fmt(shown.A, 1)} cm²`],
+            ["ry (minor axis)", `${fmt(shown.ry, 2)} cm`],
+          ]},
+          { heading: "Compression check", rows: [
+            ["Slenderness λ = LE/ry", `${fmt(check.slenderness, 0)}`],
+            ["Compressive strength pc", `${fmt(check.pc, 0)} N/mm²`],
+            ["Resistance Pc", `${fmt(check.Pc, 0)} kN`],
+            ["Axial N/Pc", `${fmt(check.axialUtil * 100, 0)}%`],
+            ...(p.moment > 0 ? [
+              ["Moment capacity Mcx", `${fmt(check.Mcx, 0)} kNm`] as [string, string],
+              ["Moment Mx/Mcx", `${fmt(check.momentUtil * 100, 0)}%`] as [string, string],
+              ["Interaction N/Pc + Mx/Mcx", `${fmt(check.util * 100, 0)}%`] as [string, string],
+            ] : []),
+            ["Result", check.pass ? "PASS" : "FAIL — overstressed"],
+          ]},
+        ]}
+        disclaimer="Indicative compression buckling (Perry-Robertson, BS 5950) with a simplified axial+bending interaction. Lateral-torsional buckling of the moment term, local buckling and connection/baseplate design are not checked. Not a substitute for a qualified structural engineer's design."
+      />
+    )}
+    </div>
+    </>
   );
 }

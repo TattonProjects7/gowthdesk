@@ -25,6 +25,7 @@ const E = 205000; // N/mm², BS 5950 value for structural steel
 export interface ColumnParams {
   height: number; // m (actual length)
   axial: number;  // kN (applied compression)
+  moment: number; // kNm (applied major-axis moment, e.g. eccentric beam reaction)
   py: number;     // N/mm²
   k: number;      // effective length factor
   a: number;      // Robertson constant
@@ -36,7 +37,10 @@ export interface ColumnCheck {
   pe: number;          // Euler strength, N/mm²
   pc: number;          // compressive strength, N/mm²
   Pc: number;          // compression resistance, kN
-  util: number;
+  axialUtil: number;   // N / Pc
+  Mcx: number;         // major-axis moment capacity, kNm
+  momentUtil: number;  // M / Mcx
+  util: number;        // combined interaction (axial + moment)
   pass: boolean;
 }
 
@@ -58,8 +62,20 @@ export function checkColumn(section: Section, p: ColumnParams): ColumnCheck {
   const pe = (Math.PI * Math.PI * E) / (slenderness * slenderness);
   const pc = compressiveStrength(slenderness, p.py, p.a);
   const Pc = (pc * section.A * 100) / 1000; // A cm²→mm² (×100), N→kN (/1000)
-  const util = Pc > 0 ? p.axial / Pc : Infinity;
-  return { section, slenderness, pe, pc, Pc, util, pass: util <= 1 };
+
+  // Major-axis moment capacity (as for the beam: py·Wpl capped at 1.2·py·Wel).
+  const Mcx = Math.min(p.py * section.Wpl, 1.2 * p.py * section.Wel) / 1000;
+
+  const axialUtil = Pc > 0 ? p.axial / Pc : Infinity;
+  const momentUtil = Mcx > 0 ? (p.moment || 0) / Mcx : Infinity;
+  // Simplified BS 5950 interaction: N/Pc + Mx/Mcx ≤ 1.
+  const util = axialUtil + momentUtil;
+
+  return {
+    section, slenderness, pe, pc, Pc,
+    axialUtil, Mcx, momentUtil, util,
+    pass: util <= 1,
+  };
 }
 
 export function autoSizeColumn(

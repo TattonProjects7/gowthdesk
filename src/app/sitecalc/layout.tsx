@@ -11,7 +11,7 @@ export const metadata = {
 export default function SiteCalcLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-ink-950 text-white">
-      <header className="sticky top-0 z-10 border-b border-ink-800 bg-ink-950/90 backdrop-blur">
+      <header className="no-print sticky top-0 z-10 border-b border-ink-800 bg-ink-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <Link href="/sitecalc" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-ink-950">
@@ -26,7 +26,7 @@ export default function SiteCalcLayout({ children }: { children: React.ReactNode
         <ToolNav />
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
-      <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-xs text-ink-500 sm:px-6">
+      <footer className="no-print mx-auto max-w-6xl px-4 pb-10 pt-4 text-xs text-ink-500 sm:px-6">
         SiteCalc gives quick indicative figures for planning and estimating. Always
         verify against the relevant standards (e.g. Eurocodes, Building Regs) and
         have structural elements checked by a qualified engineer before construction.

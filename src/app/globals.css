@@ -3,3 +3,13 @@
 @tailwind utilities;
 
 html, body { height: 100%; }
+
+/* Print: hide the interactive UI and show the clean calc sheet only. */
+.print-only { display: none; }
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+  html, body { background: #fff !important; }
+  @page { margin: 16mm; }
+}
