@@ -1,147 +1,357 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { solveBeam, BeamInput, STEEL_SECTIONS } from "@/lib/sitecalc/beam";
+import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { solveBeam, BeamInput } from "@/lib/sitecalc/beam";
+import {
+  SECTIONS, STEEL_GRADES, DEFLECTION_LIMITS, Section,
+} from "@/lib/sitecalc/sections";
+import {
+  DesignParams, serviceEffects, checkSection, autoSize, SectionCheck,
+} from "@/lib/sitecalc/beam-design";
 import { Card, Field, Result, SelectField, fmt } from "@/components/sitecalc/ui";
 
 export default function BeamPage() {
-  const [input, setInput] = useState<BeamInput>({
-    span: 5,
-    udl: 10,
-    pointLoad: 0,
-    pointPos: 2.5,
-    E: 210,
-    I: 8503,
+  const [p, setP] = useState<DesignParams>({
+    span: 5, udl: 15, pointLoad: 0, pointPos: 2.5,
+    E: 210, py: 275, gammaF: 1.5, deflDenom: 360,
   });
+  const [types, setTypes] = useState<Record<"UB" | "UC" | "PFC", boolean>>({
+    UB: true, UC: false, PFC: false,
+  });
+  const [override, setOverride] = useState<string | null>(null); // null = use suggested
 
-  const set = (k: keyof BeamInput) => (v: number) =>
-    setInput((s) => ({ ...s, [k]: v }));
+  const set = (k: keyof DesignParams) => (v: number) =>
+    setP((s) => ({ ...s, [k]: v }));
 
-  const r = useMemo(() => solveBeam(input), [input]);
+  const svc = useMemo(() => serviceEffects(p), [p]);
 
-  // Deflection limit check (common serviceability limit span/360).
-  const limit = (input.span * 1000) / 360;
-  const passes = r.maxDeflection <= limit;
+  const candidates = useMemo(
+    () => SECTIONS.filter((s) => types[s.type]),
+    [types],
+  );
+  const { best, alternatives } = useMemo(
+    () => autoSize(candidates, p, svc),
+    [candidates, p, svc],
+  );
+
+  // Section currently shown in the check panel / diagrams.
+  const shown: Section | null = useMemo(() => {
+    if (override) return SECTIONS.find((s) => s.name === override) ?? best?.section ?? null;
+    return best?.section ?? null;
+  }, [override, best]);
+
+  const check: SectionCheck | null = useMemo(
+    () => (shown ? checkSection(shown, p, svc) : null),
+    [shown, p, svc],
+  );
+
+  const solved = useMemo(() => {
+    const I = shown?.Ix ?? 10000;
+    return solveBeam({ span: p.span, udl: p.udl, pointLoad: p.pointLoad, pointPos: p.pointPos, E: p.E, I });
+  }, [shown, p]);
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,360px)_1fr]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
+      {/* Inputs */}
       <div className="space-y-4">
-        <Card title="Beam & loading">
+        <Card title="Span & loading (service loads)">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Span (L)" unit="m" value={input.span} onChange={set("span")} min={0} />
-            <Field label="UDL (w)" unit="kN/m" value={input.udl} onChange={set("udl")} min={0} />
-            <Field label="Point load (P)" unit="kN" value={input.pointLoad} onChange={set("pointLoad")} min={0} />
-            <Field label="P position" unit="m" value={input.pointPos} onChange={set("pointPos")} min={0} />
+            <Field label="Span (L)" unit="m" value={p.span} onChange={set("span")} min={0} />
+            <Field label="UDL (w)" unit="kN/m" value={p.udl} onChange={set("udl")} min={0} />
+            <Field label="Point load (P)" unit="kN" value={p.pointLoad} onChange={set("pointLoad")} min={0} />
+            <Field label="P position" unit="m" value={p.pointPos} onChange={set("pointPos")} min={0} />
           </div>
         </Card>
 
-        <Card title="Section (for deflection)">
-          <div className="space-y-3">
+        <Card title="Design settings">
+          <div className="grid grid-cols-2 gap-3">
             <SelectField
-              label="Pick a section"
-              value={String(input.I)}
-              onChange={(v) => set("I")(parseFloat(v))}
-              options={STEEL_SECTIONS.map((s) => ({
-                value: String(s.I),
-                label: `${s.name}  (I=${s.I} cm⁴)`,
-              }))}
+              label="Steel grade"
+              value={String(p.py)}
+              onChange={(v) => set("py")(parseFloat(v))}
+              options={STEEL_GRADES.map((g) => ({ value: String(g.py), label: `${g.name} (py=${g.py})` }))}
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="E (Young's)" unit="GPa" value={input.E} onChange={set("E")} min={0} />
-              <Field label="I (2nd moment)" unit="cm⁴" value={input.I} onChange={set("I")} min={0} />
+            <Field label="Load factor γf" value={p.gammaF} onChange={set("gammaF")} min={1} />
+            <div className="col-span-2">
+              <SelectField
+                label="Deflection limit"
+                value={String(p.deflDenom)}
+                onChange={(v) => set("deflDenom")(parseFloat(v))}
+                options={DEFLECTION_LIMITS.map((d) => ({ value: String(d.denom), label: d.label }))}
+              />
             </div>
-            <p className="text-xs text-ink-500">Steel E≈210, aluminium≈69, C24 timber≈11 GPa.</p>
+          </div>
+          <div className="mt-3">
+            <span className="mb-1.5 block text-xs font-medium text-ink-300">Consider section types</span>
+            <div className="flex gap-2">
+              {(["UB", "UC", "PFC"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTypes((s) => ({ ...s, [t]: !s[t] }))}
+                  className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors ${
+                    types[t]
+                      ? "border-amber-600 bg-amber-950/40 text-amber-300"
+                      : "border-ink-700 text-ink-400 hover:bg-ink-800"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Service results">
+          <div className="grid grid-cols-2 gap-3">
+            <Result label="Reaction L / R" value={`${fmt(svc.reactionLeft, 1)} / ${fmt(svc.reactionRight, 1)}`} unit="kN" />
+            <Result label="Max shear (V)" value={fmt(svc.Vs, 1)} unit="kN" />
+            <Result label="Max moment (M)" value={fmt(svc.Ms, 1)} unit="kNm" />
+            <Result label="ULS moment (γf·M)" value={fmt(svc.Ms * p.gammaF, 1)} unit="kNm" />
           </div>
         </Card>
       </div>
 
+      {/* Results */}
       <div className="space-y-4">
-        <BeamDiagram input={input} />
+        <SuggestionCard best={best} alternatives={alternatives} onPick={setOverride} />
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Result label="Reaction left" value={fmt(r.reactionLeft)} unit="kN" />
-          <Result label="Reaction right" value={fmt(r.reactionRight)} unit="kN" />
-          <Result label="Max shear" value={fmt(r.maxShear)} unit="kN" />
-          <Result label="Max moment" value={fmt(r.maxMoment)} unit="kNm" big accent="text-amber-400" />
-          <Result label="at" value={fmt(r.maxMomentPos)} unit="m" />
-          <Result
-            label="Max deflection"
-            value={fmt(r.maxDeflection)}
-            unit="mm"
-            big
-            accent={passes ? "text-emerald-400" : "text-rose-400"}
-          />
-        </div>
-
-        <Card>
-          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <span className="text-ink-300">
-              Deflection ratio:{" "}
-              <span className="font-mono text-white">
-                {r.spanOverDefl ? `L/${Math.round(r.spanOverDefl)}` : "—"}
-              </span>
-            </span>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                passes ? "bg-emerald-950 text-emerald-300" : "bg-rose-950 text-rose-300"
-              }`}
-            >
-              {passes ? "✓ Within L/360" : "✗ Exceeds L/360 limit"}
-            </span>
+        {/* Section selector + checks */}
+        <Card title="Section check">
+          <div className="mb-4">
+            <SelectField
+              label="Section (defaults to the suggestion — change to check any size)"
+              value={override ?? best?.section.name ?? ""}
+              onChange={(v) => setOverride(v)}
+              options={[
+                ...(best ? [{ value: best.section.name, label: `${best.section.name} ${best.section.type} — suggested` }] : []),
+                ...SECTIONS.filter((s) => s.name !== best?.section.name).map((s) => ({
+                  value: s.name, label: `${s.name} ${s.type} (${s.mass} kg/m)`,
+                })),
+              ]}
+            />
           </div>
-          <p className="mt-2 text-xs text-ink-500">
-            L/360 ≈ {fmt(limit, 1)} mm is a typical serviceability limit for floor
-            beams. Roofs and brittle finishes may use different limits.
-          </p>
+          {check ? <ChecksTable c={check} /> : <p className="text-sm text-ink-400">Select at least one section type to check.</p>}
         </Card>
+
+        {shown && check && <DimensionsCard s={shown} bendStress={check.bendStress} />}
+
+        {/* Diagrams */}
+        <Card title="Diagrams">
+          <BeamDiagram p={p} />
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <MiniChart title="Shear force" unit="kN" color="#38bdf8" samples={solved.samples.map((s) => ({ x: s.x, y: s.shear }))} span={p.span} />
+            <MiniChart title="Bending moment" unit="kNm" color="#f59e0b" samples={solved.samples.map((s) => ({ x: s.x, y: s.moment }))} span={p.span} flip />
+            <MiniChart title="Deflection" unit="mm" color={check?.deflUtil != null && check.deflUtil > 1 ? "#fb7185" : "#34d399"} samples={solved.samples.map((s) => ({ x: s.x, y: s.defl }))} span={p.span} flip />
+          </div>
+        </Card>
+
+        <p className="text-xs text-ink-500">
+          Simplified BS 5950 elastic/plastic checks for a laterally-restrained,
+          simply-supported beam. Section properties are indicative. Lateral-torsional
+          buckling, web bearing/buckling, bolts and connections are not checked —
+          have the design confirmed by a qualified structural engineer.
+        </p>
       </div>
     </div>
   );
 }
 
-function BeamDiagram({ input }: { input: BeamInput }) {
-  const W = 640, H = 150, m = 40;
-  const bx = m, bw = W - 2 * m, by = 70;
-  const px = input.span > 0 ? bx + (input.pointPos / input.span) * bw : bx;
-  const hasP = input.pointLoad > 0;
+function SuggestionCard({ best, alternatives, onPick }: {
+  best: SectionCheck | null;
+  alternatives: SectionCheck[];
+  onPick: (name: string) => void;
+}) {
+  if (!best) {
+    return (
+      <Card>
+        <div className="flex items-center gap-3 text-rose-300">
+          <XCircle className="h-6 w-6 shrink-0" />
+          <div>
+            <p className="font-semibold">No section in the selected range is adequate</p>
+            <p className="text-sm text-ink-400">Reduce the span/load, relax the deflection limit, use S355, or enable deeper UB sections.</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+  const s = best.section;
   return (
-    <Card>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-        {/* beam */}
-        <rect x={bx} y={by} width={bw} height={8} rx={2} className="fill-ink-300" />
-        {/* supports (triangles) */}
-        <polygon points={`${bx},${by + 8} ${bx - 9},${by + 26} ${bx + 9},${by + 26}`} className="fill-amber-400" />
-        <polygon points={`${bx + bw},${by + 8} ${bx + bw - 9},${by + 26} ${bx + bw + 9},${by + 26}`} className="fill-amber-400" />
-        {/* UDL arrows */}
-        {input.udl > 0 &&
-          Array.from({ length: 9 }).map((_, i) => {
-            const x = bx + (i / 8) * bw;
-            return <line key={i} x1={x} y1={by - 22} x2={x} y2={by - 2} className="stroke-sky-400" strokeWidth={1.5} markerEnd="url(#ah)" />;
-          })}
-        {input.udl > 0 && (
-          <>
-            <line x1={bx} y1={by - 22} x2={bx + bw} y2={by - 22} className="stroke-sky-400" strokeWidth={1.5} />
-            <text x={W / 2} y={by - 28} textAnchor="middle" className="fill-sky-300 text-[11px]">{input.udl} kN/m</text>
-          </>
-        )}
-        {/* point load */}
-        {hasP && (
-          <>
-            <line x1={px} y1={by - 40} x2={px} y2={by - 4} className="stroke-rose-400" strokeWidth={2.5} markerEnd="url(#ahr)" />
-            <text x={px} y={by - 46} textAnchor="middle" className="fill-rose-300 text-[11px]">{input.pointLoad} kN</text>
-          </>
-        )}
-        {/* span label */}
-        <text x={W / 2} y={by + 44} textAnchor="middle" className="fill-ink-400 text-[11px]">L = {input.span} m</text>
-        <defs>
-          <marker id="ah" markerWidth="6" markerHeight="6" refX="3" refY="5" orient="auto">
-            <path d="M0,0 L3,5 L6,0" className="fill-sky-400" />
-          </marker>
-          <marker id="ahr" markerWidth="7" markerHeight="7" refX="3.5" refY="6" orient="auto">
-            <path d="M0,0 L3.5,6 L7,0" className="fill-rose-400" />
-          </marker>
-        </defs>
-      </svg>
+    <div className="rounded-2xl border border-amber-600/60 bg-gradient-to-br from-amber-950/40 to-ink-900 p-5">
+      <div className="mb-3 flex items-center gap-2 text-amber-300">
+        <Sparkles className="h-5 w-5" />
+        <span className="text-xs font-semibold uppercase tracking-wide">Suggested section — lightest that passes</span>
+      </div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-3xl font-bold text-white">{s.name} <span className="text-lg text-amber-300">{s.type}</span></p>
+          <p className="mt-1 text-sm text-ink-300">{s.mass} kg/m · depth {fmt(s.D, 1)} mm · width {fmt(s.B, 1)} mm</p>
+        </div>
+        <div className="flex gap-2 text-center">
+          <Util label="Bending" v={best.bendUtil} />
+          <Util label="Shear" v={best.shearUtil} />
+          <Util label="Defl" v={best.deflUtil} />
+        </div>
+      </div>
+      <p className="mt-3 text-xs text-ink-400">
+        Governed by <b className="text-ink-200">{best.governs.toLowerCase()}</b> at {fmt(best.governUtil * 100, 0)}% utilisation.
+      </p>
+      {alternatives.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink-800 pt-3">
+          <span className="text-xs text-ink-500">Heavier options:</span>
+          {alternatives.map((a) => (
+            <button key={a.section.name} onClick={() => onPick(a.section.name)}
+              className="rounded-full border border-ink-700 px-3 py-1 text-xs text-ink-200 hover:bg-ink-800">
+              {a.section.name} ({a.section.mass} kg/m)
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Util({ label, v }: { label: string; v: number }) {
+  const pct = v * 100;
+  const col = v > 1 ? "text-rose-400" : v > 0.85 ? "text-amber-300" : "text-emerald-400";
+  return (
+    <div className="rounded-lg bg-ink-950/60 px-3 py-1.5">
+      <p className="text-[10px] uppercase text-ink-500">{label}</p>
+      <p className={`font-mono text-sm font-semibold ${col}`}>{fmt(pct, 0)}%</p>
+    </div>
+  );
+}
+
+function ChecksTable({ c }: { c: SectionCheck }) {
+  const rows = [
+    { name: "Bending", demand: `${fmt(c.Med, 1)} kNm`, cap: `${fmt(c.Mc, 1)} kNm`, util: c.bendUtil },
+    { name: "Shear", demand: `${fmt(c.Ved, 1)} kN`, cap: `${fmt(c.Pv, 1)} kN`, util: c.shearUtil },
+    { name: "Deflection", demand: `${fmt(c.defl, 1)} mm`, cap: `${fmt(c.deflLimit, 1)} mm`, util: c.deflUtil },
+  ];
+  return (
+    <div>
+      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 gap-y-1 text-sm">
+        <div className="text-xs font-semibold uppercase text-ink-500">Check</div>
+        <div className="text-right text-xs font-semibold uppercase text-ink-500">Demand</div>
+        <div className="text-right text-xs font-semibold uppercase text-ink-500">Capacity</div>
+        <div className="text-right text-xs font-semibold uppercase text-ink-500">Util.</div>
+        {rows.map((r) => (
+          <Row key={r.name} {...r} />
+        ))}
+      </div>
+      <div className={`mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
+        c.pass ? "bg-emerald-950/50 text-emerald-300" : "bg-rose-950/50 text-rose-300"
+      }`}>
+        {c.pass ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+        {c.pass ? `Adequate — governed by ${c.governs.toLowerCase()} (${fmt(c.governUtil * 100, 0)}%)` : `Not adequate — ${c.governs.toLowerCase()} at ${fmt(c.governUtil * 100, 0)}%`}
+      </div>
+    </div>
+  );
+}
+
+function Row({ name, demand, cap, util }: { name: string; demand: string; cap: string; util: number }) {
+  const col = util > 1 ? "text-rose-400" : util > 0.85 ? "text-amber-300" : "text-emerald-400";
+  return (
+    <>
+      <div className="border-t border-ink-800 py-1.5 text-ink-200">{name}</div>
+      <div className="border-t border-ink-800 py-1.5 text-right font-mono text-ink-300">{demand}</div>
+      <div className="border-t border-ink-800 py-1.5 text-right font-mono text-ink-300">{cap}</div>
+      <div className={`border-t border-ink-800 py-1.5 text-right font-mono font-semibold ${col}`}>{fmt(util * 100, 0)}%</div>
+    </>
+  );
+}
+
+function DimensionsCard({ s, bendStress }: { s: Section; bendStress: number }) {
+  const items = [
+    ["Mass", `${s.mass} kg/m`],
+    ["Depth D", `${fmt(s.D, 1)} mm`],
+    ["Width B", `${fmt(s.B, 1)} mm`],
+    ["Web tw", `${fmt(s.tw, 1)} mm`],
+    ["Flange tf", `${fmt(s.tf, 1)} mm`],
+    ["Area", `${fmt(s.A, 1)} cm²`],
+    ["Ix", `${fmt(s.Ix, 0)} cm⁴`],
+    ["Wel,y", `${fmt(s.Wel, 0)} cm³`],
+    ["Wpl,y", `${fmt(s.Wpl, 0)} cm³`],
+    ["Bending stress σ", `${fmt(bendStress, 0)} N/mm²`],
+  ];
+  return (
+    <Card title={`Exact dimensions — ${s.name} ${s.type}`}>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-5">
+        {items.map(([k, v]) => (
+          <div key={k}>
+            <p className="text-[11px] text-ink-500">{k}</p>
+            <p className="font-mono text-sm text-white">{v}</p>
+          </div>
+        ))}
+      </div>
     </Card>
+  );
+}
+
+function MiniChart({ title, unit, color, samples, span, flip }: {
+  title: string; unit: string; color: string;
+  samples: { x: number; y: number }[]; span: number; flip?: boolean;
+}) {
+  const W = 220, H = 110, padL = 6, padR = 6, padT = 16, padB = 16;
+  const maxAbs = Math.max(1e-6, ...samples.map((s) => Math.abs(s.y)));
+  const peak = samples.reduce((a, b) => (Math.abs(b.y) > Math.abs(a.y) ? b : a), samples[0] ?? { x: 0, y: 0 });
+  const sx = (x: number) => padL + (x / (span || 1)) * (W - padL - padR);
+  const sy = (y: number) => {
+    const t = y / maxAbs; // -1..1
+    const v = flip ? -t : t;
+    return padT + ((1 - v) / 2) * (H - padT - padB);
+  };
+  const zeroY = sy(0);
+  const path = samples.map((s, i) => `${i ? "L" : "M"}${sx(s.x).toFixed(1)},${sy(s.y).toFixed(1)}`).join(" ");
+  const area = `M${sx(0).toFixed(1)},${zeroY.toFixed(1)} ${samples.map((s) => `L${sx(s.x).toFixed(1)},${sy(s.y).toFixed(1)}`).join(" ")} L${sx(span).toFixed(1)},${zeroY.toFixed(1)} Z`;
+  return (
+    <div className="rounded-xl border border-ink-800 bg-ink-950/60 p-3">
+      <p className="mb-1 text-xs font-semibold text-ink-200">{title}</p>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+        <path d={area} fill={color} fillOpacity={0.15} />
+        <line x1={padL} y1={zeroY} x2={W - padR} y2={zeroY} stroke="#3f4666" strokeWidth={1} />
+        <path d={path} fill="none" stroke={color} strokeWidth={2} />
+        <circle cx={sx(peak.x)} cy={sy(peak.y)} r={2.5} fill={color} />
+        <text x={W / 2} y={H - 3} textAnchor="middle" className="fill-ink-500 text-[9px]">L = {span} m</text>
+      </svg>
+      <p className="text-center font-mono text-xs" style={{ color }}>
+        peak {fmt(Math.abs(peak.y), maxAbs < 10 ? 2 : 1)} {unit}
+      </p>
+    </div>
+  );
+}
+
+function BeamDiagram({ p }: { p: DesignParams }) {
+  const W = 640, H = 130, m = 40;
+  const bx = m, bw = W - 2 * m, by = 64;
+  const px = p.span > 0 ? bx + (Math.min(p.pointPos, p.span) / p.span) * bw : bx;
+  const hasP = p.pointLoad > 0;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+      <rect x={bx} y={by} width={bw} height={8} rx={2} className="fill-ink-300" />
+      <polygon points={`${bx},${by + 8} ${bx - 9},${by + 26} ${bx + 9},${by + 26}`} className="fill-amber-400" />
+      <polygon points={`${bx + bw},${by + 8} ${bx + bw - 9},${by + 26} ${bx + bw + 9},${by + 26}`} className="fill-amber-400" />
+      {p.udl > 0 && Array.from({ length: 9 }).map((_, i) => {
+        const x = bx + (i / 8) * bw;
+        return <line key={i} x1={x} y1={by - 20} x2={x} y2={by - 2} className="stroke-sky-400" strokeWidth={1.5} markerEnd="url(#bh)" />;
+      })}
+      {p.udl > 0 && (
+        <>
+          <line x1={bx} y1={by - 20} x2={bx + bw} y2={by - 20} className="stroke-sky-400" strokeWidth={1.5} />
+          <text x={W / 2} y={by - 26} textAnchor="middle" className="fill-sky-300 text-[11px]">{p.udl} kN/m</text>
+        </>
+      )}
+      {hasP && (
+        <>
+          <line x1={px} y1={by - 38} x2={px} y2={by - 4} className="stroke-rose-400" strokeWidth={2.5} markerEnd="url(#bhr)" />
+          <text x={px} y={by - 44} textAnchor="middle" className="fill-rose-300 text-[11px]">{p.pointLoad} kN</text>
+        </>
+      )}
+      <text x={W / 2} y={by + 44} textAnchor="middle" className="fill-ink-400 text-[11px]">L = {p.span} m</text>
+      <defs>
+        <marker id="bh" markerWidth="6" markerHeight="6" refX="3" refY="5" orient="auto"><path d="M0,0 L3,5 L6,0" className="fill-sky-400" /></marker>
+        <marker id="bhr" markerWidth="7" markerHeight="7" refX="3.5" refY="6" orient="auto"><path d="M0,0 L3.5,6 L7,0" className="fill-rose-400" /></marker>
+      </defs>
+    </svg>
   );
 }

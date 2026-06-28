@@ -10,9 +10,16 @@ export interface Tool {
 
 export const TOOLS: Tool[] = [
   {
+    slug: "markup",
+    name: "Steel Markup",
+    tagline: "Upload plans & elevations, mark where the steels go and build a schedule",
+    icon: "PencilRuler",
+    accent: "amber",
+  },
+  {
     slug: "beam",
-    name: "Beam Calculator",
-    tagline: "Reactions, shear, bending moment & deflection for a simply-supported beam",
+    name: "Beam Designer",
+    tagline: "Auto-size the steel from span & load — capacity checks, stress and diagrams",
     icon: "Ruler",
     accent: "amber",
   },
