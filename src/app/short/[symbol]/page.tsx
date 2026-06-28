@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import { ArrowLeft, Check, TrendingDown } from "lucide-react";
+import { ArrowLeft, Check, ShieldAlert, TrendingDown } from "lucide-react";
 import Nav from "@/components/Nav";
 import Sparkline from "@/components/Sparkline";
-import { useNow } from "@/lib/useNow";
+import ThesisPanel from "@/components/ThesisPanel";
+import { useMarket } from "@/lib/useMarket";
 import { candidateFor } from "@/lib/shorts";
-import { UNIVERSE, priceAt } from "@/lib/market";
+import { UNIVERSE } from "@/lib/market";
+import { squeezeTone } from "@/lib/squeeze";
 import { useTakenShorts } from "@/lib/store";
 
 export default function ShortDetail() {
@@ -16,10 +18,11 @@ export default function ShortDetail() {
   const symbol = (params.symbol || "").toUpperCase();
   const valid = UNIVERSE.some((t) => t.symbol === symbol);
 
-  const { now, mounted } = useNow();
+  const { mounted, priceFor, closesFor } = useMarket();
   const { take, has } = useTakenShorts();
 
-  const c = useMemo(() => (mounted && valid ? candidateFor(symbol, now) : null), [mounted, valid, symbol, now]);
+  const c = useMemo(() => (mounted && valid ? candidateFor(symbol, closesFor(symbol)) : null), [mounted, valid, symbol, closesFor]);
+  const price = mounted && valid ? priceFor(symbol) : 0;
 
   if (!valid) {
     return (
@@ -47,19 +50,16 @@ export default function ShortDetail() {
           <div className="h-96 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />
         ) : (
           <>
-            {/* Header */}
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-2.5">
                   <h1 className="text-3xl font-bold text-white">{c.symbol}</h1>
-                  <span className="rounded-md bg-rose-950 border border-rose-900 px-2 py-0.5 text-xs font-semibold text-rose-300">
-                    SHORT
-                  </span>
+                  <span className="rounded-md bg-rose-950 border border-rose-900 px-2 py-0.5 text-xs font-semibold text-rose-300">SHORT</span>
                 </div>
                 <p className="text-ink-400">{c.name}</p>
               </div>
               <div className="text-right">
-                <p className="font-mono text-2xl font-bold text-white">${priceAt(c.symbol, now).toFixed(2)}</p>
+                <p className="font-mono text-2xl font-bold text-white">${price.toFixed(2)}</p>
                 <p className="text-xs text-ink-500">live · score {c.score}/100 ({c.grade})</p>
               </div>
             </div>
@@ -70,8 +70,11 @@ export default function ShortDetail() {
               </p>
             </div>
 
+            {/* Squeeze Risk Radar — the standout safeguard */}
+            <SqueezeRadar c={c} />
+
             {/* Structured trade */}
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">The structured trade</h2>
+            <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">The structured trade</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               <Stat label="Entry (short at)" value={`$${c.structure.entry.toFixed(2)}`} />
               <Stat label="Stop (you're wrong)" value={`$${c.structure.stop.toFixed(2)}`} tone="rose" sub={`+${(c.structure.stopPct * 100).toFixed(1)}%`} />
@@ -79,7 +82,7 @@ export default function ShortDetail() {
               <Stat label="Size" value={`${c.structure.shares} sh`} sub={`$${(c.structure.shares * c.structure.entry).toLocaleString()}`} />
             </div>
 
-            <PayoffBar entry={c.structure.entry} stop={c.structure.stop} target={c.structure.target} price={priceAt(c.symbol, now)} />
+            <PayoffBar entry={c.structure.entry} stop={c.structure.stop} target={c.structure.target} price={price} />
 
             <div className="mt-5 grid grid-cols-3 gap-3">
               <BigStat label="Max loss" value={`−£${c.structure.maxLoss}`} tone="rose" caption="capped — lose small" />
@@ -87,17 +90,19 @@ export default function ShortDetail() {
               <BigStat label="Reward : risk" value={`${c.structure.rewardRisk.toFixed(1)}:1`} tone="white" caption="asymmetry" />
             </div>
 
+            {/* AI dual thesis */}
+            <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">Both sides of the trade</h2>
+            <ThesisPanel c={c} />
+
             {/* Why */}
             <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">Why it’s on the shortlist</h2>
             <div className="space-y-2 mb-6">
-              {c.reasons.length === 0 && (
-                <p className="text-sm text-ink-400">No strong bearish signals right now — this one ranks low for a reason.</p>
-              )}
+              {c.reasons.length === 0 && <p className="text-sm text-ink-400">No strong signals right now — this one ranks low for a reason.</p>}
               {c.reasons.map((r) => (
                 <div key={r.label} className="flex items-start gap-3 rounded-xl border border-ink-800 bg-ink-900 p-3.5">
                   <span
                     className={`mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold ${
-                      r.weight >= 0 ? "bg-rose-950 text-rose-300 border border-rose-900" : "bg-ink-800 text-ink-400"
+                      r.weight >= 0 ? "bg-rose-950 text-rose-300 border border-rose-900" : "bg-emerald-950 text-emerald-300 border border-emerald-900"
                     }`}
                   >
                     {r.weight >= 0 ? `+${Math.round(r.weight)}` : Math.round(r.weight)}
@@ -114,7 +119,7 @@ export default function ShortDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
               <div className="rounded-xl border border-ink-800 bg-ink-900 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500 mb-3">30-day price</p>
-                <Sparkline symbol={c.symbol} now={now} width={260} height={70} />
+                <Sparkline points={closesFor(c.symbol)} width={260} height={70} />
               </div>
               <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500 mb-1">Signals</p>
@@ -127,7 +132,6 @@ export default function ShortDetail() {
               </div>
             </div>
 
-            {/* CTA */}
             <button
               onClick={() =>
                 take({
@@ -162,8 +166,41 @@ export default function ShortDetail() {
   );
 }
 
+function SqueezeRadar({ c }: { c: import("@/lib/shorts").ShortCandidate }) {
+  const sq = c.squeeze;
+  const tone = squeezeTone(sq.level);
+  return (
+    <div className={`rounded-2xl border p-5 ${tone.border} ${tone.bg}`}>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <p className={`flex items-center gap-2 font-semibold ${tone.text}`}>
+          <ShieldAlert className="h-5 w-5" /> Short-squeeze risk: {sq.level.toUpperCase()}
+        </p>
+        <div className="text-right">
+          <p className={`text-2xl font-bold ${tone.text}`}>{sq.score}</p>
+          <p className="text-[10px] text-ink-400 uppercase">/100 risk</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <Mini label="Short interest" value={`${sq.shortInterestPctFloat.toFixed(1)}%`} sub="of float" />
+        <Mini label="Days to cover" value={sq.daysToCover.toFixed(1)} sub="shorts trapped" />
+        <Mini label="Borrow fee" value={`${sq.borrowFeePct.toFixed(1)}%`} sub={sq.hardToBorrow ? "hard to borrow" : "per year"} />
+      </div>
+      <p className="text-sm text-ink-200/90">{sq.verdict}</p>
+    </div>
+  );
+}
+
+function Mini({ label, value, sub }: { label: string; value: string; sub: string }) {
+  return (
+    <div className="rounded-lg border border-ink-800 bg-ink-950/40 p-2.5 text-center">
+      <p className="text-[10px] uppercase tracking-wide text-ink-500">{label}</p>
+      <p className="mt-0.5 font-mono font-bold text-white">{value}</p>
+      <p className="text-[10px] text-ink-500">{sub}</p>
+    </div>
+  );
+}
+
 function PayoffBar({ entry, stop, target, price }: { entry: number; stop: number; target: number; price: number }) {
-  // Left edge = target (best), right edge = stop (worst). Map a price to %.
   const lo = target;
   const hi = stop;
   const pct = (v: number) => Math.max(0, Math.min(100, ((hi - v) / (hi - lo)) * 100));
@@ -178,9 +215,7 @@ function PayoffBar({ entry, stop, target, price }: { entry: number; stop: number
         <span className="text-rose-400 font-semibold">stop ${stop.toFixed(2)}</span>
       </div>
       <div className="relative h-3 rounded-full bg-gradient-to-r from-emerald-500/70 via-ink-700 to-rose-500/70">
-        {/* entry marker */}
         <div className="absolute top-1/2 -translate-y-1/2 h-5 w-0.5 bg-ink-300" style={{ left: `${entryPos}%` }} />
-        {/* live price marker */}
         <div
           className="absolute -top-1.5 h-6 w-1 rounded-full bg-white shadow ring-2 ring-ink-950 transition-all duration-500"
           style={{ left: `calc(${pricePos}% - 2px)` }}
@@ -205,7 +240,12 @@ function Stat({ label, value, sub, tone = "white" }: { label: string; value: str
 }
 
 function BigStat({ label, value, caption, tone }: { label: string; value: string; caption: string; tone: "rose" | "emerald" | "white" }) {
-  const c = tone === "rose" ? "text-rose-300 border-rose-900 bg-rose-950/40" : tone === "emerald" ? "text-emerald-300 border-emerald-900 bg-emerald-950/40" : "text-white border-ink-700 bg-ink-800";
+  const c =
+    tone === "rose"
+      ? "text-rose-300 border-rose-900 bg-rose-950/40"
+      : tone === "emerald"
+        ? "text-emerald-300 border-emerald-900 bg-emerald-950/40"
+        : "text-white border-ink-700 bg-ink-800";
   return (
     <div className={`rounded-xl border p-3.5 text-center ${c}`}>
       <p className="text-[11px] uppercase tracking-wide opacity-70">{label}</p>

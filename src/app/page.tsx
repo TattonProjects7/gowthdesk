@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowRight, Check, ShieldCheck, Target, Zap } from "lucide-react";
+import { ArrowRight, Check, ShieldAlert, ShieldCheck, Target, Zap } from "lucide-react";
 import Nav from "@/components/Nav";
 import Sparkline from "@/components/Sparkline";
-import { useNow } from "@/lib/useNow";
+import { useMarket } from "@/lib/useMarket";
 import { scanMarket, RISK_BUDGET, type ShortCandidate } from "@/lib/shorts";
 import { useTakenShorts } from "@/lib/store";
-import { dayChangePct } from "@/lib/market";
+import { squeezeTone } from "@/lib/squeeze";
 
 export default function Scanner() {
-  const { now, mounted } = useNow();
+  const { mounted, source, priceFor, closesFor } = useMarket();
   const { take, has } = useTakenShorts();
 
-  const candidates = useMemo(() => (mounted ? scanMarket(now) : []), [now, mounted]);
+  const candidates = useMemo(() => (mounted ? scanMarket(closesFor) : []), [mounted, closesFor]);
   const best = candidates[0];
 
   return (
@@ -22,24 +22,27 @@ export default function Scanner() {
       <Nav />
 
       <main className="mx-auto max-w-5xl px-5 sm:px-8 py-10">
-        {/* Hero */}
         <section className="mb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-rose-900 bg-rose-950 px-3 py-1 text-xs font-semibold text-rose-300 mb-5">
-            <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" /> Live market scan
+          <div className="flex items-center gap-2 mb-5">
+            <div className="inline-flex items-center gap-2 rounded-full border border-rose-900 bg-rose-950 px-3 py-1 text-xs font-semibold text-rose-300">
+              <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" /> Live market scan
+            </div>
+            <SourceBadge source={source} />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight max-w-2xl">
             Find the best stocks to short. Risk a little, win big.
           </h1>
           <p className="mt-3 text-ink-300 max-w-2xl leading-relaxed">
-            Shortlist scans the market for stocks that are stretched, overbought and rolling over — then structures
-            each idea so a wrong call loses a small, fixed amount and a right call pays a multiple of it.
+            Shortlist scans the market for stocks that are stretched, overbought and rolling over, structures each idea
+            so a wrong call loses a small fixed amount and a right call pays a multiple of it — then flags the crowded
+            ones that could squeeze you.
           </p>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { icon: ShieldCheck, title: "Defined risk", body: `Every idea risks a fixed £${RISK_BUDGET}. The stop caps the loss — that's the "lose small".` },
               { icon: Target, title: "Asymmetric payoff", body: "Targets are 3–8× the risk. One winner pays for several stops." },
-              { icon: Zap, title: "Ranked for you", body: "The whole market scored and sorted, best short setup first." },
+              { icon: ShieldAlert, title: "Squeeze radar", body: "Crowded shorts are flagged, not sold to you — avoid the GME-style trap." },
             ].map(({ icon: Icon, title, body }) => (
               <div key={title} className="rounded-xl border border-ink-800 bg-ink-900 p-4">
                 <Icon className="h-5 w-5 text-rose-400 mb-2" />
@@ -50,7 +53,6 @@ export default function Scanner() {
           </div>
         </section>
 
-        {/* Top pick spotlight */}
         {mounted && best && (
           <Link
             href={`/short/${best.symbol}`}
@@ -64,7 +66,8 @@ export default function Scanner() {
               <div>
                 <p className="text-2xl font-bold text-white">{best.headline}</p>
                 <p className="mt-1 text-sm text-ink-300">
-                  {best.name} · reward:risk {best.structure.rewardRisk.toFixed(1)}:1 · short score {best.score}/100
+                  {best.name} · reward:risk {best.structure.rewardRisk.toFixed(1)}:1 · short score {best.score}/100 ·
+                  squeeze risk {best.squeeze.level}
                 </p>
               </div>
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white group-hover:bg-rose-500 transition-colors">
@@ -74,7 +77,6 @@ export default function Scanner() {
           </Link>
         )}
 
-        {/* Ranked list */}
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-400">Ranked short candidates</h2>
           <span className="text-xs text-ink-500">{mounted ? `${candidates.length} scanned` : "scanning…"}</span>
@@ -88,7 +90,8 @@ export default function Scanner() {
                 key={c.symbol}
                 rank={i + 1}
                 c={c}
-                now={now}
+                price={priceFor(c.symbol)}
+                closes={closesFor(c.symbol)}
                 tracked={has(c.symbol)}
                 onTake={() =>
                   take({
@@ -108,28 +111,45 @@ export default function Scanner() {
         </div>
 
         <p className="mt-10 text-center text-xs text-ink-600 max-w-xl mx-auto leading-relaxed">
-          Educational simulation on a synthetic market — not investment advice. Real short selling carries uncapped risk
-          unless a hard stop or defined-risk instrument is used.
+          Educational simulation — not investment advice. Real short selling carries uncapped risk unless a hard stop or
+          defined-risk instrument (e.g. a put) is used.
         </p>
       </main>
     </div>
   );
 }
 
+function SourceBadge({ source }: { source: "loading" | "simulated" | "live" }) {
+  if (source === "live")
+    return (
+      <span className="rounded-full border border-emerald-800 bg-emerald-950 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+        LIVE data
+      </span>
+    );
+  return (
+    <span className="rounded-full border border-ink-700 bg-ink-800 px-2.5 py-1 text-xs font-semibold text-ink-400">
+      {source === "loading" ? "…" : "SIM data"}
+    </span>
+  );
+}
+
 function CandidateRow({
   rank,
   c,
-  now,
+  price,
+  closes,
   tracked,
   onTake,
 }: {
   rank: number;
   c: ShortCandidate;
-  now: number;
+  price: number;
+  closes: number[];
   tracked: boolean;
   onTake: () => void;
 }) {
-  const chg = dayChangePct(c.symbol, now);
+  const chg = closes.length >= 2 ? (closes[closes.length - 1] / closes[closes.length - 2] - 1) * 100 : 0;
+  const sq = squeezeTone(c.squeeze.level);
   return (
     <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 hover:border-ink-600 transition-colors">
       <div className="flex items-center gap-4">
@@ -143,7 +163,7 @@ function CandidateRow({
             <span className="truncate text-sm text-ink-400">{c.name}</span>
           </div>
           <div className="mt-0.5 flex items-center gap-2 text-xs">
-            <span className="font-mono text-ink-300">${c.structure.entry.toFixed(2)}</span>
+            <span className="font-mono text-ink-300">${price.toFixed(2)}</span>
             <span className={chg >= 0 ? "text-emerald-400" : "text-rose-400"}>
               {chg >= 0 ? "+" : ""}
               {chg.toFixed(2)}%
@@ -152,10 +172,16 @@ function CandidateRow({
         </Link>
 
         <div className="hidden md:block">
-          <Sparkline symbol={c.symbol} now={now} />
+          <Sparkline points={closes} />
         </div>
 
-        <div className="hidden lg:block text-right w-40">
+        {/* Squeeze risk pill — the unique safeguard, visible at a glance */}
+        <div className={`hidden sm:block shrink-0 rounded-lg border px-2 py-1 text-center ${sq.bg} ${sq.border}`}>
+          <p className={`text-[10px] font-semibold uppercase ${sq.text}`}>squeeze</p>
+          <p className={`text-xs font-bold ${sq.text}`}>{c.squeeze.level}</p>
+        </div>
+
+        <div className="hidden lg:block text-right w-36">
           <p className="text-xs text-ink-500">Risk → Reward</p>
           <p className="text-sm font-semibold text-white">
             <span className="text-rose-400">£{c.structure.maxLoss}</span> →{" "}

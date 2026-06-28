@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { priceAt, round2 } from "./market";
+import { round2 } from "./market";
 
 // A short the user chose to track. We persist the *structure as taken* so the
 // asymmetry (small capped loss, big target) is fixed at entry and can play out.
@@ -82,10 +82,9 @@ export function useTakenShorts() {
   return { items, take, drop, has, mounted };
 }
 
-// --- Live evaluation of a taken short ---------------------------------------
+// --- Live evaluation of a taken short (price comes from the active data source) -
 
-export function shortPnl(t: TakenShort, now: number): number {
-  const price = priceAt(t.symbol, now);
+export function shortPnl(t: TakenShort, price: number): number {
   // Clamp to the structure: once price reaches the stop or target the trade is
   // treated as closed there, so the loss can never exceed maxLoss and the gain
   // never exceeds maxGain. This is what makes "lose small, win big" honest.
@@ -93,16 +92,14 @@ export function shortPnl(t: TakenShort, now: number): number {
   return round2((t.entry - effective) * t.shares); // shorts profit when price falls
 }
 
-export function shortState(t: TakenShort, now: number): ShortState {
-  const price = priceAt(t.symbol, now);
+export function shortState(t: TakenShort, price: number): ShortState {
   if (price >= t.stop) return "stopped"; // capped small loss
   if (price <= t.target) return "won"; // big win
   return "open";
 }
 
 // 0–1 progress from stop (0) toward target (1), for a payoff bar.
-export function shortProgress(t: TakenShort, now: number): number {
-  const price = priceAt(t.symbol, now);
+export function shortProgress(t: TakenShort, price: number): number {
   const span = t.stop - t.target;
   if (span <= 0) return 0;
   return Math.max(0, Math.min(1, (t.stop - price) / span));

@@ -3,18 +3,17 @@
 import Link from "next/link";
 import { Radar, Trophy, X } from "lucide-react";
 import Nav from "@/components/Nav";
-import { useNow } from "@/lib/useNow";
+import { useMarket } from "@/lib/useMarket";
 import { useTakenShorts, shortPnl, shortState, shortProgress, type TakenShort } from "@/lib/store";
-import { priceAt } from "@/lib/market";
 
 export default function Tracker() {
-  const { now, mounted } = useNow();
+  const { mounted, priceFor } = useMarket();
   const { items, drop } = useTakenShorts();
 
   const ready = mounted;
-  const totalPnl = ready ? items.reduce((a, t) => a + shortPnl(t, now), 0) : 0;
-  const wins = ready ? items.filter((t) => shortState(t, now) === "won").length : 0;
-  const stopped = ready ? items.filter((t) => shortState(t, now) === "stopped").length : 0;
+  const totalPnl = ready ? items.reduce((a, t) => a + shortPnl(t, priceFor(t.symbol)), 0) : 0;
+  const wins = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "won").length : 0;
+  const stopped = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "stopped").length : 0;
 
   return (
     <div className="min-h-screen bg-ink-950">
@@ -45,18 +44,17 @@ export default function Tracker() {
         )}
 
         <div className="space-y-3">
-          {ready && items.map((t) => <TrackedCard key={t.id} t={t} now={now} onDrop={() => drop(t.id)} />)}
+          {ready && items.map((t) => <TrackedCard key={t.id} t={t} price={priceFor(t.symbol)} onDrop={() => drop(t.id)} />)}
         </div>
       </main>
     </div>
   );
 }
 
-function TrackedCard({ t, now, onDrop }: { t: TakenShort; now: number; onDrop: () => void }) {
-  const price = priceAt(t.symbol, now);
-  const pnl = shortPnl(t, now);
-  const state = shortState(t, now);
-  const progress = shortProgress(t, now);
+function TrackedCard({ t, price, onDrop }: { t: TakenShort; price: number; onDrop: () => void }) {
+  const pnl = shortPnl(t, price);
+  const state = shortState(t, price);
+  const progress = shortProgress(t, price);
 
   const badge =
     state === "won"
@@ -88,7 +86,6 @@ function TrackedCard({ t, now, onDrop }: { t: TakenShort; now: number; onDrop: (
         </div>
       </div>
 
-      {/* progress from stop → target */}
       <div className="relative h-2 rounded-full bg-ink-800 overflow-hidden">
         <div
           className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${state === "stopped" ? "bg-rose-500" : "bg-emerald-500"}`}
