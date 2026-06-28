@@ -19,8 +19,8 @@ export const BUSINESSES: Business[] = [
     url: "https://esti-mate.app",
     tagline: "Quoting and estimating app for UK tradespeople",
     description:
-      "EstiMate is a SaaS app for UK builders, plumbers, electricians and contractors. It creates professional PDF quotes, tracks payment milestones, manages jobs, and includes an AI room visualiser. Monthly subscription model — designed for sole traders and small firms.",
-    niche: "Trade software / Construction SaaS / UK tradespeople",
+      "EstiMate is a SaaS app for UK builders, plumbers, electricians and contractors. It creates professional PDF quotes, tracks payment milestones, manages jobs, and includes an AI room visualiser. Its standout feature, BuilderVision, lets a tradesperson walk around a room with their phone camera and automatically measure everything — generating a floor plan, wall areas, ceiling area, a materials take-off, costed line items, a ready-to-send quote, an outline programme of works and a job risk list, all from the scan. Monthly subscription model — designed for sole traders and small firms.",
+    niche: "Trade software / Construction SaaS / UK tradespeople / AI camera measuring / Photo-to-quote estimating",
     audience:
       "UK builders, plumbers, electricians, roofers, joiners, landscapers, tilers and other self-employed tradespeople",
     location: "United Kingdom",
