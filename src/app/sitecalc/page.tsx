@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {
-  Ruler, Box, BrickWall, Waves, Weight, ArrowLeftRight, ArrowRight, PencilRuler,
+  Ruler, Box, BrickWall, Waves, Weight, ArrowLeftRight, ArrowRight, PencilRuler, Columns3,
 } from "lucide-react";
 import { TOOLS, ACCENT } from "@/lib/sitecalc/tools";
 
-const ICONS = { Ruler, Box, BrickWall, Waves, Weight, ArrowLeftRight, PencilRuler } as const;
+const ICONS = { Ruler, Box, BrickWall, Waves, Weight, ArrowLeftRight, PencilRuler, Columns3 } as const;
 
 export default function SiteCalcHub() {
   return (

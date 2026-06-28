@@ -24,6 +24,13 @@ export const TOOLS: Tool[] = [
     accent: "amber",
   },
   {
+    slug: "column",
+    name: "Column Designer",
+    tagline: "Auto-size a steel post from axial load & height — buckling capacity check",
+    icon: "Columns3",
+    accent: "rose",
+  },
+  {
     slug: "concrete",
     name: "Concrete Estimator",
     tagline: "Volume, cement / sand / aggregate quantities and ready-mix cost",

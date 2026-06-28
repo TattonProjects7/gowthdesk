@@ -15,6 +15,10 @@ export interface Mark {
   section?: string; // e.g. "UB 203x133x25"
   note?: string;
   color: string;
+  // Optional quick-size inputs (steel members) — used by the in-panel sizer.
+  span?: number;    // m
+  udl?: number;     // kN/m
+  point?: number;   // kN point load at mid-span
 }
 
 export interface Sheet {

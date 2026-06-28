@@ -12,6 +12,9 @@ import {
 import {
   loadProject, saveProject, importFile, uid, scheduleCsv, emptyProject,
 } from "@/lib/sitecalc/markup-store";
+import { SECTIONS } from "@/lib/sitecalc/sections";
+import { serviceEffects, autoSize } from "@/lib/sitecalc/beam-design";
+import { fmt } from "@/components/sitecalc/ui";
 
 type Tool = "select" | "steel" | "column" | "note" | "pan";
 
@@ -541,6 +544,7 @@ function PropertiesPanel({ selected, patch, onDelete }: {
           <datalist id="sections">{COMMON_SECTIONS.map((s) => <option key={s} value={s} />)}</datalist>
         </label>
       )}
+      {selected.type === "steel" && <QuickSizer selected={selected} patch={patch} />}
       <label className="block">
         <span className="mb-1 block text-xs text-ink-400">{selected.type === "note" ? "Text" : "Notes"}</span>
         <textarea value={selected.note ?? ""} onChange={(e) => patch({ note: e.target.value })} rows={2}
@@ -556,6 +560,60 @@ function PropertiesPanel({ selected, patch, onDelete }: {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+// In-panel beam sizer for a marked steel member. Reuses the Beam Designer
+// engine: enter span + load, get the lightest UB and apply it to the mark.
+function QuickSizer({ selected, patch }: { selected: Mark; patch: (p: Partial<Mark>) => void }) {
+  const span = selected.span ?? 4;
+  const udl = selected.udl ?? 10;
+  const point = selected.point ?? 0;
+
+  const result = (() => {
+    if (!(span > 0) || (udl <= 0 && point <= 0)) return null;
+    const params = {
+      span, udl, pointLoad: point, pointPos: span / 2,
+      E: 210, py: 275, gammaF: 1.5, deflDenom: 360,
+    };
+    const svc = serviceEffects(params);
+    const { best } = autoSize(SECTIONS.filter((s) => s.type === "UB"), params, svc);
+    return best;
+  })();
+
+  return (
+    <div className="rounded-lg border border-amber-700/40 bg-amber-950/20 p-3">
+      <p className="mb-2 text-xs font-semibold text-amber-300">Quick-size this steel</p>
+      <div className="grid grid-cols-3 gap-2">
+        {([
+          ["Span m", span, "span"],
+          ["UDL kN/m", udl, "udl"],
+          ["Point kN", point, "point"],
+        ] as const).map(([label, val, key]) => (
+          <label key={key} className="block">
+            <span className="mb-0.5 block text-[10px] text-ink-400">{label}</span>
+            <input type="number" inputMode="decimal" value={val}
+              onChange={(e) => patch({ [key]: parseFloat(e.target.value) } as Partial<Mark>)}
+              className="w-full rounded-md border border-ink-700 bg-ink-950 px-2 py-1.5 text-xs text-white outline-none focus:border-amber-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+          </label>
+        ))}
+      </div>
+      {result ? (
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <div className="text-xs">
+            <span className="text-ink-400">Suggested: </span>
+            <span className="font-mono font-semibold text-white">{result.section.name} UB</span>
+            <span className="text-ink-500"> · {result.section.mass}kg/m · {result.governs.toLowerCase()} {fmt(result.governUtil * 100, 0)}%</span>
+          </div>
+          <button onClick={() => patch({ section: `UB ${result.section.name}` })}
+            className="shrink-0 rounded-md bg-amber-500 px-2.5 py-1 text-xs font-semibold text-ink-950 hover:bg-amber-400">
+            Apply
+          </button>
+        </div>
+      ) : (
+        <p className="mt-2 text-[11px] text-ink-500">Enter a span and a load to get a suggested beam.</p>
+      )}
     </div>
   );
 }
