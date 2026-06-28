@@ -273,7 +273,7 @@ function BearingCard({ shown, ulsReaction, bearing, setBearing, result }: {
   return (
     <Card title="End bearing / padstone">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <Field label="ULS reaction" unit="kN" value={ulsReaction} onChange={() => {}} />
+        <Result label="ULS reaction" value={fmt(ulsReaction, 1)} unit="kN" />
         <Field label="Bearing width" unit="mm" value={bearing.width} onChange={(v) => setBearing({ ...bearing, width: v })} min={0} />
         <Field label="Bearing length" unit="mm" value={bearing.length} onChange={(v) => setBearing({ ...bearing, length: v })} min={0} />
         <div className="col-span-2">
