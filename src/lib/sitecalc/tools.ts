@@ -65,6 +65,13 @@ export const TOOLS: Tool[] = [
     icon: "ArrowLeftRight",
     accent: "emerald",
   },
+  {
+    slug: "project",
+    name: "Job",
+    tagline: "Saved beam & column designs — print the whole job as one PDF",
+    icon: "FolderOpen",
+    accent: "sky",
+  },
 ];
 
 export function getTool(slug: string): Tool | undefined {

@@ -574,6 +574,7 @@ function QuickSizer({ selected, patch }: { selected: Mark; patch: (p: Partial<Ma
   const result = (() => {
     if (!(span > 0) || (udl <= 0 && point <= 0)) return null;
     const params = {
+      config: "simple" as const,
       span, udl, pointLoad: point, pointPos: span / 2,
       E: 210, py: 275, gammaF: 1.5, deflDenom: 360,
     };

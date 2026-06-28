@@ -1,28 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Printer } from "lucide-react";
+import Link from "next/link";
+import { Printer, Save, Check, FolderOpen } from "lucide-react";
 
 export interface SheetGroup {
   heading: string;
   rows: [string, string][];
 }
 
-/** On-screen control bar (hidden in print): project reference + Print button. */
+/** On-screen control bar (hidden in print): project reference + Save + Print. */
 export function PrintBar({
-  projectRef, onRef,
+  projectRef, onRef, onSave, saved, jobHref,
 }: {
   projectRef: string;
   onRef: (v: string) => void;
+  onSave?: () => void;
+  saved?: boolean;
+  jobHref?: string;
 }) {
   return (
     <div className="no-print flex flex-wrap items-center gap-2 rounded-2xl border border-ink-800 bg-ink-900 p-2">
       <input
         value={projectRef}
         onChange={(e) => onRef(e.target.value)}
-        placeholder="Project / job reference (for the printout)"
+        placeholder="Member ref (e.g. B1) — shown on the printout"
         className="min-w-0 flex-1 rounded-lg border border-ink-700 bg-ink-950 px-3 py-2 text-sm text-white outline-none focus:border-ink-500"
       />
+      {onSave && (
+        <button
+          onClick={onSave}
+          className="flex items-center gap-2 rounded-lg border border-ink-700 px-3 py-2 text-sm font-semibold text-ink-100 hover:bg-ink-800"
+        >
+          {saved ? <Check className="h-4 w-4 text-emerald-400" /> : <Save className="h-4 w-4" />}
+          {saved ? "Saved" : "Save to job"}
+        </button>
+      )}
+      {jobHref && (
+        <Link href={jobHref} className="flex items-center gap-2 rounded-lg border border-ink-700 px-3 py-2 text-sm text-ink-200 hover:bg-ink-800">
+          <FolderOpen className="h-4 w-4" /> Job
+        </Link>
+      )}
       <button
         onClick={() => window.print()}
         className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-amber-400"

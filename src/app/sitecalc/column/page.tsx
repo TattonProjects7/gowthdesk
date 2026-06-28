@@ -7,14 +7,16 @@ import {
   ColumnParams, checkColumn, autoSizeColumn, ColumnCheck,
   END_CONDITIONS, STRUT_CURVES,
 } from "@/lib/sitecalc/column-design";
+import { saveMember } from "@/lib/sitecalc/project-store";
 import { Card, Field, Result, SelectField, fmt } from "@/components/sitecalc/ui";
-import { PrintBar, CalcSheet } from "@/components/sitecalc/CalcSheet";
+import { PrintBar, CalcSheet, SheetGroup } from "@/components/sitecalc/CalcSheet";
 
 export default function ColumnPage() {
   const [p, setP] = useState<ColumnParams>({
     height: 3, axial: 500, moment: 0, py: 275, k: 1.0, a: 5.5,
   });
   const [projectRef, setProjectRef] = useState("");
+  const [saved, setSaved] = useState(false);
   const [types, setTypes] = useState<Record<"UB" | "UC" | "PFC", boolean>>({
     UB: false, UC: true, PFC: false,
   });
@@ -36,10 +38,51 @@ export default function ColumnPage() {
     [shown, p],
   );
 
+  const sheetGroups: SheetGroup[] | null = shown && check ? [
+    { heading: "Loading", rows: [
+      ["Height L", `${fmt(p.height, 2)} m`],
+      ["Axial load N", `${fmt(p.axial, 1)} kN`],
+      ["Applied moment Mx", `${fmt(p.moment, 1)} kNm`],
+      ["Effective length LE", `${fmt(p.k * p.height, 2)} m (k = ${p.k})`],
+      ["Steel grade", `py = ${p.py} N/mm²`],
+    ]},
+    { heading: `Section ${shown.name} ${shown.type}`, rows: [
+      ["Mass", `${shown.mass} kg/m`],
+      ["Depth × Width", `${fmt(shown.D, 1)} × ${fmt(shown.B, 1)} mm`],
+      ["Area", `${fmt(shown.A, 1)} cm²`],
+      ["ry (minor axis)", `${fmt(shown.ry, 2)} cm`],
+    ]},
+    { heading: "Compression check", rows: [
+      ["Slenderness λ = LE/ry", `${fmt(check.slenderness, 0)}`],
+      ["Compressive strength pc", `${fmt(check.pc, 0)} N/mm²`],
+      ["Resistance Pc", `${fmt(check.Pc, 0)} kN`],
+      ["Axial N/Pc", `${fmt(check.axialUtil * 100, 0)}%`],
+      ...(p.moment > 0 ? [
+        ["Moment capacity Mcx", `${fmt(check.Mcx, 0)} kNm`] as [string, string],
+        ["Moment Mx/Mcx", `${fmt(check.momentUtil * 100, 0)}%`] as [string, string],
+        ["Interaction N/Pc + Mx/Mcx", `${fmt(check.util * 100, 0)}%`] as [string, string],
+      ] : []),
+      ["Result", check.pass ? "PASS" : "FAIL — overstressed"],
+    ]},
+  ] : null;
+
+  const onSave = () => {
+    if (!shown || !sheetGroups) return;
+    saveMember({
+      kind: "column",
+      title: `${shown.name} ${shown.type}`,
+      subtitle: `${fmt(p.height, 2)} m post, N = ${fmt(p.axial, 0)} kN`,
+      ref: projectRef,
+      groups: sheetGroups,
+    });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <>
     <div className="space-y-4">
-    <PrintBar projectRef={projectRef} onRef={setProjectRef} />
+    <PrintBar projectRef={projectRef} onRef={setProjectRef} onSave={onSave} saved={saved} jobHref="/sitecalc/project" />
     <div className="no-print grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,340px)_1fr]">
       <div className="space-y-4">
         <Card title="Column & load">
@@ -214,33 +257,7 @@ export default function ColumnPage() {
         title="Column Design"
         subtitle={`${shown.name} ${shown.type} — ${fmt(p.height, 2)} m, LE = ${fmt(p.k * p.height, 2)} m`}
         projectRef={projectRef}
-        groups={[
-          { heading: "Loading", rows: [
-            ["Height L", `${fmt(p.height, 2)} m`],
-            ["Axial load N", `${fmt(p.axial, 1)} kN`],
-            ["Applied moment Mx", `${fmt(p.moment, 1)} kNm`],
-            ["Effective length LE", `${fmt(p.k * p.height, 2)} m (k = ${p.k})`],
-            ["Steel grade", `py = ${p.py} N/mm²`],
-          ]},
-          { heading: `Section ${shown.name} ${shown.type}`, rows: [
-            ["Mass", `${shown.mass} kg/m`],
-            ["Depth × Width", `${fmt(shown.D, 1)} × ${fmt(shown.B, 1)} mm`],
-            ["Area", `${fmt(shown.A, 1)} cm²`],
-            ["ry (minor axis)", `${fmt(shown.ry, 2)} cm`],
-          ]},
-          { heading: "Compression check", rows: [
-            ["Slenderness λ = LE/ry", `${fmt(check.slenderness, 0)}`],
-            ["Compressive strength pc", `${fmt(check.pc, 0)} N/mm²`],
-            ["Resistance Pc", `${fmt(check.Pc, 0)} kN`],
-            ["Axial N/Pc", `${fmt(check.axialUtil * 100, 0)}%`],
-            ...(p.moment > 0 ? [
-              ["Moment capacity Mcx", `${fmt(check.Mcx, 0)} kNm`] as [string, string],
-              ["Moment Mx/Mcx", `${fmt(check.momentUtil * 100, 0)}%`] as [string, string],
-              ["Interaction N/Pc + Mx/Mcx", `${fmt(check.util * 100, 0)}%`] as [string, string],
-            ] : []),
-            ["Result", check.pass ? "PASS" : "FAIL — overstressed"],
-          ]},
-        ]}
+        groups={sheetGroups ?? []}
         disclaimer="Indicative compression buckling (Perry-Robertson, BS 5950) with a simplified axial+bending interaction. Lateral-torsional buckling of the moment term, local buckling and connection/baseplate design are not checked. Not a substitute for a qualified structural engineer's design."
       />
     )}
