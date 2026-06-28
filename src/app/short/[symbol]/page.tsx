@@ -3,22 +3,24 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import { ArrowLeft, Check, ShieldAlert, TrendingDown } from "lucide-react";
+import { ArrowLeft, CalendarClock, Check, Shield, ShieldAlert, TrendingDown } from "lucide-react";
 import Nav from "@/components/Nav";
 import Sparkline from "@/components/Sparkline";
 import ThesisPanel from "@/components/ThesisPanel";
 import { useMarket } from "@/lib/useMarket";
-import { candidateFor } from "@/lib/shorts";
+import { candidateFor, RISK_BUDGET, type ShortCandidate } from "@/lib/shorts";
 import { UNIVERSE } from "@/lib/market";
 import { squeezeTone } from "@/lib/squeeze";
 import { useTakenShorts } from "@/lib/store";
+import { putPlayFor } from "@/lib/options";
+import { nextCatalyst, fmtDate } from "@/lib/catalysts";
 
 export default function ShortDetail() {
   const params = useParams<{ symbol: string }>();
   const symbol = (params.symbol || "").toUpperCase();
   const valid = UNIVERSE.some((t) => t.symbol === symbol);
 
-  const { mounted, priceFor, closesFor } = useMarket();
+  const { mounted, now, priceFor, closesFor } = useMarket();
   const { take, has } = useTakenShorts();
 
   const c = useMemo(() => (mounted && valid ? candidateFor(symbol, closesFor(symbol)) : null), [mounted, valid, symbol, closesFor]);
@@ -70,8 +72,11 @@ export default function ShortDetail() {
               </p>
             </div>
 
-            {/* Squeeze Risk Radar — the standout safeguard */}
-            <SqueezeRadar c={c} />
+            {/* Catalyst countdown + Squeeze Risk Radar */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <CatalystCard symbol={c.symbol} now={now} />
+              <SqueezeRadar c={c} />
+            </div>
 
             {/* Structured trade */}
             <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">The structured trade</h2>
@@ -89,6 +94,9 @@ export default function ShortDetail() {
               <BigStat label="Max gain" value={`+£${c.structure.maxGain.toLocaleString()}`} tone="emerald" caption="the big win" />
               <BigStat label="Reward : risk" value={`${c.structure.rewardRisk.toFixed(1)}:1`} tone="white" caption="asymmetry" />
             </div>
+
+            {/* Defined-risk put alternative */}
+            <PutCard c={c} price={price} />
 
             {/* AI dual thesis */}
             <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">Both sides of the trade</h2>
@@ -260,6 +268,50 @@ function Row({ k, v, hot }: { k: string; v: string; hot?: boolean }) {
     <div className="flex items-center justify-between text-sm">
       <span className="text-ink-400">{k}</span>
       <span className={`font-mono ${hot ? "text-rose-300 font-semibold" : "text-ink-200"}`}>{v}</span>
+    </div>
+  );
+}
+
+function CatalystCard({ symbol, now }: { symbol: string; now: number }) {
+  const cat = nextCatalyst(symbol, now);
+  const tone = cat.imminent ? { border: "border-amber-800", bg: "bg-amber-950/30", text: "text-amber-300" } : { border: "border-ink-800", bg: "bg-ink-900", text: "text-ink-300" };
+  return (
+    <div className={`rounded-2xl border p-5 ${tone.border} ${tone.bg}`}>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <p className={`flex items-center gap-2 font-semibold ${tone.text}`}>
+          <CalendarClock className="h-5 w-5" /> Next catalyst
+        </p>
+        <div className="text-right">
+          <p className={`text-2xl font-bold ${tone.text}`}>{cat.daysUntil}d</p>
+          <p className="text-[10px] text-ink-400 uppercase">{fmtDate(cat.date)}</p>
+        </div>
+      </div>
+      <p className="text-sm font-semibold text-white mb-1">{cat.type}</p>
+      <p className="text-sm text-ink-300/90">{cat.note}</p>
+    </div>
+  );
+}
+
+function PutCard({ c, price }: { c: ShortCandidate; price: number }) {
+  const put = putPlayFor({ price, target: c.structure.target, dailyVol: c.signals.volatility, riskBudget: RISK_BUDGET });
+  return (
+    <div className="mt-5 rounded-2xl border border-sky-900 bg-sky-950/25 p-5">
+      <p className="flex items-center gap-2 font-semibold text-sky-300 mb-1">
+        <Shield className="h-5 w-5" /> Prefer capped risk? Express it as a put
+      </p>
+      <p className="text-sm text-ink-300 mb-4">
+        Same bearish view, but your loss is <span className="text-sky-300 font-medium">capped at the premium</span> — no
+        margin call, and a squeeze can’t force you out. One contract = 100 shares, so size to your own risk.
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+        <Stat label="Buy put" value={`$${put.strike} strike`} sub={`${put.expiryDays}d expiry`} />
+        <Stat label="Est. premium" value={`$${put.premium.toFixed(2)}`} sub={`${put.ivPct.toFixed(0)}% IV · ${put.contracts} contract${put.contracts > 1 ? "s" : ""}`} />
+        <Stat label="Max loss" value={`−£${put.maxLoss}`} tone="rose" sub="premium only" />
+        <Stat label="If target hit" value={`${put.payoffAtTarget >= 0 ? "+" : "−"}£${Math.abs(put.payoffAtTarget).toLocaleString()}`} tone="emerald" sub={`breakeven $${put.breakeven.toFixed(2)}`} />
+      </div>
+      <p className="text-xs text-ink-500">
+        Indicative Black–Scholes pricing from live volatility — real fills depend on the options chain.
+      </p>
     </div>
   );
 }

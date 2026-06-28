@@ -104,3 +104,62 @@ export function shortProgress(t: TakenShort, price: number): number {
   if (span <= 0) return 0;
   return Math.max(0, Math.min(1, (t.stop - price) / span));
 }
+
+// --- Expectancy / R-multiple analytics --------------------------------------
+// "R" = result expressed in units of risk. Risking £maxLoss, a +£maxLoss result
+// is +1R. Expectancy (avg R per trade) is the single number that says whether
+// the asymmetric edge actually pays — a positive expectancy is the whole game.
+
+export interface TrackerStats {
+  closed: number;
+  open: number;
+  winRate: number; // % of closed trades that won
+  expectancyR: number; // average R across closed trades
+  avgWinR: number;
+  avgLossR: number;
+  totalR: number;
+  totalPnl: number;
+  interpretation: string;
+}
+
+export function trackerStats(items: TakenShort[], priceFor: (s: string) => number, riskBudget: number): TrackerStats {
+  const withState = items.map((t) => {
+    const price = priceFor(t.symbol);
+    return { t, price, state: shortState(t, price), pnl: shortPnl(t, price) };
+  });
+  const closed = withState.filter((x) => x.state !== "open");
+  const open = withState.length - closed.length;
+  const totalPnl = round2(withState.reduce((a, x) => a + x.pnl, 0));
+
+  if (closed.length === 0) {
+    return { closed: 0, open, winRate: 0, expectancyR: 0, avgWinR: 0, avgLossR: 0, totalR: 0, totalPnl, interpretation: "Close out a tracked short (target or stop) to start measuring your edge in R." };
+  }
+
+  const rs = closed.map((x) => x.pnl / x.t.maxLoss);
+  const winsR = rs.filter((r) => r > 0);
+  const lossR = rs.filter((r) => r <= 0);
+  const winRate = (winsR.length / rs.length) * 100;
+  const expectancyR = rs.reduce((a, b) => a + b, 0) / rs.length;
+  const avgWinR = winsR.length ? winsR.reduce((a, b) => a + b, 0) / winsR.length : 0;
+  const avgLossR = lossR.length ? lossR.reduce((a, b) => a + b, 0) / lossR.length : 0;
+  const totalR = rs.reduce((a, b) => a + b, 0);
+
+  const interpretation =
+    expectancyR > 0.05
+      ? `Positive expectancy of +${expectancyR.toFixed(2)}R — each £${riskBudget} risked returns about £${Math.round(expectancyR * riskBudget)} on average. The asymmetry is paying.`
+      : expectancyR < -0.05
+        ? `Negative expectancy of ${expectancyR.toFixed(2)}R — you're losing about £${Math.round(Math.abs(expectancyR) * riskBudget)} per £${riskBudget} risked. Tighten setup selection or stops.`
+        : "Roughly break-even so far — not enough edge yet to call it.";
+
+  return {
+    closed: closed.length,
+    open,
+    winRate: Math.round(winRate),
+    expectancyR: round2(expectancyR),
+    avgWinR: round2(avgWinR),
+    avgLossR: round2(avgLossR),
+    totalR: round2(totalR),
+    totalPnl,
+    interpretation,
+  };
+}

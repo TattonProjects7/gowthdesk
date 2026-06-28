@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Radar, Trophy, X } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useMarket } from "@/lib/useMarket";
-import { useTakenShorts, shortPnl, shortState, shortProgress, type TakenShort } from "@/lib/store";
+import { useTakenShorts, shortPnl, shortState, shortProgress, trackerStats, type TakenShort, type TrackerStats } from "@/lib/store";
+import { RISK_BUDGET } from "@/lib/shorts";
 
 export default function Tracker() {
   const { mounted, priceFor } = useMarket();
@@ -14,6 +15,7 @@ export default function Tracker() {
   const totalPnl = ready ? items.reduce((a, t) => a + shortPnl(t, priceFor(t.symbol)), 0) : 0;
   const wins = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "won").length : 0;
   const stopped = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "stopped").length : 0;
+  const stats = ready ? trackerStats(items, priceFor, RISK_BUDGET) : null;
 
   return (
     <div className="min-h-screen bg-ink-950">
@@ -29,6 +31,8 @@ export default function Tracker() {
             <Summary label="Stopped out" value={`${stopped}`} tone="rose" />
           </div>
         )}
+
+        {ready && stats && items.length > 0 && <EdgePanel stats={stats} />}
 
         {!ready && <div className="h-40 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />}
 
@@ -101,6 +105,35 @@ function TrackedCard({ t, price, onDrop }: { t: TakenShort; price: number; onDro
           <Trophy className="h-3 w-3" /> target ${t.target.toFixed(2)} · +£{t.maxGain.toLocaleString()}
         </span>
       </div>
+    </div>
+  );
+}
+
+function EdgePanel({ stats }: { stats: TrackerStats }) {
+  const positive = stats.expectancyR > 0.05;
+  const tone = positive ? "text-emerald-300" : stats.expectancyR < -0.05 ? "text-rose-300" : "text-ink-200";
+  return (
+    <div className="mb-7 rounded-2xl border border-violet-900 bg-violet-950/20 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-semibold uppercase tracking-wide text-violet-300">Your edge — in R</p>
+        <span className="text-xs text-ink-500">{stats.closed} closed · {stats.open} open</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <Metric label="Expectancy" value={`${stats.expectancyR >= 0 ? "+" : ""}${stats.expectancyR.toFixed(2)}R`} tone={tone} big />
+        <Metric label="Win rate" value={`${stats.winRate}%`} />
+        <Metric label="Avg win" value={`+${stats.avgWinR.toFixed(2)}R`} tone="text-emerald-300" />
+        <Metric label="Avg loss" value={`${stats.avgLossR.toFixed(2)}R`} tone="text-rose-300" />
+      </div>
+      <p className="text-sm text-ink-300">{stats.interpretation}</p>
+    </div>
+  );
+}
+
+function Metric({ label, value, tone = "text-white", big }: { label: string; value: string; tone?: string; big?: boolean }) {
+  return (
+    <div className="rounded-xl border border-ink-800 bg-ink-900 p-3 text-center">
+      <p className="text-[11px] uppercase tracking-wide text-ink-500">{label}</p>
+      <p className={`mt-1 font-bold ${big ? "text-2xl" : "text-lg"} ${tone}`}>{value}</p>
     </div>
   );
 }
