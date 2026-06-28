@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import { ArrowLeft, CalendarClock, Check, Shield, ShieldAlert, TrendingDown } from "lucide-react";
+import { ArrowLeft, CalendarClock, Check, Lock, Shield, ShieldAlert, TrendingDown } from "lucide-react";
 import Nav from "@/components/Nav";
 import Sparkline from "@/components/Sparkline";
 import ThesisPanel from "@/components/ThesisPanel";
+import { useSubscription } from "@/lib/subscription";
 import { useMarket } from "@/lib/useMarket";
 import { candidateFor, RISK_BUDGET, type ShortCandidate } from "@/lib/shorts";
 import { UNIVERSE } from "@/lib/market";
@@ -22,6 +23,7 @@ export default function ShortDetail() {
 
   const { mounted, now, priceFor, closesFor } = useMarket();
   const { take, has } = useTakenShorts();
+  const { pro } = useSubscription();
 
   const c = useMemo(() => (mounted && valid ? candidateFor(symbol, closesFor(symbol)) : null), [mounted, valid, symbol, closesFor]);
   const price = mounted && valid ? priceFor(symbol) : 0;
@@ -95,12 +97,12 @@ export default function ShortDetail() {
               <BigStat label="Reward : risk" value={`${c.structure.rewardRisk.toFixed(1)}:1`} tone="white" caption="asymmetry" />
             </div>
 
-            {/* Defined-risk put alternative */}
-            <PutCard c={c} price={price} />
+            {/* Defined-risk put alternative (Pro) */}
+            {pro ? <PutCard c={c} price={price} /> : <UpgradeTease feature="Defined-risk put alternatives" />}
 
-            {/* AI dual thesis */}
+            {/* AI dual thesis (Pro) */}
             <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">Both sides of the trade</h2>
-            <ThesisPanel c={c} />
+            {pro ? <ThesisPanel c={c} /> : <UpgradeTease feature="the AI bear + steel-manned bull thesis" />}
 
             {/* Why */}
             <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-ink-400 mb-3">Why it’s on the shortlist</h2>
@@ -269,6 +271,18 @@ function Row({ k, v, hot }: { k: string; v: string; hot?: boolean }) {
       <span className="text-ink-400">{k}</span>
       <span className={`font-mono ${hot ? "text-rose-300 font-semibold" : "text-ink-200"}`}>{v}</span>
     </div>
+  );
+}
+
+function UpgradeTease({ feature }: { feature: string }) {
+  return (
+    <Link href="/pricing" className="mt-5 flex items-center gap-3 rounded-2xl border border-amber-900 bg-amber-950/20 p-4 hover:bg-amber-950/40 transition-colors">
+      <Lock className="h-5 w-5 shrink-0 text-amber-400" />
+      <div>
+        <p className="text-sm font-semibold text-amber-200">Unlock {feature} with Pro</p>
+        <p className="text-xs text-ink-400">£12/mo — AI thesis, put structures and cross-device alerts.</p>
+      </div>
+    </Link>
   );
 }
 

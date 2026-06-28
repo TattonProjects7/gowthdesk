@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { round2 } from "./market";
+import { useAuth } from "@/lib/auth";
 
 // A short the user chose to track. We persist the *structure as taken* so the
 // asymmetry (small capped loss, big target) is fixed at entry and can play out.
@@ -46,13 +47,49 @@ function makeId(): string {
   return "s_" + Date.now().toString(36) + "_" + Math.floor(Math.random() * 1e6).toString(36);
 }
 
+// Map a Supabase row to the in-app shape (numeric columns may arrive as strings).
+function rowToShort(r: Record<string, unknown>): TakenShort {
+  return {
+    id: String(r.id),
+    symbol: String(r.symbol),
+    name: String(r.name),
+    entry: Number(r.entry),
+    stop: Number(r.stop),
+    target: Number(r.target),
+    shares: Number(r.shares),
+    maxLoss: Number(r.max_loss),
+    maxGain: Number(r.max_gain),
+    rewardRisk: Number(r.reward_risk),
+    openedAt: new Date(String(r.opened_at)).getTime(),
+  };
+}
+
+// Tracked shorts persist to Supabase when the user is signed in, and to
+// localStorage otherwise — same API either way, so the UI never branches.
 export function useTakenShorts() {
+  const { supabase, user } = useAuth();
+  const cloud = Boolean(supabase && user);
   const [items, setItems] = useState<TakenShort[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setItems(load());
     setMounted(true);
+
+    if (cloud && supabase && user) {
+      let active = true;
+      supabase
+        .from("tracked_shorts")
+        .select("*")
+        .order("opened_at", { ascending: false })
+        .then(({ data }) => {
+          if (active && data) setItems(data.map(rowToShort));
+        });
+      return () => {
+        active = false;
+      };
+    }
+
+    setItems(load());
     const sync = () => setItems(load());
     window.addEventListener("shortlist:change", sync);
     window.addEventListener("storage", sync);
@@ -60,22 +97,55 @@ export function useTakenShorts() {
       window.removeEventListener("shortlist:change", sync);
       window.removeEventListener("storage", sync);
     };
-  }, []);
+  }, [cloud, supabase, user]);
 
-  const take = useCallback((t: Omit<TakenShort, "id" | "openedAt">) => {
-    const exists = load().some((x) => x.symbol === t.symbol);
-    if (exists) return false; // one tracked short per symbol keeps the demo clean
-    const next = [{ ...t, id: makeId(), openedAt: Date.now() }, ...load()];
-    persist(next);
-    setItems(next);
-    return true;
-  }, []);
+  const take = useCallback(
+    async (t: Omit<TakenShort, "id" | "openedAt">): Promise<boolean> => {
+      if (items.some((x) => x.symbol === t.symbol)) return false; // one per symbol
 
-  const drop = useCallback((id: string) => {
-    const next = load().filter((x) => x.id !== id);
-    persist(next);
-    setItems(next);
-  }, []);
+      if (cloud && supabase && user) {
+        const { data, error } = await supabase
+          .from("tracked_shorts")
+          .insert({
+            user_id: user.id,
+            symbol: t.symbol,
+            name: t.name,
+            entry: t.entry,
+            stop: t.stop,
+            target: t.target,
+            shares: t.shares,
+            max_loss: t.maxLoss,
+            max_gain: t.maxGain,
+            reward_risk: t.rewardRisk,
+          })
+          .select()
+          .single();
+        if (error || !data) return false;
+        setItems((prev) => [rowToShort(data), ...prev]);
+        return true;
+      }
+
+      const next = [{ ...t, id: makeId(), openedAt: Date.now() }, ...load()];
+      persist(next);
+      setItems(next);
+      return true;
+    },
+    [cloud, supabase, user, items],
+  );
+
+  const drop = useCallback(
+    async (id: string) => {
+      if (cloud && supabase && user) {
+        await supabase.from("tracked_shorts").delete().eq("id", id);
+        setItems((prev) => prev.filter((x) => x.id !== id));
+        return;
+      }
+      const next = load().filter((x) => x.id !== id);
+      persist(next);
+      setItems(next);
+    },
+    [cloud, supabase, user],
+  );
 
   const has = useCallback((symbol: string) => items.some((x) => x.symbol === symbol), [items]);
 

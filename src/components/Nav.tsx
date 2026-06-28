@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { TrendingDown, Radar, ListChecks, Bell, Target, ShieldX, Sparkles, BellRing } from "lucide-react";
+import { TrendingDown, Radar, ListChecks, Bell, Target, ShieldX, Sparkles, BellRing, User as UserIcon, LogOut, Crown } from "lucide-react";
 import { useAlerts, type Alert } from "@/lib/alerts";
+import { useAuth } from "@/lib/auth";
+import { useSubscription } from "@/lib/subscription";
 
 const LINKS = [
   { href: "/", label: "Scanner", icon: Radar },
@@ -14,7 +16,10 @@ const LINKS = [
 export default function Nav() {
   const path = usePathname();
   const { alerts, unseen, mounted, markAllSeen, clear } = useAlerts();
+  const { enabled, user, signOut } = useAuth();
+  const { pro, billingEnabled } = useSubscription();
   const [open, setOpen] = useState(false);
+  const [acct, setAcct] = useState(false);
 
   const toggle = () => {
     const next = !open;
@@ -100,9 +105,60 @@ export default function Nav() {
             </>
           )}
         </div>
+
+        {/* Account */}
+        {enabled ? (
+          user ? (
+            <div className="relative">
+              <button
+                onClick={() => setAcct((v) => !v)}
+                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-ink-300 hover:text-white hover:bg-ink-900 transition-colors"
+                aria-label="Account"
+              >
+                <UserIcon className="h-4 w-4" />
+                {pro && billingEnabled && <Crown className="h-3.5 w-3.5 text-amber-400" />}
+              </button>
+              {acct && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setAcct(false)} />
+                  <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-ink-700 bg-ink-900 shadow-2xl p-1.5">
+                    <p className="truncate px-3 py-2 text-xs text-ink-400">{user.email}</p>
+                    {billingEnabled &&
+                      (pro ? (
+                        <button onClick={() => openPortal()} className="block w-full rounded-lg px-3 py-2 text-left text-sm text-ink-200 hover:bg-ink-800">
+                          Manage billing
+                        </button>
+                      ) : (
+                        <Link href="/pricing" onClick={() => setAcct(false)} className="block rounded-lg px-3 py-2 text-sm text-amber-300 hover:bg-ink-800">
+                          Upgrade to Pro
+                        </Link>
+                      ))}
+                    <button onClick={() => signOut()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-200 hover:bg-ink-800">
+                      <LogOut className="h-4 w-4" /> Sign out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link href="/login" className="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-rose-500">
+              Sign in
+            </Link>
+          )
+        ) : null}
       </nav>
     </header>
   );
+}
+
+async function openPortal() {
+  try {
+    const res = await fetch("/api/stripe/portal", { method: "POST" });
+    const j = await res.json();
+    if (j.url) window.location.href = j.url;
+  } catch {
+    /* ignore */
+  }
 }
 
 function AlertRow({ a }: { a: Alert }) {
