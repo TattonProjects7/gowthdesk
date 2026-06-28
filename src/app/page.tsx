@@ -106,6 +106,26 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Product screenshots */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 py-16">
+        <h2 className="text-center text-2xl sm:text-3xl font-bold text-white">See it in action</h2>
+        <p className="mt-3 text-center text-ink-400 max-w-2xl mx-auto">
+          The live scanner ranks the market; each setup breaks down the squeeze risk, catalyst and defined-risk structure.
+        </p>
+        <div className="mt-10 grid lg:grid-cols-2 gap-6">
+          <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/screenshots/scanner.png" alt="Shortlist scanner ranking short candidates" className="rounded-xl w-full" loading="lazy" />
+            <figcaption className="px-3 py-3 text-sm text-ink-400">Ranked scanner — every name scored, with squeeze risk and risk:reward at a glance.</figcaption>
+          </figure>
+          <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/screenshots/detail.png" alt="Shortlist setup detail with squeeze radar and structured trade" className="rounded-xl w-full" loading="lazy" />
+            <figcaption className="px-3 py-3 text-sm text-ink-400">Setup detail — squeeze radar, catalyst countdown and the defined-risk trade.</figcaption>
+          </figure>
+        </div>
+      </section>
+
       {/* Squeeze spotlight */}
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-16 grid lg:grid-cols-2 gap-10 items-center">
         <div>
