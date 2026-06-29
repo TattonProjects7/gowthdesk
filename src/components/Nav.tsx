@@ -31,6 +31,17 @@ export default function Nav() {
     if (typeof Notification !== "undefined" && Notification.permission === "default") Notification.requestPermission();
   };
 
+  const deleteAccount = async () => {
+    if (!window.confirm("Permanently delete your account and all your data? This can’t be undone.")) return;
+    const res = await fetch("/api/account/delete", { method: "POST" });
+    if (res.ok) {
+      await signOut();
+      window.location.href = "/";
+    } else {
+      window.alert("Couldn’t delete the account. Please try again.");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b border-ink-800 bg-ink-950/85 backdrop-blur px-5 sm:px-8 py-3.5 flex items-center gap-3">
       <Link href="/" className="flex items-center gap-2.5">
@@ -135,6 +146,9 @@ export default function Nav() {
                       ))}
                     <button onClick={() => signOut()} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-200 hover:bg-ink-800">
                       <LogOut className="h-4 w-4" /> Sign out
+                    </button>
+                    <button onClick={deleteAccount} className="block w-full rounded-lg px-3 py-2 text-left text-xs text-ink-500 hover:bg-ink-800 hover:text-rose-400">
+                      Delete account
                     </button>
                   </div>
                 </>

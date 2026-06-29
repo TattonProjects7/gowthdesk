@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AlertEngine from "@/components/AlertEngine";
+import NativeBridge from "@/components/NativeBridge";
 import { AuthProvider } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="bg-ink-950 text-ink-100 antialiased">
         <AuthProvider>
+          <NativeBridge />
           <AlertEngine />
           {children}
         </AuthProvider>

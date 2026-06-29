@@ -7,6 +7,8 @@ import { Check, Loader2 } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/lib/subscription";
+import { isNative } from "@/lib/platform";
+import { purchasePro, restorePurchases } from "@/lib/iap";
 
 const FREE = ["Live short scanner & rankings", "Squeeze-risk radar", "Catalyst countdown", "Track shorts & expectancy stats"];
 const PRO = ["Everything in Free", "AI bear + steel-manned bull thesis", "Defined-risk put alternatives", "Real-time alerts across devices", "Priority data refresh"];
@@ -18,14 +20,28 @@ export default function Pricing() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const native = typeof window !== "undefined" && isNative();
+
   const upgrade = async () => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
     setBusy(true);
     setErr(null);
     try {
+      // Native: App Store / Play Store in-app purchase via RevenueCat.
+      if (native) {
+        const r = await purchasePro();
+        if (r.ok) {
+          router.push("/tracker");
+          router.refresh();
+        } else {
+          setErr(r.message || "Purchase failed.");
+        }
+        return;
+      }
+      // Web: Stripe Checkout (requires an account).
+      if (!user) {
+        router.push("/login");
+        return;
+      }
       const res = await fetch("/api/stripe/checkout", { method: "POST" });
       const j = await res.json();
       if (j.url) window.location.href = j.url;
@@ -34,6 +50,19 @@ export default function Pricing() {
       setErr("Could not start checkout.");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const restore = async () => {
+    setBusy(true);
+    setErr(null);
+    const ok = await restorePurchases();
+    setBusy(false);
+    if (ok) {
+      router.push("/tracker");
+      router.refresh();
+    } else {
+      setErr("No previous purchase found to restore.");
     }
   };
 
@@ -74,14 +103,21 @@ export default function Pricing() {
                   You’re on Pro ✓
                 </div>
               ) : (
-                <button
-                  onClick={upgrade}
-                  disabled={busy || !billingEnabled}
-                  className="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60 inline-flex items-center justify-center gap-2"
-                >
-                  {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {!enabled ? "Sign-in required" : !user ? "Sign in to upgrade" : "Upgrade to Pro"}
-                </button>
+                <>
+                  <button
+                    onClick={upgrade}
+                    disabled={busy || !billingEnabled}
+                    className="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+                  >
+                    {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {native ? "Upgrade to Pro" : !enabled ? "Sign-in required" : !user ? "Sign in to upgrade" : "Upgrade to Pro"}
+                  </button>
+                  {native && billingEnabled && (
+                    <button onClick={restore} disabled={busy} className="mt-2 w-full text-center text-xs text-ink-400 hover:text-white">
+                      Restore purchases
+                    </button>
+                  )}
+                </>
               )}
               {err && <p className="mt-2 text-sm text-rose-400">{err}</p>}
             </div>
