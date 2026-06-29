@@ -3,3 +3,6 @@
 @tailwind utilities;
 
 html, body { height: 100%; }
+
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.live-dot { animation: pulse-dot 1.4s ease-in-out infinite; }

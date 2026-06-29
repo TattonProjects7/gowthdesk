@@ -1,0 +1,149 @@
+"use client";
+
+import Link from "next/link";
+import { Radar, Trophy, X } from "lucide-react";
+import Nav from "@/components/Nav";
+import { useMarket } from "@/lib/useMarket";
+import { useTakenShorts, shortPnl, shortState, shortProgress, trackerStats, type TakenShort, type TrackerStats } from "@/lib/store";
+import { RISK_BUDGET } from "@/lib/shorts";
+
+export default function Tracker() {
+  const { mounted, priceFor } = useMarket();
+  const { items, drop } = useTakenShorts();
+
+  const ready = mounted;
+  const totalPnl = ready ? items.reduce((a, t) => a + shortPnl(t, priceFor(t.symbol)), 0) : 0;
+  const wins = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "won").length : 0;
+  const stopped = ready ? items.filter((t) => shortState(t, priceFor(t.symbol)) === "stopped").length : 0;
+  const stats = ready ? trackerStats(items, priceFor, RISK_BUDGET) : null;
+
+  return (
+    <div className="min-h-screen bg-ink-950">
+      <Nav />
+      <main className="mx-auto max-w-4xl px-5 sm:px-8 py-10">
+        <h1 className="text-2xl font-bold text-white mb-1">My shorts</h1>
+        <p className="text-ink-400 mb-6">Watch the asymmetry play out — losses stay capped, winners run to target.</p>
+
+        {ready && items.length > 0 && (
+          <div className="grid grid-cols-3 gap-3 mb-7">
+            <Summary label="Open P&L" value={`${totalPnl >= 0 ? "+" : ""}£${Math.round(totalPnl).toLocaleString()}`} tone={totalPnl >= 0 ? "emerald" : "rose"} />
+            <Summary label="Hit target" value={`${wins}`} tone="emerald" />
+            <Summary label="Stopped out" value={`${stopped}`} tone="rose" />
+          </div>
+        )}
+
+        {ready && stats && items.length > 0 && <EdgePanel stats={stats} />}
+
+        {!ready && <div className="h-40 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />}
+
+        {ready && items.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-ink-700 bg-ink-900 p-10 text-center">
+            <Radar className="mx-auto h-8 w-8 text-ink-500 mb-3" />
+            <p className="text-ink-300 font-medium">No shorts tracked yet.</p>
+            <p className="text-ink-500 text-sm mb-5">Pick a setup from the scanner and watch it run.</p>
+            <Link href="/scan" className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
+              <Radar className="h-4 w-4" /> Open the scanner
+            </Link>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {ready && items.map((t) => <TrackedCard key={t.id} t={t} price={priceFor(t.symbol)} onDrop={() => drop(t.id)} />)}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function TrackedCard({ t, price, onDrop }: { t: TakenShort; price: number; onDrop: () => void }) {
+  const pnl = shortPnl(t, price);
+  const state = shortState(t, price);
+  const progress = shortProgress(t, price);
+
+  const badge =
+    state === "won"
+      ? { text: "TARGET HIT", cls: "bg-emerald-950 text-emerald-300 border-emerald-800" }
+      : state === "stopped"
+        ? { text: "STOPPED OUT", cls: "bg-rose-950 text-rose-300 border-rose-800" }
+        : { text: "OPEN", cls: "bg-ink-800 text-ink-300 border-ink-700" };
+
+  return (
+    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2.5">
+          <Link href={`/short/${t.symbol}`} className="font-bold text-white hover:underline">
+            {t.symbol}
+          </Link>
+          <span className="text-sm text-ink-400">{t.name}</span>
+          <span className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${badge.cls}`}>{badge.text}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className={`font-mono font-bold ${pnl >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+              {pnl >= 0 ? "+" : ""}£{Math.round(pnl).toLocaleString()}
+            </p>
+            <p className="text-[11px] text-ink-500">live ${price.toFixed(2)}</p>
+          </div>
+          <button onClick={onDrop} className="text-ink-500 hover:text-rose-400" aria-label="Stop tracking">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="relative h-2 rounded-full bg-ink-800 overflow-hidden">
+        <div
+          className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${state === "stopped" ? "bg-rose-500" : "bg-emerald-500"}`}
+          style={{ width: `${Math.round(progress * 100)}%` }}
+        />
+      </div>
+      <div className="mt-2 flex justify-between text-[11px] text-ink-500">
+        <span className="text-rose-400">
+          stop ${t.stop.toFixed(2)} · −£{t.maxLoss}
+        </span>
+        <span>entry ${t.entry.toFixed(2)}</span>
+        <span className="text-emerald-400 inline-flex items-center gap-1">
+          <Trophy className="h-3 w-3" /> target ${t.target.toFixed(2)} · +£{t.maxGain.toLocaleString()}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function EdgePanel({ stats }: { stats: TrackerStats }) {
+  const positive = stats.expectancyR > 0.05;
+  const tone = positive ? "text-emerald-300" : stats.expectancyR < -0.05 ? "text-rose-300" : "text-ink-200";
+  return (
+    <div className="mb-7 rounded-2xl border border-violet-900 bg-violet-950/20 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-semibold uppercase tracking-wide text-violet-300">Your edge — in R</p>
+        <span className="text-xs text-ink-500">{stats.closed} closed · {stats.open} open</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <Metric label="Expectancy" value={`${stats.expectancyR >= 0 ? "+" : ""}${stats.expectancyR.toFixed(2)}R`} tone={tone} big />
+        <Metric label="Win rate" value={`${stats.winRate}%`} />
+        <Metric label="Avg win" value={`+${stats.avgWinR.toFixed(2)}R`} tone="text-emerald-300" />
+        <Metric label="Avg loss" value={`${stats.avgLossR.toFixed(2)}R`} tone="text-rose-300" />
+      </div>
+      <p className="text-sm text-ink-300">{stats.interpretation}</p>
+    </div>
+  );
+}
+
+function Metric({ label, value, tone = "text-white", big }: { label: string; value: string; tone?: string; big?: boolean }) {
+  return (
+    <div className="rounded-xl border border-ink-800 bg-ink-900 p-3 text-center">
+      <p className="text-[11px] uppercase tracking-wide text-ink-500">{label}</p>
+      <p className={`mt-1 font-bold ${big ? "text-2xl" : "text-lg"} ${tone}`}>{value}</p>
+    </div>
+  );
+}
+
+function Summary({ label, value, tone }: { label: string; value: string; tone: "emerald" | "rose" }) {
+  const c = tone === "emerald" ? "text-emerald-300" : "text-rose-300";
+  return (
+    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 text-center">
+      <p className="text-[11px] uppercase tracking-wide text-ink-500">{label}</p>
+      <p className={`mt-1 text-xl font-bold ${c}`}>{value}</p>
+    </div>
+  );
+}
