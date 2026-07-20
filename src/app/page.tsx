@@ -222,9 +222,11 @@ export default function Landing() {
               </div>
               <span className="font-bold text-white">Shortlist</span>
             </Link>
-            <div className="flex items-center gap-5 text-sm text-ink-400">
+            <div className="flex flex-wrap items-center gap-5 text-sm text-ink-400">
               <Link href="/scan" className="hover:text-white">Scanner</Link>
               <Link href="/pricing" className="hover:text-white">Pricing</Link>
+              <Link href="/privacy" className="hover:text-white">Privacy</Link>
+              <Link href="/terms" className="hover:text-white">Terms</Link>
               <Link href="/login" className="hover:text-white">Sign in</Link>
             </div>
           </div>
