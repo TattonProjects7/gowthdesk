@@ -35,10 +35,16 @@ Give Shortlist its own Vercel project instead:
 | Variable | Value |
 | --- | --- |
 | `NEXT_PUBLIC_APP_URL` | Your live address, e.g. `https://shortlist.vercel.app`. The apps load this. |
-| `BROKER_SECRET` | A long random string. Run `openssl rand -base64 48`. Needed for real mode. |
+| `BROKER_SECRET` | A long random string, needed for real mode. Mac: `openssl rand -base64 48`. Windows: see below. |
 | `ANTHROPIC_API_KEY` | Turns on the live AI coach and digests. Optional. |
 | `FINNHUB_API_KEY` | Live prices. Strongly recommended before real mode. |
 | `ALPHAVANTAGE_API_KEY` | Daily price history. Optional. |
+
+**Making `BROKER_SECRET` on Windows:** open PowerShell and run:
+
+```powershell
+$b = New-Object byte[] 48; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b); [Convert]::ToBase64String($b)
+```
 
 Supabase, Stripe and RevenueCat variables are in `.env.local.example` and
 `SETUP.md`. The app runs without them.
@@ -100,6 +106,16 @@ Without this, everything still works and each user's data stays on their device.
    keytool -genkey -v -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
    base64 -w0 upload.jks   # on macOS: base64 -i upload.jks
    ```
+
+   On Windows, install Java first (Temurin JDK from adoptium.net, with "Add to
+   PATH" ticked). Then, in PowerShell:
+
+   ```powershell
+   keytool -genkey -v -keystore upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\upload.jks")) | Set-Clipboard
+   ```
+
+   The second line copies the base64 text to your clipboard, ready to paste.
 
 4. Add these repository **secrets**: `ANDROID_KEYSTORE_BASE64` (the base64
    output), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`upload`) and
