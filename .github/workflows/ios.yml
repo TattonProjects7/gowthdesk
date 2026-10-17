@@ -3,9 +3,9 @@ name: iOS
 # Builds the iPhone app on a macOS runner.
 #   - Always: compiles the app for the simulator (no Apple account needed), so a
 #     broken native build is caught straight away.
-#   - Run manually with "upload" ticked and the App Store Connect secrets set:
-#     archives, signs (automatic signing via the API key) and uploads the build
-#     to TestFlight.
+#   - With the App Store Connect secrets set: archives, signs (automatic signing
+#     via the API key) and uploads to TestFlight when run manually with "upload"
+#     ticked, or on any run while the variable TESTFLIGHT_AUTO_UPLOAD is "true".
 # Set the repository variable APP_URL to your live https site first (GO-LIVE.md).
 
 on:
@@ -57,7 +57,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO build
 
       - name: Archive and upload to TestFlight
-        if: env.HAS_ASC == 'true' && github.event_name == 'workflow_dispatch' && inputs.upload
+        # Manual "Run workflow" (once this file is on main), or any run while the
+        # repository variable TESTFLIGHT_AUTO_UPLOAD is "true".
+        if: env.HAS_ASC == 'true' && ((github.event_name == 'workflow_dispatch' && inputs.upload) || vars.TESTFLIGHT_AUTO_UPLOAD == 'true')
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}

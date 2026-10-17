@@ -23,10 +23,14 @@ Give Shortlist its own Vercel project instead:
 
 1. Vercel → **Add New → Project** → import `TattonProjects7/gowthdesk`.
 2. Name it `shortlist`. Framework: **Next.js**. Root directory: `.`
-3. Add the environment variables below, then **Deploy**.
+3. Add the environment variables below, then **Deploy**. This first deploy
+   builds `main` (GrowthDesk), which is expected. Ignore it.
 4. Project → **Settings → Git → Production Branch**: set it to
-   `claude/stock-trading-app-idea-aaj8rv`, so every push updates the live site.
-5. Optional: **Settings → Domains** → add your own domain.
+   `claude/stock-trading-app-idea-aaj8rv` and save.
+5. **Deployments → Create Deployment** → enter
+   `claude/stock-trading-app-idea-aaj8rv` → **Create**. From now on every push
+   to that branch updates the live site.
+6. Optional: **Settings → Domains** → add your own domain.
 
 | Variable | Value |
 | --- | --- |
@@ -100,12 +104,14 @@ Without this, everything still works and each user's data stays on their device.
 4. Add these repository **secrets**: `ANDROID_KEYSTORE_BASE64` (the base64
    output), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`upload`) and
    `ANDROID_KEY_PASSWORD`.
-5. GitHub → **Actions → Android → Run workflow**. Download
-   `shortlist-release-aab` from the run, and upload it in the Play Console as
-   your first release. Turn on Play App Signing when asked.
+5. GitHub → **Actions → Android** → open the latest run → **Re-run all jobs**.
+   Download `shortlist-release-aab` from the run, and upload it in the Play
+   Console as your first release. Turn on Play App Signing when asked.
 6. Later releases can go up automatically. Create a Play service account with
-   release permissions, add its JSON as the `PLAY_SERVICE_ACCOUNT_JSON` secret,
-   and run the workflow with **upload** ticked.
+   release permissions and add its JSON as the `PLAY_SERVICE_ACCOUNT_JSON`
+   secret. Add the repository variable `PLAY_AUTO_UPLOAD` = `true`, then
+   re-run the latest Android run. Each build is uploaded as a draft on the
+   internal track, or the track in the variable `PLAY_TRACK`.
 7. In the Play Console, complete Data safety, content rating (18+), the
    Financial features declaration and the store listing. Copy and
    screenshots are in `store/`.
@@ -113,18 +119,26 @@ Without this, everything still works and each user's data stays on their device.
 Every Android run also produces `shortlist-debug-apk`, which you can install on
 any Android phone to test straight away.
 
+> The **Run workflow** button only appears once these workflows are on `main`.
+> Until then, re-run the latest run, which uses your current secrets and
+> variables.
+
 ## 6. iPhone (App Store)
 
 1. Join the Apple Developer Program **as an organisation**, not an individual.
    Apps that offer real-money trading must be submitted by a legal entity
    (App Review Guideline 5.1.1(ix)).
-2. In App Store Connect, create the app with bundle ID `com.shortlist.app`.
+2. In the developer portal, **Certificates, Identifiers & Profiles →
+   Identifiers → +** → App ID `com.shortlist.app`, with Push Notifications
+   ticked. Then, in App Store Connect, create the app with that bundle ID.
 3. **Users and Access → Integrations → App Store Connect API** → generate a key
-   with the App Manager role. Add repository secrets: `ASC_KEY_ID`,
+   with the **Admin** role, so the build can create its own signing
+   certificate. Add repository secrets: `ASC_KEY_ID`,
    `ASC_ISSUER_ID`, `ASC_KEY_P8` (the full contents of the .p8 file) and
    `APPLE_TEAM_ID` (from your Membership page).
-4. GitHub → **Actions → iOS → Run workflow** with **upload** ticked. The build
-   appears in TestFlight after processing.
+4. Add the repository variable `TESTFLIGHT_AUTO_UPLOAD` = `true`. Then
+   GitHub → **Actions → iOS** → open the latest run → **Re-run all jobs**. The
+   build appears in TestFlight after processing.
 5. Test it in TestFlight, then submit for review with the screenshots in
    `store/screenshots/ios-6.9in` and the copy in `store/LISTING.md`. In the
    review notes, give Apple a Trading 212 **practice** API key, so they can
@@ -144,6 +158,7 @@ change, with no Apple account needed, so build breaks show up early.
 | Vercel | `FINNHUB_API_KEY`, `ALPHAVANTAGE_API_KEY` | Live prices |
 | Vercel | `ANTHROPIC_API_KEY` | AI coach and digests |
 | GitHub variable | `APP_URL` | Address the native apps open |
+| GitHub variable | `PLAY_AUTO_UPLOAD`, `PLAY_TRACK`, `TESTFLIGHT_AUTO_UPLOAD` | Turning store uploads on |
 | GitHub secret | `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | Signing the Play bundle |
 | GitHub secret | `PLAY_SERVICE_ACCOUNT_JSON` | Uploading to Google Play |
 | GitHub secret | `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `APPLE_TEAM_ID` | Signing and uploading to TestFlight |
