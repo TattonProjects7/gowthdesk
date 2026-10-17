@@ -43,7 +43,7 @@ npm run build       # production build
 ## Phase 1 — Accounts + database (Supabase) 🔑
 
 1. Go to https://supabase.com → **New project**. Pick a region near your users, set a strong DB password.
-2. **SQL Editor → New query** → paste the entire contents of `supabase/migrations/0001_init.sql` → **Run**. (This creates the tables, security rules and the auto-profile trigger.)
+2. **SQL Editor → New query** → paste the entire contents of `supabase/migrations/0001_init.sql` → **Run**. (This creates the tables, security rules and the auto-profile trigger.) Then run `supabase/migrations/0002_user_state.sql` the same way — it stores each user's portfolio, watchlists, price alerts and savings plans so they sync across devices.
 3. **Project Settings → API** and copy three values into `.env.local`:
 
 ```bash

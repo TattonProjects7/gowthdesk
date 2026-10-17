@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Privacy Policy — Shortlist" };
 
 export default function Privacy() {
   return (
-    <LegalShell title="Privacy Policy" updated="20 July 2026">
+    <LegalShell title="Privacy Policy" updated="17 October 2026">
       <p>
         Shortlist (“we”, “us”) is a stock-shorting research and education tool. This policy explains what personal data
         we collect, why, and your choices. We do not sell your personal data.
@@ -14,10 +14,11 @@ export default function Privacy() {
       <h2>Information we collect</h2>
       <ul>
         <li><strong>Account data</strong> — your email address and authentication details, if you create an account.</li>
-        <li><strong>Your content</strong> — the shorts you choose to track and related settings, stored against your account.</li>
+        <li><strong>Your content</strong> — your paper portfolio (virtual accounts, orders, holdings, savings plans), watchlists, price alerts, tracked shorts and settings, stored against your account so they sync across your devices.</li>
         <li><strong>Purchase data</strong> — subscription status. Card details are handled by our payment providers, not by us.</li>
         <li><strong>Device data</strong> — on mobile, a push-notification token if you enable notifications, and basic diagnostics.</li>
-        <li><strong>Local storage</strong> — if you use the app without an account, your tracked shorts and alerts stay in your browser only.</li>
+        <li><strong>Local storage</strong> — if you use the app without an account, all of the above stays on your device only.</li>
+        <li><strong>Biometrics</strong> — if you turn on Face ID, Touch ID or fingerprint unlock, the check is performed by your device’s operating system. We never receive or store biometric data. An app-lock PIN is stored only on your device, hashed.</li>
       </ul>
 
       <h2>How we use it</h2>

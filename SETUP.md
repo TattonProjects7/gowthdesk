@@ -44,7 +44,7 @@ deterministic generator produces a solid version, so the feature always works.
 ## 3. Accounts + database (Supabase)
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. **SQL Editor → New query** → paste `supabase/migrations/0001_init.sql` → Run.
+2. **SQL Editor → New query** → paste `supabase/migrations/0001_init.sql` → Run. Then do the same with `supabase/migrations/0002_user_state.sql` (syncs the portfolio, watchlists, price alerts and savings plans across devices).
    This creates the tables, row-level security, and the auto-profile trigger.
 3. **Project Settings → API**, copy into `.env.local`:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`

@@ -5,13 +5,16 @@ export const metadata: Metadata = { title: "Terms of Service — Shortlist" };
 
 export default function Terms() {
   return (
-    <LegalShell title="Terms of Service" updated="20 July 2026">
+    <LegalShell title="Terms of Service" updated="17 October 2026">
       <p>By using Shortlist you agree to these terms. If you do not agree, please do not use the app.</p>
 
       <h2>What Shortlist is</h2>
       <p>
-        Shortlist is a research and education tool for short-selling ideas. It scans markets, scores setups, and helps
-        you track hypothetical trades. <strong>It does not execute trades and is not a broker.</strong>
+        Shortlist is a research, education and paper-trading app. It shows market data for shares, ETFs and crypto, lets
+        you run a practice portfolio with <strong>virtual funds</strong> (including simulated ISA and SIPP accounts, orders,
+        savings plans and rebalancing), and scans markets for short-selling ideas.{" "}
+        <strong>It does not execute trades, hold client money or provide accounts with a regulated provider, and it is not a broker.</strong>{" "}
+        Simulated ISA/SIPP labels and allowances are for practice only and have no tax effect.
       </p>
 
       <h2>Not investment advice — risk warning</h2>

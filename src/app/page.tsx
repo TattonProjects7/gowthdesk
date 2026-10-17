@@ -10,6 +10,11 @@ import {
   Bell,
   BarChart3,
   Check,
+  Wallet,
+  LineChart,
+  Receipt,
+  Repeat,
+  Layers,
 } from "lucide-react";
 
 // Public marketing landing page. The app itself lives at /scan.
@@ -25,44 +30,62 @@ export default function Landing() {
           <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
         </Link>
         <nav className="ml-auto flex items-center gap-2">
+          <Link href="/markets" className="hidden sm:inline rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
+            Markets
+          </Link>
           <Link href="/pricing" className="hidden sm:inline rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
             Pricing
           </Link>
           <Link href="/login" className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
             Sign in
           </Link>
-          <Link href="/scan" className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-rose-500">
-            Start free
+          <Link href="/portfolio" className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-rose-500">
+            Open app
           </Link>
         </nav>
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 pb-12 grid lg:grid-cols-2 gap-12 items-center">
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-14 pb-12 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-rose-900 bg-rose-950 px-3 py-1 text-xs font-semibold text-rose-300 mb-5">
-            <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" /> The short-seller’s edge, in one app
+            <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" /> Invest · trade · short — one app
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white leading-[1.1]">
-            Find the best stocks to short. <span className="text-rose-400">Risk small, win big.</span>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white leading-[1.08] tracking-tight">
+            Invest smarter. <span className="text-rose-400">Short with defined risk.</span>
           </h1>
           <p className="mt-5 text-lg text-ink-300 leading-relaxed max-w-xl">
-            Shortlist scans the market for stretched, rolling-over stocks, structures every idea with defined risk, and
-            flags the crowded ones that could squeeze you — so your losses stay small and your winners run.
+            UK and US shares, ETFs and crypto in one app: a practice portfolio with ISA and SIPP accounts, live charts with
+            indicators, watchlists, price alerts, savings plans, one-tap rebalancing and look-through analytics — plus the
+            asymmetric short-finder no one else has.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href="/scan" className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500">
-              Start scanning free <ArrowRight className="h-4 w-4" />
+            <Link href="/portfolio" className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500">
+              Open the app <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl border border-ink-700 px-5 py-3 text-sm font-semibold text-ink-200 hover:bg-ink-900">
-              See pricing
+            <Link href="/markets" className="inline-flex items-center gap-2 rounded-xl border border-ink-700 px-5 py-3 text-sm font-semibold text-ink-200 hover:bg-ink-900">
+              Browse markets
             </Link>
           </div>
-          <p className="mt-4 text-xs text-ink-500">No card required · works instantly in your browser</p>
+          <p className="mt-4 text-xs text-ink-500">Free · £10,000 of virtual money to practise with · iPhone, Android and web</p>
         </div>
 
-        {/* Product mock */}
-        <HeroMock />
+        {/* Phone mock-up with the real app */}
+        <PhoneMock />
+      </section>
+
+      {/* Investing features */}
+      <section className="mx-auto max-w-6xl px-5 sm:px-8 pb-16">
+        <h2 className="text-center text-2xl sm:text-3xl font-bold text-white">Everything a modern investing app should do</h2>
+        <p className="mt-3 text-center text-ink-400 max-w-2xl mx-auto">The features people rely on at the big UK platforms, in one fast, clean app.</p>
+        <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Feature icon={Wallet} title="Portfolio & accounts" body="One screen for your whole picture: general account, Stocks & Shares ISA and SIPP, cash, P&L, dividends and income." />
+          <Feature icon={LineChart} title="Charts that mean something" body="1W to 1Y charts with moving averages, Bollinger Bands, RSI and MACD. Drag to see any day." />
+          <Feature icon={Receipt} title="Deal ticket" body="Market, limit and stop orders, fractional from £1, stop-loss, take-profit and trailing stops. Top up without leaving the ticket." />
+          <Feature icon={Repeat} title="Automate it" body="Savings plans weekly to monthly, AutoInvest for spare cash, model portfolios and one-click rebalancing to your targets." />
+          <Feature icon={Layers} title="See what you really own" body="Look-through splits every ETF into the companies, sectors and regions inside it, and flags overlap." />
+          <Feature icon={Bell} title="Alerts that reach you" body="Price alerts, order fills, stop triggers and dividends — as phone notifications, with Face ID / fingerprint app lock." />
+        </div>
       </section>
 
       {/* Logos / trust line */}
@@ -110,19 +133,20 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-5 sm:px-8 py-16">
         <h2 className="text-center text-2xl sm:text-3xl font-bold text-white">See it in action</h2>
         <p className="mt-3 text-center text-ink-400 max-w-2xl mx-auto">
-          The live scanner ranks the market; each setup breaks down the squeeze risk, catalyst and defined-risk structure.
+          Your portfolio at a glance, every instrument in depth, and the short scanner when you want the other side of the trade.
         </p>
         <div className="mt-10 grid lg:grid-cols-2 gap-6">
-          <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/screenshots/scanner.png" alt="Shortlist scanner ranking short candidates" className="rounded-xl w-full" loading="lazy" />
-            <figcaption className="px-3 py-3 text-sm text-ink-400">Ranked scanner — every name scored, with squeeze risk and risk:reward at a glance.</figcaption>
-          </figure>
-          <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/screenshots/detail.png" alt="Shortlist setup detail with squeeze radar and structured trade" className="rounded-xl w-full" loading="lazy" />
-            <figcaption className="px-3 py-3 text-sm text-ink-400">Setup detail — squeeze radar, catalyst countdown and the defined-risk trade.</figcaption>
-          </figure>
+          <Shot src="/screenshots/portfolio.png" alt="Shortlist portfolio overview with value chart, accounts and holdings" caption="Portfolio — value chart, accounts, P&L, income and holdings on one screen." />
+          <Shot src="/screenshots/instrument.png" alt="Shortlist instrument page with chart, deal ticket and fund look-through" caption="Instrument — chart and indicators, deal ticket, alerts, sentiment and fund look-through." />
+          <Shot src="/screenshots/scanner.png" alt="Shortlist scanner ranking short candidates" caption="Short scanner — every name scored, with squeeze risk and risk:reward at a glance." />
+          <Shot src="/screenshots/detail.png" alt="Shortlist setup detail with squeeze radar and structured trade" caption="Setup detail — squeeze radar, catalyst countdown and the defined-risk trade." />
+        </div>
+      </section>
+
+      <section className="border-t border-ink-800 bg-ink-900/30">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 pt-16 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-rose-400 mb-2">And the part no one else has</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white">The asymmetric short-finder</h2>
         </div>
       </section>
 
@@ -241,36 +265,31 @@ export default function Landing() {
   );
 }
 
-function HeroMock() {
-  const rows = [
-    { sym: "COIN", name: "Coinbase", price: "$241.50", score: 78, sq: "EXTREME", sqTone: "text-rose-300 border-rose-800 bg-rose-950", rr: "£250 → £1,800" },
-    { sym: "TSLA", name: "Tesla", price: "$248.10", score: 71, sq: "MODERATE", sqTone: "text-amber-300 border-amber-800 bg-amber-950", rr: "£250 → £1,150" },
-    { sym: "SHOP", name: "Shopify", price: "$78.40", score: 64, sq: "LOW", sqTone: "text-emerald-300 border-emerald-800 bg-emerald-950", rr: "£250 → £980" },
-  ];
+function Shot({ src, alt, caption }: { src: string; alt: string; caption: string }) {
   return (
-    <div className="rounded-2xl border border-ink-800 bg-ink-900 p-4 shadow-2xl">
-      <div className="flex items-center gap-2 mb-3 px-1">
-        <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" />
-        <span className="text-xs font-semibold text-ink-300">Live scanner</span>
-        <span className="ml-auto rounded-full border border-emerald-800 bg-emerald-950 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-          LIVE data
-        </span>
-      </div>
-      <div className="space-y-2">
-        {rows.map((r, i) => (
-          <div key={r.sym} className="flex items-center gap-3 rounded-xl border border-ink-800 bg-ink-950/60 p-3">
-            <span className="hidden sm:flex h-6 w-6 items-center justify-center rounded-md bg-ink-800 text-[11px] font-bold text-ink-400">{i + 1}</span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-white leading-none">
-                {r.sym} <span className="ml-1 text-xs font-normal text-ink-400">{r.name}</span>
-              </p>
-              <p className="mt-1 font-mono text-xs text-ink-300">{r.price}</p>
-            </div>
-            <span className={`hidden sm:block rounded-lg border px-2 py-1 text-center text-[10px] font-bold ${r.sqTone}`}>{r.sq}</span>
-            <span className="hidden md:block text-right text-xs font-semibold text-white w-28">{r.rr}</span>
-            <span className="w-10 shrink-0 rounded-lg border border-rose-800 bg-rose-950 px-1 py-1 text-center text-base font-bold text-rose-300">{r.score}</span>
+    <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="rounded-xl w-full" loading="lazy" />
+      <figcaption className="px-3 py-3 text-sm text-ink-400">{caption}</figcaption>
+    </figure>
+  );
+}
+
+function PhoneMock() {
+  return (
+    <div className="relative mx-auto w-[280px] sm:w-[300px]">
+      <div className="absolute -inset-10 rounded-full bg-rose-600/20 blur-3xl" aria-hidden />
+      <div className="relative rounded-[3rem] border border-ink-700 bg-black p-2.5 shadow-2xl">
+        <div className="overflow-hidden rounded-[2.4rem] bg-ink-950">
+          {/* status bar with the camera island */}
+          <div className="relative flex h-9 items-center justify-between px-7 text-[11px] font-semibold text-white">
+            <span>9:41</span>
+            <span className="absolute left-1/2 top-2 h-5 w-20 -translate-x-1/2 rounded-full bg-black" aria-hidden />
+            <span className="tracking-tight">5G ▮▮▮</span>
           </div>
-        ))}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/screenshots/mobile-portfolio.png" alt="Shortlist on iPhone: portfolio value, chart and quick actions" className="block w-full" />
+        </div>
       </div>
     </div>
   );

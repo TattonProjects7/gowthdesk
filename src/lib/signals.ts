@@ -20,9 +20,13 @@ export interface Signals {
 
 // Simulated daily closes ending "now" (chronological, oldest first). Used as the
 // zero-config fallback when no live market-data key is configured.
+// Like a real chart: one point per past day at the daily close (midnight UTC),
+// then today's live price as the last point.
 export function simCloses(symbol: string, now: number, n = 31): number[] {
   const out: number[] = [];
-  for (let i = n - 1; i >= 0; i--) out.push(priceAt(symbol, now - i * DAY));
+  const today = Math.floor(now / DAY) * DAY;
+  for (let i = n - 2; i >= 0; i--) out.push(priceAt(symbol, today - i * DAY));
+  out.push(priceAt(symbol, now));
   return out;
 }
 

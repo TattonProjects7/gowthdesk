@@ -11,7 +11,7 @@ Legend: ⏱️ rough time · 🔑 needs an account/keys · 💻 needs a Mac
 ## Phase 1 — Web app live (⏱️ ~30 min)
 
 - [ ] **Deploy to Vercel.** Import the repo, deploy. Note the URL. 🔑
-- [ ] **Supabase** — create project, run `supabase/migrations/0001_init.sql`, copy the URL + anon + service_role keys into Vercel env. Add `<url>/auth/callback` to Auth redirect URLs. 🔑
+- [ ] **Supabase** — create project, run `supabase/migrations/0001_init.sql` then `0002_user_state.sql`, copy the URL + anon + service_role keys into Vercel env. Add `<url>/auth/callback` to Auth redirect URLs. 🔑
 - [ ] **Market data** — add `FINNHUB_API_KEY` and `ALPHAVANTAGE_API_KEY` (optional but makes it real). 🔑
 - [ ] **AI thesis** — add `OPENAI_API_KEY` (optional; falls back to rules). 🔑
 - [ ] **Stripe** — create the £12/mo price, add `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PRICE_ID`; add the webhook to `<url>/api/stripe/webhook` and set `STRIPE_WEBHOOK_SECRET`. 🔑

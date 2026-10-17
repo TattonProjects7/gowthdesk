@@ -14,13 +14,14 @@ interface MarketPayload {
 
 // One hook to rule the data layer. It transparently serves either REAL prices
 // (when the /api/market route reports a configured provider) or the built-in
-// simulator. Pages just call priceFor()/closesFor() and never care which.
+// simulator, for every instrument in the universe (shares, ETFs, crypto).
+// Pages just call priceFor()/closesFor() and never care which.
 export function useMarket(): {
   mounted: boolean;
   source: Source;
   now: number;
   priceFor: (symbol: string) => number;
-  closesFor: (symbol: string) => number[];
+  closesFor: (symbol: string, n?: number) => number[];
 } {
   const [now, setNow] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -82,15 +83,18 @@ export function useMarket(): {
     [source, now],
   );
 
+  // Daily closes ending now. `n` days of history (default 31 — enough for the
+  // signals; the chart asks for up to a year).
   const closesFor = useCallback(
-    (symbol: string): number[] => {
+    (symbol: string, n = 31): number[] => {
       if (source === "live") {
         const c = data.current.closes?.[symbol];
-        if (c && c.length >= 20) return c;
+        if (c && c.length >= 20 && n <= c.length) return c.slice(-n);
         const q = data.current.quotes?.[symbol];
-        if (typeof q === "number" && q > 0) return scaleTo(simCloses(symbol, now), q);
+        const last = typeof q === "number" && q > 0 ? q : c && c.length ? c[c.length - 1] : 0;
+        if (last > 0) return scaleTo(simCloses(symbol, now, n), last);
       }
-      return simCloses(symbol, now);
+      return simCloses(symbol, now, n);
     },
     [source, now],
   );

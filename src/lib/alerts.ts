@@ -1,8 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { isNative } from "./platform";
+import { nativeNotify } from "./native";
 
-export type AlertType = "target" | "stop" | "agrade";
+// The in-app alert feed. Short-side alerts (target/stop/A-grade) and the
+// investing-side ones (price alerts, order fills, protections, savings plans,
+// dividends) all land here, so the bell in the header is the one inbox.
+export type AlertType = "target" | "stop" | "agrade" | "price" | "order" | "protection" | "plan" | "income";
 
 export interface Alert {
   id: string; // also the dedupe key — pushing an existing id is a no-op
@@ -28,7 +33,7 @@ function load(): Alert[] {
 
 function save(items: Alert[]) {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(items.slice(0, 50)));
+    window.localStorage.setItem(KEY, JSON.stringify(items.slice(0, 100)));
     window.dispatchEvent(new Event(EVENT));
   } catch {
     /* ignore */
@@ -41,6 +46,28 @@ export function pushAlert(a: { id: string; type: AlertType; symbol: string; mess
   if (items.some((x) => x.id === a.id)) return false;
   save([{ ...a, ts: Date.now(), seen: false }, ...items]);
   return true;
+}
+
+// OS notification when the user has allowed it: a real iOS / Android
+// notification inside the apps, a browser notification on the web.
+export function notify(title: string, body: string): void {
+  if (isNative()) {
+    nativeNotify(title, body);
+    return;
+  }
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  try {
+    new Notification(title, { body });
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Push to the feed and notify in one go; returns true if it was new. */
+export function raise(a: { id: string; type: AlertType; symbol: string; message: string; title?: string }): boolean {
+  const added = pushAlert(a);
+  if (added) notify(a.title ?? a.symbol ?? "Shortlist", a.message);
+  return added;
 }
 
 export function useAlerts() {

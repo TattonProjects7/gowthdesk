@@ -1,8 +1,8 @@
 // Server-only market-data layer. Pulls REAL prices when an API key is present,
 // and returns null otherwise so the app transparently falls back to the
 // built-in simulator. Two optional providers, both free-tier friendly:
-//   • FINNHUB_API_KEY     → real-time quotes        (finnhub.io)
-//   • ALPHAVANTAGE_API_KEY → daily candle history   (alphavantage.co)
+//   • FINNHUB_API_KEY      → real-time quotes + company news   (finnhub.io)
+//   • ALPHAVANTAGE_API_KEY → daily candle history               (alphavantage.co)
 //
 // Nothing here runs unless a key is configured, so the keyless demo never makes
 // a network call. Only imported from server routes (never bundled to client).
@@ -12,6 +12,10 @@ const ALPHA = process.env.ALPHAVANTAGE_API_KEY;
 
 export function hasLiveData(): boolean {
   return Boolean(FINNHUB || ALPHA);
+}
+
+export function hasNews(): boolean {
+  return Boolean(FINNHUB);
 }
 
 async function withTimeout(url: string, ms = 4000): Promise<Response | null> {
@@ -27,10 +31,11 @@ async function withTimeout(url: string, ms = 4000): Promise<Response | null> {
   }
 }
 
-// Real-time last price via Finnhub. Returns null if unconfigured or on error.
-export async function fetchQuote(symbol: string): Promise<number | null> {
+// Real-time last price via Finnhub. `providerSymbol` is Finnhub's own ticker
+// (e.g. "AAPL", "LLOY.L", "BINANCE:BTCUSDT"). Returns null if unconfigured or on error.
+export async function fetchQuote(providerSymbol: string): Promise<number | null> {
   if (!FINNHUB) return null;
-  const res = await withTimeout(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB}`);
+  const res = await withTimeout(`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`);
   if (!res) return null;
   try {
     const j = (await res.json()) as { c?: number };
@@ -59,5 +64,44 @@ export async function fetchDailyCloses(symbol: string): Promise<number[] | null>
     return closes.length >= 20 ? closes.slice(-31) : null;
   } catch {
     return null;
+  }
+}
+
+export interface ProviderNews {
+  id: string;
+  headline: string;
+  summary: string;
+  source: string;
+  url: string;
+  at: number;
+}
+
+// Company news for the last 14 days via Finnhub.
+export async function fetchCompanyNews(providerSymbol: string): Promise<ProviderNews[]> {
+  if (!FINNHUB) return [];
+  const to = new Date();
+  const from = new Date(to.getTime() - 14 * 86400_000);
+  const d = (x: Date) => x.toISOString().slice(0, 10);
+  const res = await withTimeout(
+    `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(providerSymbol)}&from=${d(from)}&to=${d(to)}&token=${FINNHUB}`,
+    5000,
+  );
+  if (!res) return [];
+  try {
+    const j = (await res.json()) as { id?: number; headline?: string; summary?: string; source?: string; url?: string; datetime?: number }[];
+    if (!Array.isArray(j)) return [];
+    return j
+      .filter((n) => n.headline && n.url)
+      .slice(0, 12)
+      .map((n, i) => ({
+        id: `n:${n.id ?? i}`,
+        headline: n.headline as string,
+        summary: (n.summary ?? "").slice(0, 280),
+        source: n.source ?? "News",
+        url: n.url as string,
+        at: (n.datetime ?? 0) * 1000,
+      }));
+  } catch {
+    return [];
   }
 }

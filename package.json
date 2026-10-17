@@ -9,16 +9,20 @@
     "test": "vitest run",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
-    "cap:sync": "cap sync",
-    "cap:ios": "cap sync ios && cap open ios",
-    "cap:android": "cap sync android && cap open android"
+    "cap:sync": "node scripts/mobile-env.mjs && cap sync",
+    "cap:ios": "node scripts/mobile-env.mjs && cap sync ios && cap open ios",
+    "cap:android": "node scripts/mobile-env.mjs && cap sync android && cap open android",
+    "cap:assets": "capacitor-assets generate --iconBackgroundColor '#0d0f1a' --iconBackgroundColorDark '#0d0f1a' --splashBackgroundColor '#0d0f1a' --splashBackgroundColorDark '#0d0f1a'"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.4.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/push-notifications": "^8.1.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@capgo/capacitor-native-biometric": "^8.8.3",
     "@revenuecat/purchases-capacitor": "^13.2.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
@@ -32,6 +36,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^8.4.1",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
     "@types/node": "^22",

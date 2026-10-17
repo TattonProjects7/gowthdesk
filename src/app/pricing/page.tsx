@@ -10,7 +10,7 @@ import { useSubscription } from "@/lib/subscription";
 import { isNative } from "@/lib/platform";
 import { purchasePro, restorePurchases } from "@/lib/iap";
 
-const FREE = ["Live short scanner & rankings", "Squeeze-risk radar", "Catalyst countdown", "Track shorts & expectancy stats"];
+const FREE = ["UK & US shares, ETFs and crypto with live charts", "Paper portfolio: GIA, ISA & SIPP, fractional from £1", "Watchlists, price alerts & market calendar", "Savings plans, AutoInvest & one-click rebalance", "Look-through analytics & income projection", "Short scanner, squeeze radar & tracker"];
 const PRO = ["Everything in Free", "AI bear + steel-manned bull thesis", "Defined-risk put alternatives", "Real-time alerts across devices", "Priority data refresh"];
 
 export default function Pricing() {
