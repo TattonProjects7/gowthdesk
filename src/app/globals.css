@@ -4,21 +4,66 @@
 
 html, body { height: 100%; }
 
+html { background: rgb(7 8 13); color-scheme: dark; }
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+  background: transparent;
 }
 
-/* Numbers: proportional system font with tabular figures — how banking and
-   broker apps set prices — instead of a code-style monospace. */
+/* Aurora: soft brand-coloured light behind every screen. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 38rem at 8% -12%, rgba(244, 63, 94, 0.14), transparent 62%),
+    radial-gradient(52rem 40rem at 105% -6%, rgba(139, 92, 246, 0.16), transparent 60%),
+    radial-gradient(60rem 46rem at 50% 115%, rgba(16, 185, 129, 0.09), transparent 62%),
+    rgb(7 8 13);
+}
+::selection { background: rgba(139, 92, 246, 0.35); color: #fff; }
+
+:focus-visible { outline: 2px solid rgba(167, 139, 250, 0.7); outline-offset: 2px; border-radius: 8px; }
+
+h1, h2, h3 { letter-spacing: -0.02em; }
+
+/* Numbers: Geist with tabular figures, the way banking and broker apps set
+   prices, instead of a code-style monospace. */
 .font-mono {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif !important;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif !important;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
 .num { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+/* Gradient text and glass surfaces. */
+.text-gradient { background: linear-gradient(135deg, #fda4af 0%, #f0abfc 45%, #a78bfa 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.glass { background: rgba(12, 14, 22, 0.78); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }
+
+/* Pages ease in: each block in <main> fades up, slightly staggered. */
+/* Fixed overlays (sheets, trade bars) are excluded so they appear instantly. */
+main > *:not(.fixed) { animation: fade-up 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+main > *:nth-child(2):not(.fixed) { animation-delay: 40ms; }
+main > *:nth-child(3):not(.fixed) { animation-delay: 80ms; }
+main > *:nth-child(4):not(.fixed) { animation-delay: 120ms; }
+main > *:nth-child(5):not(.fixed) { animation-delay: 160ms; }
+main > *:nth-child(n + 6):not(.fixed) { animation-delay: 200ms; }
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* Lift on hover for links that look like cards. */
+a.lift, .lift { transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+@media (hover: hover) { a.lift:hover, .lift:hover { transform: translateY(-2px); } }
+
+/* Skeleton shimmer. */
+.skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 100%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+@keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 
 @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .live-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
@@ -54,5 +99,34 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 @keyframes gift-wiggle { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-10deg); } 94% { transform: rotate(9deg); } 97% { transform: rotate(-5deg); } }
 .gift-wiggle { animation: gift-wiggle 2.6s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .gift-wiggle, .sheet-pop, .sheet-up, .fade-in, .flash-up, .flash-down { animation: none; }
+  .gift-wiggle, .sheet-pop, .sheet-up, .fade-in, .flash-up, .flash-down, main > *, .skeleton { animation: none; }
+  a.lift:hover, .lift:hover { transform: none; }
+}
+
+/* Trade celebrations (see components/effects). */
+@keyframes fx-card-in { 0% { opacity: 0; transform: translateY(-18px) scale(0.9); } 60% { opacity: 1; transform: translateY(2px) scale(1.02); } 100% { transform: translateY(0) scale(1); } }
+.fx-card { animation: fx-card-in 520ms cubic-bezier(0.2, 0.9, 0.25, 1.2) both; }
+@keyframes fx-timer { from { width: 100%; } to { width: 0%; } }
+.fx-timer { animation-name: fx-timer; animation-timing-function: linear; animation-fill-mode: forwards; }
+@keyframes fx-draw { to { stroke-dashoffset: 0; } }
+.fx-draw-ring { stroke-dasharray: 184; stroke-dashoffset: 184; animation: fx-draw 600ms ease-out 80ms forwards; }
+.fx-draw-check { stroke-dasharray: 42; stroke-dashoffset: 42; animation: fx-draw 420ms cubic-bezier(0.65, 0, 0.35, 1) 480ms forwards; }
+@keyframes fx-badge-in { 0% { transform: scale(0.4) rotate(-12deg); opacity: 0; } 70% { transform: scale(1.12) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+.fx-badge { animation: fx-badge-in 620ms cubic-bezier(0.2, 0.9, 0.25, 1.3) both; }
+@keyframes fx-bob { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-4px) rotate(6deg); } }
+.fx-bob { display: inline-block; animation: fx-bob 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .fx-card, .fx-badge, .fx-bob { animation: none; }
+  .fx-draw-ring, .fx-draw-check { animation: none; stroke-dashoffset: 0; }
+}
+
+/* Charts: the line draws itself in, the latest point pulses. */
+.chart-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: chart-draw 1100ms cubic-bezier(0.65, 0, 0.35, 1) 120ms forwards; }
+@keyframes chart-draw { to { stroke-dashoffset: 0; } }
+.chart-fade { animation: fade-in 900ms ease-out 400ms both; }
+.chart-pulse { transform-box: fill-box; transform-origin: center; animation: chart-pulse 2s ease-out infinite; opacity: 0.35; }
+@keyframes chart-pulse { 0% { transform: scale(0.4); opacity: 0.55; } 100% { transform: scale(1.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .chart-draw { animation: none; stroke-dashoffset: 0; }
+  .chart-fade, .chart-pulse { animation: none; }
 }

@@ -23,6 +23,11 @@ bottom-sheet deal ticket.
 
 ---
 
+> **Builds in the cloud:** the `Android` and `iOS` GitHub Actions workflows
+> build both apps for you, including signed store builds and TestFlight or
+> Google Play uploads once the secrets are added. See **[GO-LIVE.md](./GO-LIVE.md)**,
+> steps 5 and 6. The manual steps below are for building on your own Mac or PC.
+
 ## 1. Point the apps at your deployed site
 
 Deploy the web app first (see `SETUP.md`). Then set its **https** address, in

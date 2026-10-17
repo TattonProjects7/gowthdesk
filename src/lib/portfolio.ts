@@ -116,6 +116,10 @@ export interface EngineEvent {
   kind: "order" | "protection" | "plan" | "income";
   symbol: string;
   message: string;
+  /** Set on order fills so the app can celebrate them. */
+  side?: OrderSide;
+  qty?: number;
+  valueGbp?: number;
 }
 
 export const STARTING_CASH = 10_000;
@@ -486,7 +490,7 @@ export function fillOrder(s: PortfolioState, order: Order, p: Pricer): OrderResu
         transactions: [tx, ...s.transactions],
       },
       order: filled,
-      events: order.source === "manual" && order.type === "market" ? [] : [{ id: `order:${filled.id}`, kind: "order", symbol: i.symbol, message: orderMessage(filled, i, fee) }],
+      events: order.source === "manual" && order.type === "market" ? [] : [{ id: `order:${filled.id}`, kind: "order", symbol: i.symbol, message: orderMessage(filled, i, fee), side: order.side, qty, valueGbp: value }],
     };
   }
 
@@ -526,7 +530,7 @@ export function fillOrder(s: PortfolioState, order: Order, p: Pricer): OrderResu
       transactions: [tx, ...s.transactions],
     },
     order: filled,
-    events: order.source === "manual" && order.type === "market" ? [] : [{ id: `order:${filled.id}`, kind: order.source.includes("stop") || order.source === "take_profit" ? "protection" : "order", symbol: i.symbol, message: orderMessage(filled, i, fee) }],
+    events: order.source === "manual" && order.type === "market" ? [] : [{ id: `order:${filled.id}`, kind: order.source.includes("stop") || order.source === "take_profit" ? "protection" : "order", symbol: i.symbol, message: orderMessage(filled, i, fee), side: order.side, qty, valueGbp: value }],
   };
 }
 

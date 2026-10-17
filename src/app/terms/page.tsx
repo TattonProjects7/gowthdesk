@@ -10,11 +10,21 @@ export default function Terms() {
 
       <h2>What Shortlist is</h2>
       <p>
-        Shortlist is a research, education and paper-trading app. It shows market data for shares, ETFs and crypto, lets
-        you run a practice portfolio with <strong>virtual funds</strong> (including simulated ISA and SIPP accounts, orders,
-        savings plans and rebalancing), and scans markets for short-selling ideas.{" "}
-        <strong>It does not execute trades, hold client money or provide accounts with a regulated provider, and it is not a broker.</strong>{" "}
-        Simulated ISA/SIPP labels and allowances are for practice only and have no tax effect.
+        Shortlist is a research, education and trading app. In <strong>demo mode</strong> it runs a practice portfolio with{" "}
+        <strong>virtual funds</strong> (including simulated ISA and SIPP accounts, orders, savings plans and rebalancing). In{" "}
+        <strong>real mode</strong> it can send orders you confirm to your own brokerage account (currently Trading 212) using an
+        API key you create. <strong>Shortlist is not a broker. It does not hold client money, keep custody of investments or
+        execute trades itself.</strong> Simulated ISA/SIPP labels and allowances in demo mode are for practice only and have no
+        tax effect.
+      </p>
+
+      <h2>Real mode and your broker</h2>
+      <p>
+        Real orders are placed in your Trading 212 account and are governed by Trading 212&apos;s own terms, fees and
+        protections. You are responsible for every order you confirm, for keeping your API key secure, and for revoking it in
+        Trading 212 if you think it has been exposed. Prices shown in Shortlist may be delayed or indicative; market orders
+        fill at your broker&apos;s price. We are not responsible for losses caused by broker outages, rejected or delayed
+        orders, or market movements. You can disconnect at any time in Settings.
       </p>
 
       <h2>Not investment advice — risk warning</h2>

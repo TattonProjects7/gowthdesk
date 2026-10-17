@@ -54,7 +54,7 @@ export default function PriceChart({ closes, currency, now, height = 220 }: Prop
     [closes],
   );
 
-  if (n < 2) return <div ref={ref} className="h-40 rounded-xl border border-ink-800 bg-ink-900 animate-pulse" />;
+  if (n < 2) return <div ref={ref} className="h-40 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />;
 
   const padL = 8;
   const padR = 56;
@@ -118,7 +118,7 @@ export default function PriceChart({ closes, currency, now, height = 220 }: Prop
   const subH = 64;
 
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-3">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3">
       <div className="mb-2 flex flex-wrap items-center gap-1.5 text-[11px]">
         {(
           [

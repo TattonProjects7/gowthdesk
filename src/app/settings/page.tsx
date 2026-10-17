@@ -2,19 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Bell, Cloud, Fingerprint, Lock, RefreshCw, ScanFace, Settings as SettingsIcon, ShieldCheck, Trash2, User } from "lucide-react";
+import { Bell, Cloud, Fingerprint, Lock, KeyRound, PartyPopper, RefreshCw, ScanFace, Settings as SettingsIcon, ShieldCheck, Trash2, User, Volume2 } from "lucide-react";
 import Nav from "@/components/Nav";
-import { Button, Card, H2, Input, Select } from "@/components/ui";
+import { Button, Card, H2, Input, Select, Switch } from "@/components/ui";
 import { useAuth } from "@/lib/auth";
 import { useAppLock, biometricsAvailable, enableBiometric, enablePin, disableAppLock, setLockAfter } from "@/lib/applock";
 import { portfolio } from "@/lib/portfolioStore";
 import { cloudAttached } from "@/lib/docstore";
+import { celebrateTrade, setFxPref, useFxPrefs } from "@/lib/effects";
+import { broker, switchMode, useBroker, useMode } from "@/lib/broker/client";
 
 // Settings — app lock (Face ID / Touch ID or PIN), notifications, account and
 // data. The security features are what IG and ii lead with in their stores.
 export default function SettingsPage() {
   const { enabled, user, signOut } = useAuth();
   const lock = useAppLock();
+  const fx = useFxPrefs();
+  const brokerState = useBroker();
+  const mode = useMode();
   const [bio, setBio] = useState(false);
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
@@ -43,13 +48,82 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-3xl px-4 sm:px-8 py-8">
         <h1 className="text-2xl font-bold text-white flex items-center gap-2 mb-1">
           <SettingsIcon className="h-6 w-6 text-ink-300" /> Settings
         </h1>
         <p className="text-sm text-ink-400">Security, notifications, account and data.</p>
+
+        {/* Real trading */}
+        <H2>
+          <span className="inline-flex items-center gap-1.5">
+            <KeyRound className="h-4 w-4" /> Real trading
+          </span>
+        </H2>
+        <Card>
+          {mounted && brokerState.status?.connected ? (
+            <div className="space-y-3">
+              <p className="text-sm text-white">
+                Connected to Trading 212 <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${brokerState.status.env === "live" ? "bg-amber-400/15 text-amber-200" : "bg-violet-400/15 text-violet-200"}`}>{brokerState.status.env === "live" ? "Live" : "Practice"}</span>
+              </p>
+              <p className="text-xs text-ink-400">
+                Account {brokerState.status.accountId} · {brokerState.status.currency}. You&apos;re in {mode === "real" ? "real" : "demo"} mode.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="ghost" onClick={() => switchMode(mode === "real" ? "demo" : "real")}>
+                  Switch to {mode === "real" ? "demo" : "real"} mode
+                </Button>
+                <Button variant="danger" onClick={() => broker.disconnect()}>
+                  Disconnect
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm text-ink-300">
+                Connect your own Trading 212 Invest or Stocks ISA account to place real orders from Shortlist. Start with Trading 212&apos;s practice account to test it safely.
+              </p>
+              <Button onClick={() => broker.openConnect()}>
+                <KeyRound className="h-4 w-4" /> Connect Trading 212
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        {/* Celebrations */}
+        <H2>
+          <span className="inline-flex items-center gap-1.5">
+            <PartyPopper className="h-4 w-4" /> Celebrations
+          </span>
+        </H2>
+        <Card>
+          <div className="space-y-4">
+            <Switch
+              checked={mounted ? fx.celebrations : true}
+              onChange={(v) => setFxPref("celebrations", v)}
+              label="Confetti, fireworks and cash"
+              hint="Confetti and fireworks when you buy, cash bundles when you sell."
+              icon={<PartyPopper className="h-4 w-4 text-amber-300" />}
+            />
+            <Switch
+              checked={mounted ? fx.sounds : true}
+              onChange={(v) => setFxPref("sounds", v)}
+              label="Sounds"
+              hint="A chime, fireworks and a cash-register ring. Respects your phone's volume."
+              icon={<Volume2 className="h-4 w-4 text-sky-300" />}
+            />
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button variant="ghost" onClick={(e) => celebrateTrade({ kind: "buy", symbol: "VWRL", qty: 2.31, valueGbp: 250, priceLabel: "£108.20", account: "Preview", origin: { x: e.clientX, y: e.clientY } })}>
+                Preview a buy
+              </Button>
+              <Button variant="ghost" onClick={(e) => celebrateTrade({ kind: "sell", symbol: "LLOY", qty: 400, valueGbp: 240, priceLabel: "60p", account: "Preview", origin: { x: e.clientX, y: e.clientY } })}>
+                Preview a sell
+              </Button>
+            </div>
+          </div>
+        </Card>
 
         {/* App lock */}
         <H2>
@@ -162,7 +236,7 @@ export default function SettingsPage() {
           ) : (
             <div className="flex flex-wrap items-center gap-3">
               <p className="flex-1 text-sm text-ink-300">Sign in to sync your portfolio, watchlists and alerts across devices.</p>
-              <Link href="/login" className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
+              <Link href="/login" className="rounded-lg bg-brand shadow-glow-rose px-4 py-2 text-sm font-semibold text-white hover:brightness-110">
                 Sign in
               </Link>
             </div>

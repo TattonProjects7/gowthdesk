@@ -26,7 +26,7 @@ export default function WatchlistPage() {
   const results = useMemo(() => (q.trim() ? searchInstruments(q, 6) : []), [q]);
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-4xl px-4 sm:px-8 py-8">
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -140,7 +140,7 @@ export default function WatchlistPage() {
               <Empty icon={Star} title="This list is empty" body="Search above to add shares, ETFs or crypto, or browse the markets." cta={{ href: "/markets", label: "Browse markets" }} />
             ) : (
               <div className="space-y-2">
-                {!mounted && list.symbols.map((s) => <div key={s} className="h-[62px] rounded-xl border border-ink-800 bg-ink-900 animate-pulse" />)}
+                {!mounted && list.symbols.map((s) => <div key={s} className="h-[62px] rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />)}
                 {mounted &&
                   list.symbols.map((s, idx) => {
                     const i = getInstrument(s);

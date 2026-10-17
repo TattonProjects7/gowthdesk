@@ -97,7 +97,7 @@ export function FreeShareModal({ pricer, onClose }: { pricer: Pricer; onClose: (
         </div>
 
         {result && inst && (
-          <div className="fade-in mt-6 flex items-center gap-3 rounded-2xl border border-ink-800 bg-ink-900 p-3">
+          <div className="fade-in mt-6 flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3">
             <Avatar symbol={result.symbol} size={40} />
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-white">1 share of {inst.name}</p>
@@ -105,7 +105,7 @@ export function FreeShareModal({ pricer, onClose }: { pricer: Pricer; onClose: (
                 {fmtNative(pricer.price(result.symbol), inst.currency)} · in your General account
               </p>
             </div>
-            <a href={`/i/${result.symbol}`} className="rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white">
+            <a href={`/i/${result.symbol}`} className="rounded-xl bg-brand shadow-glow-rose px-3 py-2 text-sm font-semibold text-white">
               View
             </a>
           </div>

@@ -70,7 +70,7 @@ export default function AppLock() {
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ink-950 px-6 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-600 text-white mb-5">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-glow-rose mb-5">
         <Lock className="h-7 w-7" />
       </div>
       <h1 className="text-xl font-bold text-white">Shortlist is locked</h1>
@@ -104,7 +104,7 @@ export default function AppLock() {
             placeholder="PIN"
             className="w-full rounded-xl border border-ink-700 bg-ink-900 px-4 py-3 text-center text-2xl tracking-[0.5em] text-white focus:border-rose-600 focus:outline-none"
           />
-          <button type="submit" disabled={busy || pin.length < 4} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60">
+          <button type="submit" disabled={busy || pin.length < 4} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand shadow-glow-rose px-5 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60">
             <Fingerprint className="h-4 w-4" /> Unlock
           </button>
         </form>

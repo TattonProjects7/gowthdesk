@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { GeistSans } from "geist/font/sans";
 import AlertEngine from "@/components/AlertEngine";
 import AppLock from "@/components/AppLock";
 import CloudSync from "@/components/CloudSync";
 import Celebrations from "@/components/Celebrations";
+import TradeCelebration from "@/components/effects/TradeCelebration";
+import BrokerEngine from "@/components/broker/BrokerEngine";
+import ConnectSheet from "@/components/broker/ConnectSheet";
 import MissionEngine from "@/components/MissionEngine";
 import { CoachProvider } from "@/components/coach/CoachProvider";
 import NativeBridge from "@/components/NativeBridge";
@@ -18,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0f1a",
+  themeColor: "#07080d",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -26,18 +30,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-ink-950 text-ink-100 antialiased">
+    <html lang="en" className={GeistSans.variable}>
+      <body className="font-sans text-ink-100 antialiased">
         <AuthProvider>
           <NativeBridge />
           <CloudSync />
           <AlertEngine />
           <PortfolioEngine />
           <MissionEngine />
+          <BrokerEngine />
           <AppLock />
           <CoachProvider>
             {children}
             <Celebrations />
+            <TradeCelebration />
+            <ConnectSheet />
           </CoachProvider>
         </AuthProvider>
       </body>

@@ -57,7 +57,7 @@ export default function DigestCard({ input }: { input: DigestInput | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, Boolean(input)]);
 
-  if (!input || !digest) return <div className="mt-4 h-40 rounded-3xl border border-ink-800 bg-ink-900 animate-pulse" />;
+  if (!input || !digest) return <div className="mt-4 h-40 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />;
 
   return (
     <section className="mt-4 rounded-3xl border border-violet-900/60 bg-gradient-to-br from-violet-950/40 to-ink-900 p-4 sm:p-5">

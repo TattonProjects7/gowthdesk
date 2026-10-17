@@ -1,0 +1,102 @@
+name: Android
+
+# Builds the Android app on every change to the native shell.
+#   - Always: a debug APK you can install on any Android phone (Actions → run → Artifacts).
+#   - With signing secrets: a signed release bundle (.aab) for Google Play.
+#   - Run manually with "upload" ticked and PLAY_SERVICE_ACCOUNT_JSON set: uploads
+#     the bundle to the chosen Play track as a draft release.
+# Set the repository variable APP_URL to your live https site first (GO-LIVE.md).
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "android/**"
+      - "mobile/**"
+      - "capacitor.config.ts"
+      - "scripts/mobile-env.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: "Upload the signed bundle to Google Play"
+        type: boolean
+        default: false
+      track:
+        description: "Play track"
+        type: choice
+        default: internal
+        options: [internal, alpha, beta, production]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL }}
+      VERSION_CODE: ${{ github.run_number }}
+      VERSION_NAME: "1.0.${{ github.run_number }}"
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      HAS_PLAY: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Sync the native project
+        run: node scripts/mobile-env.mjs && npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shortlist-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+      - name: Build signed release bundle
+        if: env.HAS_KEYSTORE == 'true'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks"
+          ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/upload.jks"
+
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYSTORE == 'true'
+        with:
+          name: shortlist-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          retention-days: 30
+
+      - name: Upload to Google Play
+        if: env.HAS_KEYSTORE == 'true' && env.HAS_PLAY == 'true' && github.event_name == 'workflow_dispatch' && inputs.upload
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.shortlist.app
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          track: ${{ inputs.track }}
+          status: draft

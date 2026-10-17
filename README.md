@@ -1,6 +1,6 @@
 # Shortlist 📉
 
-**Invest smarter. Short with defined risk.**
+**Investing that's actually fun.**
 
 Shortlist is an investing app for the web, iPhone and Android. You practise with
 £10,000 of virtual money across UK and US shares, ETFs and crypto, using the
@@ -8,8 +8,13 @@ tools the leading UK platforms offer (IG, interactive investor, InvestEngine).
 A built-in Academy and an AI coach make it a fun way to learn, and an
 asymmetric short-finder sits on top that none of them has.
 
-It is a research, education and paper-trading product. It does **not** execute
-trades or hold client money.
+It has two modes. **Demo** is a free £10,000 practice portfolio. **Real**
+connects the user's own Trading 212 account and sends the orders they confirm
+there. Shortlist is not a broker: it never holds client money, and Trading 212
+executes and holds everything.
+
+**Going live?** Follow **[GO-LIVE.md](./GO-LIVE.md)**: web, real trading,
+Android and iPhone, step by step.
 
 See **[docs/COMPETITOR-FEATURES.md](./docs/COMPETITOR-FEATURES.md)** for the
 competitor study and how each feature maps to this app.
@@ -39,6 +44,26 @@ competitor study and how each feature maps to this app.
   on a % move, in-app and as phone notifications.
 - **Security** — Face ID / Touch ID / fingerprint app lock in the apps, with a
   PIN fallback.
+
+**Demo and real modes**
+
+- **Demo / Real switch** in the top bar. Demo is the practice portfolio. Real
+  shows the connected Trading 212 account, with a banner so it's always clear.
+- **Connect Trading 212** with an API key, practice or live server. The key is
+  encrypted into an httpOnly cookie and never stored in a database.
+- **Real deal ticket** with market, limit and stop orders, a review screen
+  before every order, and a real-money warning on live accounts.
+- **Real portfolio** with cash, positions and working orders straight from the
+  broker, refreshed every 15 seconds, plus cancel.
+
+**Celebrations and design**
+
+- **Confetti and fireworks** when you buy, **cash bundles and coins** when you
+  sell, and a sparkle for working orders. There's an order-filled card with an
+  animated tick, sounds and haptics, and a switch in Settings to turn it all
+  off. Reduced-motion settings are respected.
+- **Modern look**: Geist type, glass surfaces, brand gradients, a glowing chart
+  that draws itself in, rolling numbers and smooth page transitions.
 
 **Learn and AI coach**
 
@@ -104,7 +129,8 @@ deterministic offline coach answers from the same app data.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind · Capacitor 8 ·
 Supabase (Postgres + Auth) · Stripe · RevenueCat · Finnhub / Alpha Vantage ·
-Anthropic Claude (coach, digests) · OpenAI (short thesis).
+Anthropic Claude (coach, digests) · OpenAI (short thesis) · Trading 212
+Public API (real mode) · Geist.
 
 ## Project layout
 
@@ -118,13 +144,18 @@ src/
                         AllocationDonut, InstrumentRow, PortfolioEngine,
                         AlertEngine, AppLock, CloudSync, NativeBridge,
                         HealthCard, DailyBrief, DigestCard, ExplainTerm,
-                        Celebrations, MissionEngine, coach/, learn/
+                        Celebrations, MissionEngine, coach/, learn/,
+                        broker/ (real mode UI), effects/ (confetti, fireworks,
+                        cash rain, sounds)
   lib/
     learn/              lessons, glossary, XP / levels / streaks / badges,
                         missions, free share (pure, unit-tested)
     ai/                 Claude coach + digest (server), offline coach,
                         rate limiter, coach context
     health.ts           portfolio health score
+    broker/             Trading 212 client, ticker mapping, encrypted session
+                        cookie (server) and demo/real mode store (client)
+    effects.ts          trade celebration bus and preferences
     instruments.ts      instrument universe + ETF look-through data
     market.ts           deterministic price simulator (random walk)
     portfolio.ts        paper-trading engine: accounts, orders, protections,

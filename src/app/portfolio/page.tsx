@@ -27,6 +27,9 @@ import {
   X,
 } from "lucide-react";
 import Nav from "@/components/Nav";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import RealPortfolio from "@/components/broker/RealPortfolio";
+import { useMode } from "@/lib/broker/client";
 import AllocationDonut from "@/components/AllocationDonut";
 import AreaChart from "@/components/AreaChart";
 import HealthCard from "@/components/HealthCard";
@@ -45,6 +48,7 @@ import { useMarket } from "@/lib/useMarket";
 import { getInstrument, searchInstruments, fmtGbp, fmtNative, INSTRUMENTS } from "@/lib/instruments";
 import { toGbp } from "@/lib/fx";
 import { makePricer, portfolio, usePortfolio } from "@/lib/portfolioStore";
+import { celebrateTrade } from "@/lib/effects";
 import {
   ACCOUNT_META,
   MODEL_PORTFOLIOS,
@@ -82,7 +86,7 @@ const TABS: { id: Tab; label: string }[] = [
 
 export default function PortfolioPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-ink-950" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <PortfolioInner />
     </Suspense>
   );
@@ -101,9 +105,21 @@ function PortfolioInner() {
   const state = usePortfolio();
   const pricer = useMemo(() => makePricer(now, priceFor, closesFor), [now, priceFor, closesFor]);
   const summary = useMemo(() => (mounted ? summarise(state, pricer) : null), [mounted, state, pricer]);
+  const mode = useMode();
+
+  if (mounted && mode === "real") {
+    return (
+      <div className="min-h-screen">
+        <Nav />
+        <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
+          <RealPortfolio />
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
         <Onboarding />
@@ -115,7 +131,7 @@ function PortfolioInner() {
         </div>
 
         {!mounted || !summary ? (
-          <div className="h-64 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />
+          <div className="h-64 rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />
         ) : (
           <>
             {tab === "overview" && <Overview state={state} summary={summary} pricer={pricer} setTab={setTab} now={now} priceFor={priceFor} closesFor={closesFor} />}
@@ -166,7 +182,7 @@ function PortfolioHero({ summary, closesFor, now, showChart }: { summary: Return
   }, [summary, closesFor, now, days]);
 
   if (!summary) {
-    return <div className="mb-5 h-56 rounded-3xl border border-ink-800 bg-ink-900 animate-pulse" />;
+    return <div className="mb-5 h-56 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />;
   }
   const v = series.values;
   const shown = scrub != null ? v[scrub] : summary.totalValue;
@@ -174,15 +190,19 @@ function PortfolioHero({ summary, closesFor, now, showChart }: { summary: Return
   const rangePct = v.length > 1 && v[0] ? (rangeChg / v[0]) * 100 : 0;
 
   return (
-    <section className="mb-5 overflow-hidden rounded-3xl border border-ink-800 bg-gradient-to-b from-ink-900 via-ink-900 to-ink-950 p-5 sm:p-6">
-      <div className="flex items-center justify-between">
-        <p className="flex items-center gap-1.5 text-xs font-medium text-ink-400">
+    <section className="relative mb-5 overflow-hidden rounded-[28px] border border-white/[0.08] bg-ink-900/70 p-5 shadow-card sm:p-6">
+      <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-rose-500/30 via-fuchsia-500/20 to-violet-600/30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-28 -left-16 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="relative flex items-center justify-between">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-ink-300">
           <Wallet className="h-3.5 w-3.5" /> Total value
         </p>
-        <span className="rounded-full border border-ink-700 bg-ink-800/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink-400">Paper money</span>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-300 ring-1 ring-white/10">
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-rose-400 to-violet-400" /> Demo money
+        </span>
       </div>
-      <p className="mt-1 font-mono text-[40px] leading-tight font-semibold tracking-tight text-white">{fmtGbp(shown)}</p>
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+      <p className="relative mt-2 font-mono text-[44px] leading-none font-bold tracking-tight text-white sm:text-[54px]">{scrub != null ? fmtGbp(shown) : <AnimatedNumber value={shown} format={(x) => fmtGbp(x)} />}</p>
+      <div className="relative mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
         {scrub != null ? (
           <span className="text-ink-300">
             {new Date(series.dates[scrub]).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })} · <Money v={rangeChg} sign /> since start of range
@@ -205,11 +225,11 @@ function PortfolioHero({ summary, closesFor, now, showChart }: { summary: Return
 
       {showChart && (
         <>
-          <div className="-mx-1 mt-4">
+          <div className="relative -mx-1 mt-5">
             <AreaChart points={v} dates={series.dates} height={150} format={(x) => fmtGbp(x, { dp: 0 })} onScrub={setScrub} />
           </div>
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex gap-1">
+          <div className="relative mt-3 flex items-center justify-between">
+            <div className="flex gap-1 rounded-full bg-white/[0.03] p-1 ring-1 ring-white/[0.06]">
               {RANGES.map((r) => (
                 <button
                   key={r.id}
@@ -249,7 +269,7 @@ function HeroStat({ label, value }: { label: string; value: React.ReactNode }) {
 function QuickAction({ icon: Icon, label, onClick, href, primary }: { icon: React.ElementType; label: string; onClick?: () => void; href?: string; primary?: boolean }) {
   const inner = (
     <>
-      <span className={`flex h-12 w-12 items-center justify-center rounded-full ${primary ? "bg-rose-600 text-white" : "bg-ink-800 text-ink-100"} transition-transform active:scale-95`}>
+      <span className={`flex h-12 w-12 items-center justify-center rounded-full ${primary ? "bg-brand text-white shadow-glow-rose" : "bg-ink-800 text-ink-100"} transition-transform active:scale-95`}>
         <Icon className="h-5 w-5" />
       </span>
       <span className="text-[11px] font-medium text-ink-300">{label}</span>
@@ -291,7 +311,7 @@ function Overview({
   return (
     <>
       {/* Quick actions — the round buttons every banking app opens with */}
-      <div className="grid grid-cols-4 gap-2 rounded-3xl border border-ink-800 bg-ink-900 px-2 py-4">
+      <div className="grid grid-cols-4 gap-2 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card px-2 py-4">
         <QuickAction icon={Plus} label="Invest" href="/markets" primary />
         <QuickAction icon={PiggyBank} label="Add funds" onClick={() => setTab("accounts")} />
         <QuickAction icon={GraduationCap} label="Learn" href="/learn" />
@@ -313,7 +333,7 @@ function Overview({
       <H2 right={<button onClick={() => setTab("accounts")} className="text-xs text-rose-400 hover:underline">Manage</button>}>Your accounts</H2>
       <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
         {summary.accounts.map((a) => (
-          <div key={a.account.id} className="min-w-[78%] snap-start rounded-3xl border border-ink-800 bg-ink-900 p-4 sm:min-w-0">
+          <div key={a.account.id} className="min-w-[78%] snap-start rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 sm:min-w-0">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white">{a.account.name}</p>
               <Pill tone={a.account.type === "ISA" ? "emerald" : a.account.type === "SIPP" ? "violet" : "ink"}>{a.account.type}</Pill>
@@ -392,7 +412,7 @@ function HoldingLine({ h, state, compact }: { h: HoldingView; state: PortfolioSt
   const [tr, setTr] = useState(h.trailingPct?.toString() ?? "");
   const hasProt = h.stopLoss != null || h.takeProfit != null || h.trailingPct != null;
   return (
-    <div className="rounded-2xl border border-ink-800 bg-ink-900 px-3.5 py-3">
+    <div className="rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-3">
       <div className="flex items-center gap-3">
         <Link href={`/i/${h.symbol}`} className="flex min-w-0 flex-1 items-center gap-3">
           <Avatar symbol={h.symbol} size={38} />
@@ -601,7 +621,7 @@ function OrderLine({ o, acc, onCancel }: { o: Order; acc: string; onCancel?: () 
   const i = getInstrument(o.symbol)!;
   const tone = o.status === "filled" ? "emerald" : o.status === "pending" ? "amber" : o.status === "rejected" ? "rose" : "ink";
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-ink-800 bg-ink-900 px-3.5 py-3">
+    <div className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-3">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`text-xs font-bold uppercase ${o.side === "buy" ? "text-emerald-400" : "text-rose-400"}`}>{o.side}</span>
@@ -917,6 +937,7 @@ function Automate({ state, pricer }: { state: PortfolioState; pricer: Pricer }) 
               onClick={() => {
                 const r = portfolio.rebalance(account.id, pricer);
                 setMsg(r.errors.length ? { ok: false, text: r.errors[0] } : { ok: true, text: `Rebalanced with ${r.legs.length} trade${r.legs.length === 1 ? "" : "s"}.` });
+                if (!r.errors.length && r.legs.length) celebrateTrade({ kind: "rebalance", symbol: "", account: account.name, detail: `${r.legs.length} trade${r.legs.length === 1 ? "" : "s"} placed in your ${account.name}.` });
               }}
             >
               <Scale className="h-4 w-4" /> Rebalance now
@@ -977,7 +998,7 @@ function SavingsPlans({ state, account }: { state: PortfolioState; account: Port
       {plans.length > 0 && (
         <div className="mt-3 space-y-2">
           {plans.map((p) => (
-            <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-ink-800 bg-ink-900 px-3.5 py-3">
+            <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-3">
               <Repeat className={`h-4 w-4 ${p.active ? "text-violet-400" : "text-ink-600"}`} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-white">

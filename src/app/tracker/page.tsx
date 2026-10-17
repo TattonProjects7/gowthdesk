@@ -18,7 +18,7 @@ export default function Tracker() {
   const stats = ready ? trackerStats(items, priceFor, RISK_BUDGET) : null;
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-4xl px-5 sm:px-8 py-10">
         <h1 className="text-2xl font-bold text-white mb-1">My shorts</h1>
@@ -34,14 +34,14 @@ export default function Tracker() {
 
         {ready && stats && items.length > 0 && <EdgePanel stats={stats} />}
 
-        {!ready && <div className="h-40 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />}
+        {!ready && <div className="h-40 rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />}
 
         {ready && items.length === 0 && (
           <div className="rounded-2xl border border-dashed border-ink-700 bg-ink-900 p-10 text-center">
             <Radar className="mx-auto h-8 w-8 text-ink-500 mb-3" />
             <p className="text-ink-300 font-medium">No shorts tracked yet.</p>
             <p className="text-ink-500 text-sm mb-5">Pick a setup from the scanner and watch it run.</p>
-            <Link href="/scan" className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">
+            <Link href="/scan" className="inline-flex items-center gap-1.5 rounded-lg bg-brand shadow-glow-rose px-4 py-2 text-sm font-semibold text-white hover:brightness-110">
               <Radar className="h-4 w-4" /> Open the scanner
             </Link>
           </div>
@@ -68,7 +68,7 @@ function TrackedCard({ t, price, onDrop }: { t: TakenShort; price: number; onDro
         : { text: "OPEN", cls: "bg-ink-800 text-ink-300 border-ink-700" };
 
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5">
           <Link href={`/short/${t.symbol}`} className="font-bold text-white hover:underline">
@@ -131,7 +131,7 @@ function EdgePanel({ stats }: { stats: TrackerStats }) {
 
 function Metric({ label, value, tone = "text-white", big }: { label: string; value: string; tone?: string; big?: boolean }) {
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-3 text-center">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3 text-center">
       <p className="text-[11px] uppercase tracking-wide text-ink-500">{label}</p>
       <p className={`mt-1 font-bold ${big ? "text-2xl" : "text-lg"} ${tone}`}>{value}</p>
     </div>
@@ -141,7 +141,7 @@ function Metric({ label, value, tone = "text-white", big }: { label: string; val
 function Summary({ label, value, tone }: { label: string; value: string; tone: "emerald" | "rose" }) {
   const c = tone === "emerald" ? "text-emerald-300" : "text-rose-300";
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 text-center">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 text-center">
       <p className="text-[11px] uppercase tracking-wide text-ink-500">{label}</p>
       <p className={`mt-1 text-xl font-bold ${c}`}>{value}</p>
     </div>

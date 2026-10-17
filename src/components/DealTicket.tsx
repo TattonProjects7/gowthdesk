@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ArrowLeftRight, Check, ChevronDown, ChevronUp, Loader2, PiggyBank } from "lucide-react";
 import { Button, Input, Segmented, Select } from "@/components/ui";
 import { getInstrument, fmtNative, fmtGbp } from "@/lib/instruments";
 import { FX_FEE_PCT } from "@/lib/fx";
 import { ACCOUNT_META, MIN_ORDER_GBP, holdingFor, previewOrder, type OrderSide, type OrderType, type Pricer } from "@/lib/portfolio";
 import { portfolio, usePortfolio } from "@/lib/portfolioStore";
-import { successHaptic, warningHaptic } from "@/lib/native";
+import { warningHaptic } from "@/lib/native";
+import { celebrateTrade, originOf } from "@/lib/effects";
 
 // The deal ticket, modelled on IG's: pick the account (GIA / ISA / SIPP), buy
 // or sell, market / limit / stop, deal in £ (fractional from £1) or units,
@@ -34,6 +35,7 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
   const [msg, setMsg] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
   const [shortfall, setShortfall] = useState<number | null>(null);
   const [fromAcc, setFromAcc] = useState("");
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   const account = accounts.find((a) => a.id === accountId) ?? accounts[0];
   const holding = account ? holdingFor(state, account.id, i.symbol) : undefined;
@@ -76,7 +78,12 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
       return;
     }
     const o = r.order!;
-    successHaptic();
+    const filled = o.status === "filled";
+    celebrateTrade(
+      filled
+        ? { kind: side, symbol: i.symbol, name: i.name, qty: o.fillQty, valueGbp: o.fillValueGbp ?? 0, priceLabel: fmtNative(o.fillPrice ?? price, i.currency), account: account.name, origin: originOf(submitRef.current) }
+        : { kind: "working", symbol: i.symbol, detail: `${type === "limit" ? "Limit" : "Stop"} ${side} at ${fmtNative(parseFloat(limit), i.currency)} in your ${account.name}.`, origin: originOf(submitRef.current) },
+    );
     setMsg({
       tone: "ok",
       text:
@@ -106,7 +113,14 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
   if (!account) return null;
 
   return (
-    <div className={`rounded-2xl border ${side === "buy" ? "border-emerald-900" : "border-rose-900"} bg-ink-900 ${compact ? "p-4" : "p-5"}`}>
+    <div className={`relative overflow-hidden rounded-3xl border bg-ink-900/80 shadow-card ${side === "buy" ? "border-emerald-400/20" : "border-rose-400/20"} ${compact ? "p-4" : "p-5"}`}>
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${side === "buy" ? "from-emerald-400 to-teal-400" : "from-rose-500 to-pink-500"}`} />
+      <div className="mb-3 flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-300 ring-1 ring-white/10">
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-rose-400 to-violet-400" /> Demo money
+        </span>
+        <span className="text-xs text-ink-400">{fmtGbp(account.cash)} cash</span>
+      </div>
       <div className="grid grid-cols-2 gap-2 mb-4">
         {(["buy", "sell"] as OrderSide[]).map((s) => (
           <button
@@ -117,8 +131,8 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
               setShortfall(null);
               if (s === "sell") setType((t) => (t === "limit" ? "limit" : "market"));
             }}
-            className={`rounded-lg py-2 text-sm font-bold uppercase tracking-wide ${
-              side === s ? (s === "buy" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white") : "bg-ink-800 text-ink-400 hover:text-white"
+            className={`rounded-2xl py-2.5 text-sm font-bold uppercase tracking-wide transition-all ${
+              side === s ? (s === "buy" ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald" : "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-glow-rose") : "bg-white/[0.04] text-ink-300 hover:text-white"
             }`}
           >
             {s}
@@ -181,11 +195,11 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
       {mode === "gbp" && side === "buy" && (
         <div className="mt-2 flex gap-1.5">
           {[25, 100, 250, 1000].map((v) => (
-            <button key={v} onClick={() => setAmount(String(v))} className="rounded-md border border-ink-800 px-2 py-1 text-xs text-ink-300 hover:bg-ink-800">
+            <button key={v} onClick={() => setAmount(String(v))} className="rounded-lg border border-white/10 px-2.5 py-1 text-xs text-ink-300 transition-colors hover:bg-white/5">
               £{v}
             </button>
           ))}
-          <button onClick={() => setAmount(String(Math.floor(account.cash)))} className="rounded-md border border-ink-800 px-2 py-1 text-xs text-ink-300 hover:bg-ink-800">
+          <button onClick={() => setAmount(String(Math.floor(account.cash)))} className="rounded-lg border border-white/10 px-2.5 py-1 text-xs text-ink-300 transition-colors hover:bg-white/5">
             Max
           </button>
         </div>
@@ -218,7 +232,7 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
       )}
 
       {/* Preview */}
-      <div className="mt-4 rounded-xl border border-ink-800 bg-ink-950/60 p-3 text-sm space-y-1">
+      <div className="mt-4 rounded-2xl bg-white/[0.03] p-3 text-sm space-y-1 ring-1 ring-white/[0.05]">
         <Row k="Price" v={fmtNative(price, i.currency)} />
         <Row k={mode === "gbp" ? `Est. ${i.type === "crypto" ? "coins" : "units"}` : "Value"} v={mode === "gbp" ? preview.qty.toLocaleString(undefined, { maximumFractionDigits: 6 }) : fmtGbp(preview.valueGbp)} />
         <Row k={preview.feeGbp ? `FX fee (${FX_FEE_PCT}%)` : "Commission"} v={preview.feeGbp ? fmtGbp(preview.feeGbp) : "£0.00"} muted />
@@ -230,7 +244,7 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
         </p>
       </div>
 
-      <Button variant={side} onClick={submit} disabled={busy || amt <= 0 || (side === "sell" && !holding)} className="mt-3 w-full py-3">
+      <Button ref={submitRef} variant={side} onClick={submit} disabled={busy || amt <= 0 || (side === "sell" && !holding)} className="mt-3 w-full rounded-2xl py-3.5">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : side === "buy" ? "Buy" : "Sell"} {i.symbol}
         {type !== "market" ? ` (${type})` : ""}
       </Button>

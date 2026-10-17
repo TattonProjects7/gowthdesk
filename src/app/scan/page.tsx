@@ -18,7 +18,7 @@ export default function Scanner() {
   const best = candidates[0];
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
 
       <main className="mx-auto max-w-5xl px-5 sm:px-8 py-10">
@@ -44,7 +44,7 @@ export default function Scanner() {
               { icon: Target, title: "Asymmetric payoff", body: "Targets are 3–8× the risk. One winner pays for several stops." },
               { icon: ShieldAlert, title: "Squeeze radar", body: "Crowded shorts are flagged, not sold to you — avoid the GME-style trap." },
             ].map(({ icon: Icon, title, body }) => (
-              <div key={title} className="rounded-xl border border-ink-800 bg-ink-900 p-4">
+              <div key={title} className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4">
                 <Icon className="h-5 w-5 text-rose-400 mb-2" />
                 <p className="text-sm font-semibold text-white mb-0.5">{title}</p>
                 <p className="text-xs text-ink-400 leading-relaxed">{body}</p>
@@ -70,7 +70,7 @@ export default function Scanner() {
                   squeeze risk {best.squeeze.level}
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white group-hover:bg-rose-500 transition-colors">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-brand shadow-glow-rose px-4 py-2 text-sm font-semibold text-white group-hover:brightness-110 transition-colors">
                 See the setup <ArrowRight className="h-4 w-4" />
               </span>
             </div>
@@ -151,7 +151,7 @@ function CandidateRow({
   const chg = closes.length >= 2 ? (closes[closes.length - 1] / closes[closes.length - 2] - 1) * 100 : 0;
   const sq = squeezeTone(c.squeeze.level);
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 hover:border-ink-600 transition-colors">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 hover:border-ink-600 transition-colors">
       <div className="flex items-center gap-4">
         <div className="hidden sm:flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-ink-800 text-xs font-bold text-ink-400">
           {rank}
@@ -196,7 +196,7 @@ function CandidateRow({
           onClick={onTake}
           disabled={tracked}
           className={`shrink-0 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-            tracked ? "bg-ink-800 text-ink-500 cursor-default" : "bg-rose-600 text-white hover:bg-rose-500"
+            tracked ? "bg-ink-800 text-ink-500 cursor-default" : "bg-brand text-white shadow-glow-rose hover:brightness-110"
           }`}
         >
           {tracked ? (
@@ -231,7 +231,7 @@ function SkeletonRows() {
   return (
     <>
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-[68px] rounded-xl border border-ink-800 bg-ink-900 animate-pulse" />
+        <div key={i} className="h-[68px] rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />
       ))}
     </>
   );

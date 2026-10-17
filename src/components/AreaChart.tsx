@@ -90,26 +90,34 @@ export default function AreaChart({
         <svg width={width} height={height} className="block">
           <defs>
             <linearGradient id={gid} x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor={color} stopOpacity="0.32" />
+              <stop offset="0%" stopColor={color} stopOpacity="0.38" />
+              <stop offset="55%" stopColor={color} stopOpacity="0.1" />
               <stop offset="100%" stopColor={color} stopOpacity="0" />
             </linearGradient>
+            <filter id={`${gid}-glow`} x="-10%" y="-40%" width="120%" height="180%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
           </defs>
-          <line x1={0} x2={width} y1={y(points[0])} y2={y(points[0])} stroke="#7b86b5" strokeOpacity="0.35" strokeDasharray="2 4" />
-          <path d={area} fill={`url(#${gid})`} />
-          <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1={0} x2={width} y1={y(points[0])} y2={y(points[0])} stroke="#929ab3" strokeOpacity="0.3" strokeDasharray="2 5" />
+          <path d={area} fill={`url(#${gid})`} className="chart-fade" />
+          <path d={line} fill="none" stroke={color} strokeOpacity="0.55" strokeWidth="5" filter={`url(#${gid}-glow)`} className="chart-fade" />
+          <path d={line} fill="none" stroke={color} strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" pathLength={1} className="chart-draw" />
           {hover == null ? (
-            <circle cx={x(n - 1)} cy={y(points[n - 1])} r="3.5" fill={color} stroke="#0d0f1a" strokeWidth="2" />
+            <g>
+              <circle cx={x(n - 1)} cy={y(points[n - 1])} r="9" fill={color} className="chart-pulse" />
+              <circle cx={x(n - 1)} cy={y(points[n - 1])} r="4" fill={color} stroke="#07080d" strokeWidth="2" />
+            </g>
           ) : (
             <g>
-              <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} stroke="#a0a9cc" strokeOpacity="0.6" />
-              <circle cx={x(hover)} cy={y(points[hover])} r="4.5" fill={color} stroke="#0d0f1a" strokeWidth="2" />
+              <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} stroke="#d6dae6" strokeOpacity="0.45" strokeDasharray="3 3" />
+              <circle cx={x(hover)} cy={y(points[hover])} r="5" fill={color} stroke="#07080d" strokeWidth="2.5" />
             </g>
           )}
         </svg>
       )}
       {ok && hover != null && (
         <div
-          className="pointer-events-none absolute -top-1 rounded-lg border border-ink-700 bg-ink-900/95 px-2 py-1 text-[11px] shadow-xl"
+          className="pointer-events-none absolute -top-1 rounded-xl border border-white/10 bg-ink-900/95 px-2 py-1 text-[11px] shadow-xl backdrop-blur"
           style={{ left: Math.min(Math.max(0, x(hover) - 50), width - 100), width: 100 }}
         >
           <p className="font-mono font-semibold text-white text-center">{format(points[hover])}</p>

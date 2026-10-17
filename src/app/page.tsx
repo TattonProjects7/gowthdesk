@@ -26,54 +26,59 @@ import {
 // Public marketing landing page. The app itself lives at /scan.
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-ink-950 text-ink-100">
+    <div className="min-h-screen text-ink-100">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-ink-800 bg-ink-950/85 backdrop-blur px-5 sm:px-8 py-3.5 flex items-center gap-3">
+      <header className="glass sticky top-0 z-30 border-b border-white/[0.06] px-5 sm:px-8 py-3 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-600 text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-white shadow-glow-rose">
             <TrendingDown className="h-5 w-5" />
           </div>
           <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
         </Link>
-        <nav className="ml-auto flex items-center gap-2">
-          <Link href="/markets" className="hidden sm:inline rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
+        <nav className="ml-auto flex items-center gap-1.5">
+          <Link href="/markets" className="hidden sm:inline rounded-full px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-white/[0.05]">
             Markets
           </Link>
-          <Link href="/pricing" className="hidden sm:inline rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
+          <Link href="/pricing" className="hidden sm:inline rounded-full px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-white/[0.05]">
             Pricing
           </Link>
-          <Link href="/login" className="rounded-lg px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-ink-900">
+          <Link href="/login" className="rounded-full px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-white/[0.05]">
             Sign in
           </Link>
-          <Link href="/portfolio" className="rounded-lg bg-rose-600 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-rose-500">
+          <Link href="/portfolio" className="rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-ink-950 shadow-[0_8px_24px_-10px_rgba(255,255,255,0.6)] transition-transform active:scale-[0.98]">
             Open app
           </Link>
         </nav>
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8 pt-14 pb-12 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+      <section className="relative mx-auto max-w-6xl px-5 sm:px-8 pt-14 sm:pt-20 pb-12 grid lg:grid-cols-[1.1fr_0.9fr] gap-14 items-center">
+        <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(232,121,249,0.18),transparent)] blur-2xl" aria-hidden />
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-rose-900 bg-rose-950 px-3 py-1 text-xs font-semibold text-rose-300 mb-5">
-            <span className="live-dot inline-block h-2 w-2 rounded-full bg-rose-400" /> Invest · trade · short — one app
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-semibold text-ink-200 mb-6 backdrop-blur">
+            <span className="rounded-full bg-gradient-to-r from-amber-300 to-orange-400 px-1.5 py-px text-[10px] font-bold uppercase text-ink-950">New</span>
+            Demo and real modes · trade for real with Trading 212
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white leading-[1.08] tracking-tight">
-            Invest smarter. <span className="text-rose-400">Short with defined risk.</span>
+          <h1 className="text-[42px] sm:text-6xl font-bold text-white leading-[1.02] tracking-[-0.035em]">
+            Investing that&apos;s <span className="text-gradient">actually fun.</span>
           </h1>
-          <p className="mt-5 text-lg text-ink-300 leading-relaxed max-w-xl">
-            UK and US shares, ETFs and crypto in one app: a practice portfolio with ISA and SIPP accounts, live charts with
-            indicators, watchlists, price alerts, savings plans, one-tap rebalancing and look-through analytics — plus the
-            asymmetric short-finder no one else has.
+          <p className="mt-6 text-lg text-ink-300 leading-relaxed max-w-xl">
+            Practise free with £10,000 of demo money, learn in two-minute lessons with an AI coach, then switch to real mode and
+            trade your own Trading 212 account. Confetti when you buy, cash when you sell.
           </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href="/portfolio" className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500">
-              Open the app <ArrowRight className="h-4 w-4" />
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href="/portfolio" className="group inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-semibold text-white shadow-glow-rose transition-transform active:scale-[0.98]">
+              Start free in demo <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link href="/markets" className="inline-flex items-center gap-2 rounded-xl border border-ink-700 px-5 py-3 text-sm font-semibold text-ink-200 hover:bg-ink-900">
-              Browse markets
+            <Link href="/learn" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-6 py-3.5 text-sm font-semibold text-ink-100 hover:bg-white/[0.07]">
+              Try a 2-minute lesson
             </Link>
           </div>
-          <p className="mt-4 text-xs text-ink-500">Free · £10,000 of virtual money to practise with · iPhone, Android and web</p>
+          <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-ink-400">
+            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Free demo, no sign-up</span>
+            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> iPhone, Android and web</span>
+            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> ISA, SIPP and GIA</span>
+          </div>
         </div>
 
         {/* Phone mock-up with the real app */}
@@ -117,7 +122,7 @@ export default function Landing() {
             <div className="rounded-[2.6rem] border border-ink-700 bg-ink-950 p-2.5 shadow-2xl shadow-violet-950/50">
               <div className="overflow-hidden rounded-[2.1rem] border border-ink-800">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/screenshots/mobile-learn.png" alt="Shortlist Academy on iPhone: level, streak, next lesson and AI coach" className="block w-full" loading="lazy" />
+                <img src="/screenshots/mobile-learn.webp" alt="Shortlist Academy on iPhone: level, streak, next lesson and AI coach" className="block w-full" loading="lazy" />
               </div>
             </div>
           </div>
@@ -172,10 +177,10 @@ export default function Landing() {
           Your portfolio at a glance, every instrument in depth, and the short scanner when you want the other side of the trade.
         </p>
         <div className="mt-10 grid lg:grid-cols-2 gap-6">
-          <Shot src="/screenshots/portfolio.png" alt="Shortlist portfolio overview with value chart, accounts and holdings" caption="Portfolio — value chart, accounts, P&L, income and holdings on one screen." />
-          <Shot src="/screenshots/instrument.png" alt="Shortlist instrument page with chart, deal ticket and fund look-through" caption="Instrument — chart and indicators, deal ticket, alerts, sentiment and fund look-through." />
-          <Shot src="/screenshots/scanner.png" alt="Shortlist scanner ranking short candidates" caption="Short scanner — every name scored, with squeeze risk and risk:reward at a glance." />
-          <Shot src="/screenshots/detail.png" alt="Shortlist setup detail with squeeze radar and structured trade" caption="Setup detail — squeeze radar, catalyst countdown and the defined-risk trade." />
+          <Shot src="/screenshots/portfolio.webp" alt="Shortlist portfolio overview with value chart, accounts and holdings" caption="Portfolio — value chart, accounts, P&L, income and holdings on one screen." />
+          <Shot src="/screenshots/instrument.webp" alt="Shortlist instrument page with chart, deal ticket and fund look-through" caption="Instrument — chart and indicators, deal ticket, alerts, sentiment and fund look-through." />
+          <Shot src="/screenshots/scanner.webp" alt="Shortlist scanner ranking short candidates" caption="Short scanner — every name scored, with squeeze risk and risk:reward at a glance." />
+          <Shot src="/screenshots/detail.webp" alt="Shortlist setup detail with squeeze radar and structured trade" caption="Setup detail — squeeze radar, catalyst countdown and the defined-risk trade." />
         </div>
       </section>
 
@@ -225,7 +230,7 @@ export default function Landing() {
       {/* Asymmetric spotlight */}
       <section className="border-t border-ink-800 bg-ink-900/30">
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-16 grid lg:grid-cols-2 gap-10 items-center">
-          <div className="order-2 lg:order-1 rounded-2xl border border-ink-800 bg-ink-900 p-6">
+          <div className="order-2 lg:order-1 rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-6">
             <div className="flex justify-between text-xs mb-2">
               <span className="text-emerald-400 font-semibold">target $190</span>
               <span className="text-ink-400">entry $241</span>
@@ -248,7 +253,7 @@ export default function Landing() {
               Prefer truly capped risk? One click shows the equivalent <span className="text-sky-300">put</span> — loss
               limited to the premium, no margin call, no forced cover.
             </p>
-            <Link href="/scan" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500">
+            <Link href="/scan" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand shadow-glow-rose px-5 py-3 text-sm font-semibold text-white hover:brightness-110">
               See today’s top setups <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -263,7 +268,7 @@ export default function Landing() {
           <Link href="/scan" className="inline-flex items-center gap-2 rounded-xl border border-ink-700 px-5 py-3 text-sm font-semibold text-ink-200 hover:bg-ink-900">
             Use it free
           </Link>
-          <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white hover:bg-rose-500">
+          <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl bg-brand shadow-glow-rose px-5 py-3 text-sm font-semibold text-white hover:brightness-110">
             See Pro — £12/mo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -277,7 +282,7 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-600 text-white">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose">
                 <TrendingDown className="h-4 w-4" />
               </div>
               <span className="font-bold text-white">Shortlist</span>
@@ -291,7 +296,7 @@ export default function Landing() {
             </div>
           </div>
           <p className="mt-6 text-xs text-ink-600 leading-relaxed max-w-3xl">
-            Educational research tool, not investment advice. Shortlist does not execute trades. Short selling carries
+            Not investment advice. Shortlist is not a broker: demo mode uses virtual money, and real-mode orders are executed and held by your own Trading 212 account. Capital at risk. Short selling carries
             uncapped risk unless a hard stop or defined-risk instrument is used. Market figures shown on this page are
             illustrative.
           </p>
@@ -303,7 +308,7 @@ export default function Landing() {
 
 function Shot({ src, alt, caption }: { src: string; alt: string; caption: string }) {
   return (
-    <figure className="rounded-2xl border border-ink-800 bg-ink-900 p-2 shadow-2xl overflow-hidden">
+    <figure className="rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-2 shadow-2xl overflow-hidden">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} className="rounded-xl w-full" loading="lazy" />
       <figcaption className="px-3 py-3 text-sm text-ink-400">{caption}</figcaption>
@@ -314,17 +319,37 @@ function Shot({ src, alt, caption }: { src: string; alt: string; caption: string
 function PhoneMock() {
   return (
     <div className="relative mx-auto w-[280px] sm:w-[300px]">
-      <div className="absolute -inset-10 rounded-full bg-rose-600/20 blur-3xl" aria-hidden />
-      <div className="relative rounded-[3rem] border border-ink-700 bg-black p-2.5 shadow-2xl">
-        <div className="overflow-hidden rounded-[2.4rem] bg-ink-950">
-          {/* status bar with the camera island */}
-          <div className="relative flex h-9 items-center justify-between px-7 text-[11px] font-semibold text-white">
-            <span>9:41</span>
-            <span className="absolute left-1/2 top-2 h-5 w-20 -translate-x-1/2 rounded-full bg-black" aria-hidden />
-            <span className="tracking-tight">5G ▮▮▮</span>
+      <div className="absolute -inset-12 rounded-full bg-gradient-to-br from-rose-500/30 via-fuchsia-500/20 to-violet-600/30 blur-3xl" aria-hidden />
+      <div className="relative animate-float">
+        <div className="relative rounded-[3rem] border border-white/15 bg-black p-2.5 shadow-[0_40px_120px_-30px_rgba(139,92,246,0.55)]">
+          <div className="overflow-hidden rounded-[2.4rem] bg-ink-950">
+            {/* status bar with the camera island */}
+            <div className="relative flex h-9 items-center justify-between px-7 text-[11px] font-semibold text-white">
+              <span>9:41</span>
+              <span className="absolute left-1/2 top-2 h-5 w-20 -translate-x-1/2 rounded-full bg-black" aria-hidden />
+              <span className="tracking-tight">5G ▮▮▮</span>
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/screenshots/mobile-portfolio.webp" alt="Shortlist on iPhone: portfolio value, chart and quick actions" className="block w-full" />
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/screenshots/mobile-portfolio.png" alt="Shortlist on iPhone: portfolio value, chart and quick actions" className="block w-full" />
+        </div>
+        {/* Floating chips */}
+        <div className="absolute -left-14 top-24 hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-ink-900/90 px-3 py-2 shadow-2xl backdrop-blur" aria-hidden>
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-400 text-ink-950">
+            <Check className="h-4 w-4" />
+          </span>
+          <span className="text-left">
+            <span className="block text-[10px] font-semibold uppercase tracking-wider text-emerald-300">Order filled</span>
+            <span className="block text-sm font-bold text-white">+£250 VWRL 🎉</span>
+          </span>
+        </div>
+        <div className="absolute -right-12 top-1/2 hidden sm:block rounded-2xl border border-white/10 bg-ink-900/90 px-3 py-2 shadow-2xl backdrop-blur" aria-hidden>
+          <span className="block text-[10px] font-semibold uppercase tracking-wider text-amber-300">Cash in!</span>
+          <span className="flex items-center gap-1.5 text-sm font-bold text-white"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-yellow-500 text-[11px] font-black text-amber-900">£</span>+£180.40</span>
+        </div>
+        <div className="absolute -left-8 bottom-16 hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-ink-900/90 px-3 py-1.5 shadow-2xl backdrop-blur" aria-hidden>
+          <span className="text-base">🔥</span>
+          <span className="text-xs font-semibold text-white">5-day streak · Level 4</span>
         </div>
       </div>
     </div>
@@ -333,8 +358,8 @@ function PhoneMock() {
 
 function Step({ n, title, body }: { n: number; title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-ink-800 bg-ink-900 p-6">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-600 text-white font-bold">{n}</div>
+    <div className="rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-6">
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose font-bold">{n}</div>
       <h3 className="mt-4 text-lg font-bold text-white">{title}</h3>
       <p className="mt-2 text-sm text-ink-400 leading-relaxed">{body}</p>
     </div>

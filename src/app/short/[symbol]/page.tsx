@@ -30,7 +30,7 @@ export default function ShortDetail() {
 
   if (!valid) {
     return (
-      <div className="min-h-screen bg-ink-950">
+      <div className="min-h-screen">
         <Nav />
         <main className="mx-auto max-w-3xl px-6 py-20 text-center">
           <p className="text-ink-300">No coverage for “{symbol}”.</p>
@@ -43,7 +43,7 @@ export default function ShortDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-3xl px-5 sm:px-8 py-8">
         <Link href="/scan" className="inline-flex items-center gap-1.5 text-sm text-ink-400 hover:text-white mb-6">
@@ -51,7 +51,7 @@ export default function ShortDetail() {
         </Link>
 
         {!c ? (
-          <div className="h-96 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />
+          <div className="h-96 rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />
         ) : (
           <>
             <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
@@ -109,7 +109,7 @@ export default function ShortDetail() {
             <div className="space-y-2 mb-6">
               {c.reasons.length === 0 && <p className="text-sm text-ink-400">No strong signals right now — this one ranks low for a reason.</p>}
               {c.reasons.map((r) => (
-                <div key={r.label} className="flex items-start gap-3 rounded-xl border border-ink-800 bg-ink-900 p-3.5">
+                <div key={r.label} className="flex items-start gap-3 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3.5">
                   <span
                     className={`mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold ${
                       r.weight >= 0 ? "bg-rose-950 text-rose-300 border border-rose-900" : "bg-emerald-950 text-emerald-300 border border-emerald-900"
@@ -127,11 +127,11 @@ export default function ShortDetail() {
 
             {/* Signals + chart */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              <div className="rounded-xl border border-ink-800 bg-ink-900 p-4">
+              <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500 mb-3">30-day price</p>
                 <Sparkline points={closesFor(c.symbol)} width={260} height={70} />
               </div>
-              <div className="rounded-xl border border-ink-800 bg-ink-900 p-4 space-y-2">
+              <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-ink-500 mb-1">Signals</p>
                 <Row k="RSI (14)" v={c.signals.rsi.toFixed(0)} hot={c.signals.rsi >= 68} />
                 <Row k="Stretch vs mean" v={`${c.signals.zscore >= 0 ? "+" : ""}${c.signals.zscore.toFixed(1)}σ`} hot={c.signals.zscore >= 1.5} />
@@ -158,7 +158,7 @@ export default function ShortDetail() {
               }
               disabled={has(c.symbol)}
               className={`w-full rounded-xl px-4 py-3.5 text-sm font-semibold transition-colors ${
-                has(c.symbol) ? "bg-ink-800 text-ink-500 cursor-default" : "bg-rose-600 text-white hover:bg-rose-500"
+                has(c.symbol) ? "bg-ink-800 text-ink-500 cursor-default" : "bg-brand text-white shadow-glow-rose hover:brightness-110"
               }`}
             >
               {has(c.symbol) ? (
@@ -218,7 +218,7 @@ function PayoffBar({ entry, stop, target, price }: { entry: number; stop: number
   const pricePos = pct(price);
 
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-4">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4">
       <div className="flex justify-between text-xs mb-2">
         <span className="text-emerald-400 font-semibold">target ${target.toFixed(2)}</span>
         <span className="text-ink-400">entry ${entry.toFixed(2)}</span>
@@ -241,7 +241,7 @@ function PayoffBar({ entry, stop, target, price }: { entry: number; stop: number
 function Stat({ label, value, sub, tone = "white" }: { label: string; value: string; sub?: string; tone?: "white" | "rose" | "emerald" }) {
   const c = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : "text-white";
   return (
-    <div className="rounded-xl border border-ink-800 bg-ink-900 p-3">
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3">
       <p className="text-[11px] text-ink-500 leading-tight">{label}</p>
       <p className={`mt-1 font-mono font-bold ${c}`}>{value}</p>
       {sub && <p className="text-[11px] text-ink-500">{sub}</p>}

@@ -10,7 +10,7 @@ import { useSubscription } from "@/lib/subscription";
 import { isNative } from "@/lib/platform";
 import { purchasePro, restorePurchases } from "@/lib/iap";
 
-const FREE = ["UK & US shares, ETFs and crypto with live charts", "Paper portfolio: GIA, ISA & SIPP, fractional from £1", "Watchlists, price alerts & market calendar", "Savings plans, AutoInvest & one-click rebalance", "Look-through analytics & income projection", "Short scanner, squeeze radar & tracker", "Shortlist Academy, missions & AI coach"];
+const FREE = ["UK & US shares, ETFs and crypto with live charts", "Paper portfolio: GIA, ISA & SIPP, fractional from £1", "Watchlists, price alerts & market calendar", "Savings plans, AutoInvest & one-click rebalance", "Look-through analytics & income projection", "Short scanner, squeeze radar & tracker", "Shortlist Academy, missions & AI coach", "Demo and real modes with Trading 212"];
 const PRO = ["Everything in Free", "AI bear + steel-manned bull thesis", "Defined-risk put alternatives", "Real-time alerts across devices", "Priority data refresh"];
 
 export default function Pricing() {
@@ -67,7 +67,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-4xl px-5 sm:px-8 py-12">
         <div className="text-center mb-10">
@@ -84,7 +84,7 @@ export default function Pricing() {
           <Plan name="Free" price="£0" tagline="Everything you need to find and track shorts." features={FREE} cta={<Link href="/scan" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Open the scanner</Link>} />
 
           <div className="rounded-2xl border border-rose-800 bg-gradient-to-br from-rose-950/40 to-ink-900 p-6 relative">
-            <span className="absolute -top-3 left-6 rounded-full bg-rose-600 px-3 py-0.5 text-xs font-bold text-white">PRO</span>
+            <span className="absolute -top-3 left-6 rounded-full bg-brand shadow-glow-rose px-3 py-0.5 text-xs font-bold text-white">PRO</span>
             <h2 className="text-lg font-bold text-white">Pro</h2>
             <p className="mt-1 text-3xl font-bold text-white">
               £12<span className="text-base font-normal text-ink-400">/mo</span>
@@ -107,7 +107,7 @@ export default function Pricing() {
                   <button
                     onClick={upgrade}
                     disabled={busy || !billingEnabled}
-                    className="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+                    className="w-full rounded-lg bg-brand shadow-glow-rose px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 inline-flex items-center justify-center gap-2"
                   >
                     {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                     {native ? "Upgrade to Pro" : !enabled ? "Sign-in required" : !user ? "Sign in to upgrade" : "Upgrade to Pro"}
@@ -130,7 +130,7 @@ export default function Pricing() {
 
 function Plan({ name, price, tagline, features, cta }: { name: string; price: string; tagline: string; features: string[]; cta: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-ink-800 bg-ink-900 p-6">
+    <div className="rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-6">
       <h2 className="text-lg font-bold text-white">{name}</h2>
       <p className="mt-1 text-3xl font-bold text-white">{price}</p>
       <p className="mt-1 text-sm text-ink-300">{tagline}</p>

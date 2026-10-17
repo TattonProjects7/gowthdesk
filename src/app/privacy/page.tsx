@@ -36,6 +36,7 @@ export default function Privacy() {
         <li><a href="https://stripe.com/privacy">Stripe</a> — web payments.</li>
         <li><a href="https://www.revenuecat.com/privacy">RevenueCat</a> and the Apple App Store / Google Play — mobile in-app purchases.</li>
         <li>Market-data providers (e.g. Finnhub, Alpha Vantage) — to display prices. Requests are for ticker data, not about you.</li>
+        <li><a href="https://www.trading212.com/legal-documentation">Trading 212</a> — only if you connect a real account. Your API key is checked with Trading 212 and then stored encrypted in a secure, httpOnly cookie on your device, never in our database. It is sent only to Trading 212, to read your balances and positions and to place the orders you confirm. Disconnecting deletes the cookie.</li>
         <li><a href="https://www.anthropic.com/legal/privacy">Anthropic</a> — to power the AI coach and the “Why it’s moving” digests. We send your question, the screen you are on, a summary of your paper portfolio and your learning level. We never send your name, email or account details.</li>
         <li><a href="https://openai.com/policies/privacy-policy">OpenAI</a> — to generate the optional AI thesis; only the trade setup, never your identity, is sent.</li>
       </ul>

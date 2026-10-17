@@ -33,7 +33,7 @@ export default function LessonPage() {
 
   if (!lesson) {
     return (
-      <main className="min-h-screen bg-ink-950 px-6 py-20 text-center">
+      <main className="min-h-screen px-6 py-20 text-center">
         <p className="text-ink-300">Lesson not found.</p>
         <Link href="/learn" className="mt-4 inline-block text-rose-400 hover:underline">
           ← Back to the Academy
@@ -75,7 +75,7 @@ export default function LessonPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <main className="mx-auto flex min-h-screen max-w-xl flex-col px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         {/* Top bar: close + story progress */}
         <div className="flex items-center gap-3">
@@ -173,11 +173,11 @@ export default function LessonPage() {
                 <RotateCcw className="h-4 w-4" /> Retake
               </button>
               {next ? (
-                <button onClick={() => router.push(`/learn/${next.id}`)} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-rose-600 text-sm font-semibold text-white hover:bg-rose-500">
+                <button onClick={() => router.push(`/learn/${next.id}`)} className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-brand shadow-glow-rose text-sm font-semibold text-white hover:brightness-110">
                   Next: {next.title} <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
-                <Link href="/learn" className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-rose-600 text-sm font-semibold text-white hover:bg-rose-500">
+                <Link href="/learn" className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-brand shadow-glow-rose text-sm font-semibold text-white hover:brightness-110">
                   Back to the Academy
                 </Link>
               )}
@@ -192,7 +192,7 @@ export default function LessonPage() {
               <button
                 onClick={advance}
                 disabled={!inCards && picked === null}
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-rose-600 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-40"
+                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-brand shadow-glow-rose text-sm font-semibold text-white hover:brightness-110 disabled:opacity-40"
               >
                 {inCards ? (step === nCards - 1 ? "Start the quiz" : "Continue") : qIndex === nQ - 1 ? "See results" : "Next question"}
                 <ArrowRight className="h-4 w-4" />

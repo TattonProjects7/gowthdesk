@@ -120,7 +120,7 @@ export default function CoachSheet({ onClose, pending, onConsumed }: { onClose: 
 
         <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto px-4 py-4 text-sm">
           {history.length === 0 && streaming === null && (
-            <div className="rounded-2xl border border-ink-800 bg-ink-900 p-4">
+            <div className="rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4">
               <p className="font-semibold text-white">Hi! I&apos;m your investing coach 👋</p>
               <p className="mt-1 text-ink-400">
                 I can explain any term, review your practice portfolio, tell you why a share is moving, or point you to the right lesson. I teach — I don&apos;t tell you what to buy.
@@ -129,17 +129,17 @@ export default function CoachSheet({ onClose, pending, onConsumed }: { onClose: 
           )}
           {history.map((m, i) =>
             m.role === "user" ? (
-              <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-rose-600 px-3.5 py-2.5 text-white">
+              <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-brand shadow-glow-rose px-3.5 py-2.5 text-white">
                 {m.content}
               </div>
             ) : (
-              <div key={i} className="max-w-[92%] rounded-2xl rounded-bl-md border border-ink-800 bg-ink-900 px-3.5 py-2.5 text-ink-200">
+              <div key={i} className="max-w-[92%] rounded-2xl rounded-bl-md border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-2.5 text-ink-200">
                 <RichText text={m.content} onNavigate={onClose} />
               </div>
             ),
           )}
           {streaming !== null && (
-            <div className="max-w-[92%] rounded-2xl rounded-bl-md border border-ink-800 bg-ink-900 px-3.5 py-2.5 text-ink-200">
+            <div className="max-w-[92%] rounded-2xl rounded-bl-md border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-2.5 text-ink-200">
               {streaming ? (
                 <RichText text={streaming} onNavigate={onClose} />
               ) : (
@@ -182,7 +182,7 @@ export default function CoachSheet({ onClose, pending, onConsumed }: { onClose: 
               aria-label="Message the coach"
               className="max-h-32 min-h-[44px] flex-1 resize-none rounded-2xl border border-ink-700 bg-ink-900 px-3.5 py-2.5 text-sm text-white placeholder-ink-500 focus:border-rose-600 focus:outline-none"
             />
-            <button type="submit" disabled={busy || !input.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-600 text-white disabled:opacity-40" aria-label="Send">
+            <button type="submit" disabled={busy || !input.trim()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-white shadow-glow-rose disabled:opacity-40" aria-label="Send">
               {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowUp className="h-5 w-5" />}
             </button>
           </form>

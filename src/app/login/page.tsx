@@ -59,15 +59,15 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-ink-950 flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6">
       <Link href="/" className="flex items-center gap-2.5 mb-8">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-600 text-white">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose">
           <TrendingDown className="h-5 w-5" />
         </div>
         <span className="font-bold text-xl text-white">Shortlist</span>
       </Link>
 
-      <div className="w-full max-w-sm rounded-2xl border border-ink-800 bg-ink-900 p-6">
+      <div className="w-full max-w-sm rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-6">
         {!enabled ? (
           <div className="text-center">
             <p className="text-white font-semibold mb-2">Accounts aren’t enabled yet</p>
@@ -105,7 +105,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+                className="w-full rounded-lg bg-brand shadow-glow-rose px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 inline-flex items-center justify-center gap-2"
               >
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                 {mode === "signin" ? "Sign in" : "Sign up"}

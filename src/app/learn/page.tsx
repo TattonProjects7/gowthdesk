@@ -33,7 +33,7 @@ export default function LearnHub() {
   }, [q]);
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
         {/* Hero: level, XP, streak, Learn & Earn */}
@@ -78,7 +78,7 @@ export default function LearnHub() {
               <p className="text-sm text-ink-300">Retake any lesson for a perfect score, or keep your streak going with the daily question.</p>
             </Card>
           )}
-          <button onClick={() => coach.open()} className="flex items-center gap-3 rounded-3xl border border-ink-800 bg-ink-900 p-4 text-left hover:border-ink-600">
+          <button onClick={() => coach.open()} className="flex items-center gap-3 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 text-left hover:border-ink-600">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-violet-600 text-white">
               <Sparkles className="h-6 w-6" />
             </span>

@@ -23,7 +23,7 @@ Practise investing in UK & US shares, ETFs and crypto. Alerts, ISA, SIPP, more.
 
 ## Promotional text — iOS (170 chars max)
 
-Start with £10,000 of virtual money. Build a portfolio across a general account, ISA and SIPP, set price alerts and automate it with savings plans and rebalancing.
+Practise with £10,000 of demo money, learn with an AI coach, then go real with your Trading 212 account. Confetti when you buy, cash when you sell.
 
 ## Description
 
@@ -60,6 +60,12 @@ SEE WHAT YOU REALLY OWN
 • Look-through splits every ETF into its companies, sectors and regions
 • Overlap check flags companies you hold through several funds
 
+DEMO OR REAL, YOUR CHOICE
+• Demo mode: £10,000 of practice money, no sign-up
+• Real mode: connect your own Trading 212 Invest or Stocks ISA account and place real orders
+• Review every real order before it's sent, with a clear real-money banner
+• Confetti and fireworks when you buy, cash raining down when you sell
+
 LEARN AS YOU GO, WITH AN AI COACH
 • Shortlist Academy: bite-sized lessons with quizzes and live calculators
 • Earn XP, practice cash, badges and streaks for learning, not for trading
@@ -77,7 +83,7 @@ PRIVATE AND SECURE
 • Face ID, Touch ID or fingerprint app lock
 • Sync across devices with an account, or use it without one
 
-Shortlist is a research, education and paper-trading app. It does not execute trades, hold client money or give investment advice. Practice ISA and SIPP accounts have no tax effect. Prices are for information only.
+Shortlist is a research, education and trading app. Demo mode uses virtual money. Real mode sends the orders you confirm to your own Trading 212 account, which executes them and holds your money; Shortlist is not a broker and does not give investment advice. Capital at risk. Practice ISA and SIPP accounts have no tax effect. Prices are for information only.
 
 ## Keywords — iOS (100 chars max)
 
@@ -93,7 +99,7 @@ Primary: Finance · Secondary: Education
 
 ## App Review notes — iOS
 
-Shortlist is a paper-trading and education app. All accounts, orders and balances use virtual money; nothing is sent to a broker and no real funds are handled. You can test every feature without signing in: open Markets, tap any instrument, then Buy. Face ID is optional (Settings → App lock). Market prices are simulated unless the server has a data-provider key configured. Learning rewards and the free practice share are virtual money inside the practice portfolio; they have no cash value, cannot be withdrawn and require no purchase. The AI coach is educational and does not give personal recommendations.
+Shortlist has a demo mode (virtual money, no account needed) and an optional real mode that sends orders the user confirms to their own Trading 212 account via Trading 212's official API. Shortlist never holds client money; Trading 212 executes and holds everything. To review real mode safely, use the Trading 212 practice-account API key provided below (practice money, not real funds): tap Real in the top bar, choose Practice and paste the key. You can test every feature without signing in: open Markets, tap any instrument, then Buy. Face ID is optional (Settings → App lock). Market prices are simulated unless the server has a data-provider key configured. Learning rewards and the free practice share are virtual money inside the practice portfolio; they have no cash value, cannot be withdrawn and require no purchase. The AI coach is educational and does not give personal recommendations.
 
 ## Privacy
 

@@ -18,7 +18,7 @@ export default function HealthCard({ state, pricer, closesFor }: { state: Portfo
   const color = h.score >= 72 ? "#34d399" : h.score >= 50 ? "#fbbf24" : "#fb7185";
   const C = 2 * Math.PI * 26;
   return (
-    <section className="mt-4 rounded-3xl border border-ink-800 bg-ink-900 p-4 sm:p-5">
+    <section className="mt-4 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 sm:p-5">
       <div className="flex items-center gap-4">
         <div className="relative h-16 w-16 shrink-0">
           <svg viewBox="0 0 64 64" className="h-16 w-16 -rotate-90">

@@ -48,7 +48,7 @@ export default function Markets() {
   const events = useMemo(() => (mounted ? upcomingEvents(now, 21).slice(0, 6) : []), [mounted, now]);
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -86,7 +86,7 @@ export default function Markets() {
         )}
 
         <div className="space-y-2">
-          {!mounted && Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[62px] rounded-xl border border-ink-800 bg-ink-900 animate-pulse" />)}
+          {!mounted && Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[62px] rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />)}
           {mounted && rows.length === 0 && <p className="py-8 text-center text-sm text-ink-500">Nothing matches “{q}”.</p>}
           {mounted && rows.map((r, idx) => <InstrumentRow key={r.i.symbol} i={r.i} price={r.price} closes={r.closes} rank={sort === "name" ? undefined : idx + 1} />)}
         </div>
@@ -147,7 +147,7 @@ function MoverStrip({ title, tone, rows }: { title: string; tone: "up" | "down";
       <div className="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0">
         {rows.length === 0 && Array.from({ length: 4 }).map((_, k) => <div key={k} className="h-[118px] min-w-[150px] rounded-2xl bg-ink-900 animate-pulse" />)}
         {rows.map((r) => (
-          <Link key={r.i.symbol} href={`/i/${r.i.symbol}`} className="min-w-[150px] snap-start rounded-2xl border border-ink-800 bg-ink-900 p-3.5 transition-colors hover:border-ink-600 active:bg-ink-800/60">
+          <Link key={r.i.symbol} href={`/i/${r.i.symbol}`} className="min-w-[150px] snap-start rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-3.5 transition-colors hover:border-ink-600 active:bg-ink-800/60">
             <div className="flex items-center gap-2">
               <Avatar symbol={r.i.symbol} size={30} />
               <div className="min-w-0">

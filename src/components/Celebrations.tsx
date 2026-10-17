@@ -1,18 +1,27 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCelebrationQueue } from "@/lib/celebrate";
+import { tradeFxBusyUntil } from "@/lib/effects";
 
 // Toast + confetti for learning milestones. Mounted once in the layout.
 // Respects prefers-reduced-motion (no particles, just the toast).
 export default function Celebrations() {
-  const [current, done] = useCelebrationQueue();
+  const [queued, done] = useCelebrationQueue();
+  const [, setTick] = useState(0);
+  // Learning toasts wait while a trade celebration card is on screen.
+  const waitMs = queued ? tradeFxBusyUntil() - Date.now() : 0;
+  const current = waitMs > 0 ? null : queued;
 
   useEffect(() => {
-    if (!current) return;
-    const t = setTimeout(done, current.big ? 3200 : 2600);
+    if (!queued) return;
+    if (waitMs > 0) {
+      const h = setTimeout(() => setTick((x) => x + 1), waitMs + 60);
+      return () => clearTimeout(h);
+    }
+    const t = setTimeout(done, queued.big ? 3200 : 2600);
     return () => clearTimeout(t);
-  }, [current, done]);
+  }, [queued, done, waitMs > 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The live region stays mounted so screen readers announce each toast.
   return (

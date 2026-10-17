@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, BellPlus, BellRing, Check, Layers, Newspaper, Plus, Radar, Sparkles, Star, Trash2, Users, X } from "lucide-react";
 import Nav from "@/components/Nav";
 import PriceChart, { TIMEFRAMES, type Timeframe } from "@/components/PriceChart";
-import DealTicket from "@/components/DealTicket";
+import TradeTicket from "@/components/TradeTicket";
 import Avatar from "@/components/Avatar";
 import DigestCard from "@/components/DigestCard";
 import ExplainTerm from "@/components/ExplainTerm";
@@ -73,7 +73,7 @@ export default function InstrumentPage() {
 
   if (!i) {
     return (
-      <div className="min-h-screen bg-ink-950">
+      <div className="min-h-screen">
         <Nav />
         <main className="mx-auto max-w-3xl px-6 py-20 text-center">
           <p className="text-ink-300">No coverage for “{symbol}”.</p>
@@ -88,7 +88,7 @@ export default function InstrumentPage() {
   const tone = i.type === "etf" ? "sky" : i.type === "crypto" ? "amber" : i.region === "UK" ? "violet" : "ink";
 
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-6">
         <Link href="/markets" className="inline-flex items-center gap-1.5 text-sm text-ink-400 hover:text-white mb-4">
@@ -146,7 +146,7 @@ export default function InstrumentPage() {
                 </span>
               )}
             </div>
-            {mounted ? <PriceChart closes={closes} currency={i.currency} now={now} /> : <div className="h-64 rounded-xl border border-ink-800 bg-ink-900 animate-pulse" />}
+            {mounted ? <PriceChart closes={closes} currency={i.currency} now={now} /> : <div className="h-64 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />}
 
             {/* Key stats */}
             {signals && (
@@ -247,13 +247,13 @@ export default function InstrumentPage() {
 
           {/* Side column: deal ticket, watchlist, alerts */}
           <aside className="space-y-4 lg:sticky lg:top-20 self-start">
-            <div className="hidden lg:block">{mounted ? <DealTicket symbol={i.symbol} pricer={pricer} /> : <div className="h-96 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />}</div>
+            <div className="hidden lg:block">{mounted ? <TradeTicket symbol={i.symbol} pricer={pricer} priceLive={source === "live"} /> : <div className="h-96 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />}</div>
             <WatchlistCard symbol={i.symbol} />
             {mounted && <PriceAlertCard symbol={i.symbol} price={price} currency={i.currency} />}
           </aside>
         </div>
 
-        {mounted && <MobileTradeBar symbol={i.symbol} pricer={pricer} />}
+        {mounted && <MobileTradeBar symbol={i.symbol} pricer={pricer} priceLive={source === "live"} />}
 
         <p className="mt-10 text-center text-xs text-ink-600 max-w-xl mx-auto leading-relaxed">
           Paper trading with {source === "live" ? "live" : "simulated"} prices. Not investment advice. Capital at risk when investing for real.
@@ -474,7 +474,7 @@ function NewsSection({ symbol, closes, now, mounted }: { symbol: string; closes:
 
 // Phones: a sticky Sell / Buy bar above the tab bar that opens the deal ticket
 // as a bottom sheet — the IG / Trading-app pattern.
-function MobileTradeBar({ symbol, pricer }: { symbol: string; pricer: Pricer }) {
+function MobileTradeBar({ symbol, pricer, priceLive }: { symbol: string; pricer: Pricer; priceLive: boolean }) {
   const [side, setSide] = useState<OrderSide | null>(null);
   useEffect(() => {
     if (!side) return;
@@ -491,7 +491,7 @@ function MobileTradeBar({ symbol, pricer }: { symbol: string; pricer: Pricer }) 
           <button onClick={() => setSide("sell")} className="rounded-2xl bg-ink-800 py-3 text-sm font-bold text-rose-300 active:scale-[0.98] transition-transform">
             Sell
           </button>
-          <button onClick={() => setSide("buy")} className="rounded-2xl bg-emerald-600 py-3 text-sm font-bold text-white active:scale-[0.98] transition-transform">
+          <button onClick={() => setSide("buy")} className="rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-400 py-3 text-sm font-bold text-ink-950 shadow-glow-emerald active:scale-[0.98] transition-transform">
             Buy {symbol}
           </button>
         </div>
@@ -508,7 +508,7 @@ function MobileTradeBar({ symbol, pricer }: { symbol: string; pricer: Pricer }) 
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <DealTicket key={side} symbol={symbol} pricer={pricer} defaultSide={side} compact />
+            <TradeTicket key={side} symbol={symbol} pricer={pricer} defaultSide={side} compact priceLive={priceLive} />
           </div>
         </div>
       )}

@@ -24,6 +24,13 @@ export function warningHaptic(): void {
   import("@capacitor/haptics").then(({ Haptics, NotificationType }) => Haptics.notification({ type: NotificationType.Warning })).catch(() => {});
 }
 
+export function impactHaptic(style: "light" | "medium" | "heavy" = "medium"): void {
+  if (!isNative()) return;
+  import("@capacitor/haptics")
+    .then(({ Haptics, ImpactStyle }) => Haptics.impact({ style: style === "heavy" ? ImpactStyle.Heavy : style === "light" ? ImpactStyle.Light : ImpactStyle.Medium }))
+    .catch(() => {});
+}
+
 // --- OS notifications -------------------------------------------------------
 // In the apps, price alerts, order fills, stop-loss triggers, savings-plan runs
 // and dividends become real iOS / Android notifications (local notifications,

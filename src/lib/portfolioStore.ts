@@ -1,6 +1,7 @@
 "use client";
 
 import { createStore, useStore } from "./docstore";
+import { celebrateTrade } from "./effects";
 import { raise } from "./alerts";
 import * as P from "./portfolio";
 
@@ -29,6 +30,8 @@ function emit(events: P.EngineEvent[]) {
   for (const e of events) {
     const title = e.kind === "income" ? "💷 Dividend received" : e.kind === "protection" ? "🛡 Position closed" : e.kind === "plan" ? "🔁 Automation ran" : "✅ Order update";
     raise({ id: e.id, type: e.kind, symbol: e.symbol, message: e.message, title });
+    // A working limit order that fills later still gets its celebration.
+    if (e.kind === "order" && e.side && e.valueGbp) celebrateTrade({ kind: e.side, symbol: e.symbol, qty: e.qty, valueGbp: e.valueGbp, detail: e.message });
   }
 }
 
