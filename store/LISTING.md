@@ -60,6 +60,14 @@ SEE WHAT YOU REALLY OWN
 • Look-through splits every ETF into its companies, sectors and regions
 • Overlap check flags companies you hold through several funds
 
+LEARN AS YOU GO, WITH AN AI COACH
+• Shortlist Academy: bite-sized lessons with quizzes and live calculators
+• Earn XP, practice cash, badges and streaks for learning, not for trading
+• Missions that tick off when you really do them, like opening an ISA holding
+• Claim a free practice share: pick a card to reveal it
+• Ask the AI coach anything, from any screen, in plain English
+• "Why it's moving" digests and a portfolio health score out of 100
+
 THE SHORT-FINDER
 • Scans for stretched, rolling-over stocks and ranks the best shorts
 • Squeeze-risk radar warns you off crowded trades
@@ -85,7 +93,7 @@ Primary: Finance · Secondary: Education
 
 ## App Review notes — iOS
 
-Shortlist is a paper-trading and education app. All accounts, orders and balances use virtual money; nothing is sent to a broker and no real funds are handled. You can test every feature without signing in: open Markets, tap any instrument, then Buy. Face ID is optional (Settings → App lock). Market prices are simulated unless the server has a data-provider key configured.
+Shortlist is a paper-trading and education app. All accounts, orders and balances use virtual money; nothing is sent to a broker and no real funds are handled. You can test every feature without signing in: open Markets, tap any instrument, then Buy. Face ID is optional (Settings → App lock). Market prices are simulated unless the server has a data-provider key configured. Learning rewards and the free practice share are virtual money inside the practice portfolio; they have no cash value, cannot be withdrawn and require no purchase. The AI coach is educational and does not give personal recommendations.
 
 ## Privacy
 

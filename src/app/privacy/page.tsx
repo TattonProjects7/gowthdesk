@@ -7,14 +7,14 @@ export default function Privacy() {
   return (
     <LegalShell title="Privacy Policy" updated="17 October 2026">
       <p>
-        Shortlist (“we”, “us”) is a stock-shorting research and education tool. This policy explains what personal data
+        Shortlist (“we”, “us”) is an investing research, education and paper-trading app. This policy explains what personal data
         we collect, why, and your choices. We do not sell your personal data.
       </p>
 
       <h2>Information we collect</h2>
       <ul>
         <li><strong>Account data</strong> — your email address and authentication details, if you create an account.</li>
-        <li><strong>Your content</strong> — your paper portfolio (virtual accounts, orders, holdings, savings plans), watchlists, price alerts, tracked shorts and settings, stored against your account so they sync across your devices.</li>
+        <li><strong>Your content</strong> — your paper portfolio (virtual accounts, orders, holdings, savings plans), watchlists, price alerts, tracked shorts, learning progress (lessons, XP, badges), AI coach chat history and settings, stored against your account so they sync across your devices.</li>
         <li><strong>Purchase data</strong> — subscription status. Card details are handled by our payment providers, not by us.</li>
         <li><strong>Device data</strong> — on mobile, a push-notification token if you enable notifications, and basic diagnostics.</li>
         <li><strong>Local storage</strong> — if you use the app without an account, all of the above stays on your device only.</li>
@@ -36,6 +36,7 @@ export default function Privacy() {
         <li><a href="https://stripe.com/privacy">Stripe</a> — web payments.</li>
         <li><a href="https://www.revenuecat.com/privacy">RevenueCat</a> and the Apple App Store / Google Play — mobile in-app purchases.</li>
         <li>Market-data providers (e.g. Finnhub, Alpha Vantage) — to display prices. Requests are for ticker data, not about you.</li>
+        <li><a href="https://www.anthropic.com/legal/privacy">Anthropic</a> — to power the AI coach and the “Why it’s moving” digests. We send your question, the screen you are on, a summary of your paper portfolio and your learning level. We never send your name, email or account details.</li>
         <li><a href="https://openai.com/policies/privacy-policy">OpenAI</a> — to generate the optional AI thesis; only the trade setup, never your identity, is sent.</li>
       </ul>
 

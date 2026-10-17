@@ -22,12 +22,17 @@ import {
   Coins,
   Repeat,
   Shield,
+  GraduationCap,
+  Flame,
 } from "lucide-react";
 import { useAlerts, type Alert } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/lib/subscription";
 import { timeAgo } from "@/components/ui";
 import { tapHaptic } from "@/lib/native";
+import { useCoach } from "@/components/coach/CoachProvider";
+import { useLearn } from "@/lib/learn/store";
+import { liveStreak } from "@/lib/learn/progress";
 
 // Primary navigation: Markets · Portfolio · Watchlist · Shorts, plus the alert
 // bell, account menu and settings. On phones the same destinations become a
@@ -35,6 +40,7 @@ import { tapHaptic } from "@/lib/native";
 const LINKS = [
   { href: "/portfolio", label: "Portfolio", icon: Wallet },
   { href: "/markets", label: "Markets", icon: Globe, match: ["/markets", "/i/"] },
+  { href: "/learn", label: "Learn", icon: GraduationCap },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/scan", label: "Shorts", icon: Radar, match: ["/scan", "/short", "/tracker"] },
 ];
@@ -46,6 +52,9 @@ export default function Nav() {
   const { pro, billingEnabled } = useSubscription();
   const [open, setOpen] = useState(false);
   const [acct, setAcct] = useState(false);
+  const coach = useCoach();
+  const learnState = useLearn();
+  const streak = mounted ? liveStreak(learnState.streak, Date.now()) : 0;
 
   const isActive = (l: (typeof LINKS)[number]) => (l.match ?? [l.href]).some((m) => path.startsWith(m));
 
@@ -95,6 +104,12 @@ export default function Nav() {
                 >
                   <Icon className="h-4 w-4" />
                   {l.label}
+                  {l.href === "/learn" && streak > 0 && (
+                    <span className="ml-0.5 inline-flex items-center gap-0.5 rounded-full bg-orange-500/15 px-1.5 text-[10px] font-bold text-orange-300">
+                      <Flame className="h-3 w-3" />
+                      {streak}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -144,7 +159,20 @@ export default function Nav() {
             )}
           </div>
 
-          <Link href="/settings" className={`hidden sm:flex items-center rounded-lg px-2.5 py-1.5 transition-colors ${path.startsWith("/settings") ? "bg-ink-800 text-white" : "text-ink-300 hover:text-white hover:bg-ink-900"}`} aria-label="Settings">
+          {/* AI coach */}
+          <button
+            onClick={() => {
+              tapHaptic();
+              coach.open();
+            }}
+            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-rose-500/20 to-violet-500/20 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-violet-500/30 hover:from-rose-500/30 hover:to-violet-500/30"
+            aria-label="Ask the AI coach"
+          >
+            <Sparkles className="h-4 w-4 text-violet-300" />
+            <span className="hidden md:inline">Coach</span>
+          </button>
+
+          <Link href="/settings" className={`flex items-center rounded-lg px-2.5 py-1.5 transition-colors ${path.startsWith("/settings") ? "bg-ink-800 text-white" : "text-ink-300 hover:text-white hover:bg-ink-900"}`} aria-label="Settings">
             <Settings className="h-4 w-4" />
           </Link>
 
@@ -200,7 +228,7 @@ export default function Nav() {
       {/* Mobile bottom tab bar */}
       <nav className="sm:hidden fixed inset-x-0 bottom-0 z-30 border-t border-ink-800 bg-ink-950/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5">
-          {[...LINKS, { href: "/settings", label: "Settings", icon: Settings, match: ["/settings"] }].map((l) => {
+          {LINKS.map((l) => {
             const Icon = l.icon;
             const active = (l.match ?? [l.href]).some((m) => path.startsWith(m));
             return (

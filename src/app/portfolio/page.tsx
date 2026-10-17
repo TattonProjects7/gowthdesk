@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeftRight,
   Banknote,
+  ChevronRight,
   Coins,
+  Flame,
+  Gift,
+  GraduationCap,
   Landmark,
   Layers,
   ListChecks,
@@ -17,6 +21,7 @@ import {
   Repeat,
   Scale,
   Shield,
+  Sparkles,
   Trash2,
   Wallet,
   X,
@@ -24,6 +29,15 @@ import {
 import Nav from "@/components/Nav";
 import AllocationDonut from "@/components/AllocationDonut";
 import AreaChart from "@/components/AreaChart";
+import HealthCard from "@/components/HealthCard";
+import DailyBrief from "@/components/DailyBrief";
+import LevelRing from "@/components/learn/LevelRing";
+import Onboarding from "@/components/learn/Onboarding";
+import { FreeShareBanner } from "@/components/learn/FreeShare";
+import { useCoach } from "@/components/coach/CoachProvider";
+import { learn, useLearn } from "@/lib/learn/store";
+import { levelFor, liveStreak, suggestedLesson } from "@/lib/learn/progress";
+import { START_TRACK } from "@/lib/learn/content";
 import Avatar from "@/components/Avatar";
 import { ChangePill } from "@/components/InstrumentRow";
 import { Button, Card, Empty, H2, Input, Money, Pill, Segmented, Select, Stat, fmtDateTime } from "@/components/ui";
@@ -92,6 +106,8 @@ function PortfolioInner() {
     <div className="min-h-screen bg-ink-950">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
+        <Onboarding />
+        {mounted && tab === "overview" && <FreeShareBanner pricer={pricer} />}
         <PortfolioHero summary={summary} closesFor={closesFor} now={now} showChart={tab === "overview"} />
 
         <div className="mb-5 -mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto no-scrollbar">
@@ -102,7 +118,7 @@ function PortfolioInner() {
           <div className="h-64 rounded-2xl border border-ink-800 bg-ink-900 animate-pulse" />
         ) : (
           <>
-            {tab === "overview" && <Overview state={state} summary={summary} pricer={pricer} setTab={setTab} />}
+            {tab === "overview" && <Overview state={state} summary={summary} pricer={pricer} setTab={setTab} now={now} priceFor={priceFor} closesFor={closesFor} />}
             {tab === "holdings" && <Holdings state={state} holdings={summary.holdings} />}
             {tab === "analytics" && <Analytics state={state} pricer={pricer} />}
             {tab === "orders" && <Orders state={state} />}
@@ -251,8 +267,26 @@ function QuickAction({ icon: Icon, label, onClick, href, primary }: { icon: Reac
   );
 }
 
-function Overview({ state, summary, pricer, setTab }: { state: PortfolioState; summary: ReturnType<typeof summarise>; pricer: Pricer; setTab: (t: Tab) => void }) {
+function Overview({
+  state,
+  summary,
+  pricer,
+  setTab,
+  now,
+  priceFor,
+  closesFor,
+}: {
+  state: PortfolioState;
+  summary: ReturnType<typeof summarise>;
+  pricer: Pricer;
+  setTab: (t: Tab) => void;
+  now: number;
+  priceFor: (s: string) => number;
+  closesFor: (s: string, n?: number) => number[];
+}) {
   const income = incomeProjection(state, pricer);
+  const coach = useCoach();
+  const closes31 = useCallback((s: string) => closesFor(s), [closesFor]);
 
   return (
     <>
@@ -260,9 +294,13 @@ function Overview({ state, summary, pricer, setTab }: { state: PortfolioState; s
       <div className="grid grid-cols-4 gap-2 rounded-3xl border border-ink-800 bg-ink-900 px-2 py-4">
         <QuickAction icon={Plus} label="Invest" href="/markets" primary />
         <QuickAction icon={PiggyBank} label="Add funds" onClick={() => setTab("accounts")} />
-        <QuickAction icon={Repeat} label="Automate" onClick={() => setTab("automate")} />
-        <QuickAction icon={ListChecks} label="Shorts" href="/tracker" />
+        <QuickAction icon={GraduationCap} label="Learn" href="/learn" />
+        <QuickAction icon={Sparkles} label="Ask coach" onClick={() => coach.open()} />
       </div>
+
+      <LearnStrip />
+      <HealthCard state={state} pricer={pricer} closesFor={closes31} />
+      <DailyBrief now={now} priceFor={priceFor} closesFor={closes31} dayChange={summary.dayChange} />
 
       <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-2">
         <Stat label="Unrealised P&L" value={<Money v={summary.unrealised} sign />} sub={`${summary.unrealisedPct >= 0 ? "+" : ""}${summary.unrealisedPct}% on cost`} />
@@ -313,6 +351,34 @@ function Overview({ state, summary, pricer, setTab }: { state: PortfolioState; s
         </div>
       )}
     </>
+  );
+}
+
+// Level, streak and the next lesson — the Academy, one tap from home.
+function LearnStrip() {
+  const s = useLearn();
+  const [now, setNow] = useState(0);
+  useEffect(() => setNow(Date.now()), []);
+  const lvl = levelFor(s.xp);
+  const next = suggestedLesson(s, START_TRACK[s.profile.experience ?? "beginner"]);
+  const streak = now ? liveStreak(s.streak, now) : 0;
+  return (
+    <Link href={next ? `/learn/${next.id}` : "/learn"} className="mt-4 flex items-center gap-3 rounded-3xl border border-violet-900/60 bg-gradient-to-r from-violet-950/50 to-ink-900 p-4 transition-colors hover:border-violet-700">
+      <LevelRing level={lvl.level} pct={lvl.pct} size={52} />
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-violet-300">
+          {lvl.title}
+          {streak > 0 && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-500/15 px-1.5 text-orange-300">
+              <Flame className="h-3 w-3" /> {streak}
+            </span>
+          )}
+        </span>
+        <span className="block truncate font-semibold text-white">{next ? `Next lesson: ${next.title}` : "All lessons complete 🎉"}</span>
+        <span className="block text-xs text-ink-400">{next ? `${next.minutes} min · +${next.xp} XP · +£${next.reward} practice cash` : "Keep your streak with the daily question"}</span>
+      </span>
+      <ChevronRight className="h-5 w-5 text-violet-300" />
+    </Link>
   );
 }
 
@@ -437,7 +503,10 @@ function Analytics({ state, pricer }: { state: PortfolioState; pricer: Pricer })
           <Segmented
             size="sm"
             value={dim}
-            onChange={setDim}
+            onChange={(d) => {
+              setDim(d);
+              if (d === "lookthrough") learn.flag("lookthrough");
+            }}
             options={[
               { id: "asset", label: "Asset class" },
               { id: "sector", label: "Sectors" },
@@ -567,7 +636,7 @@ function Activity({ state }: { state: PortfolioState }) {
   const [filter, setFilter] = useState<"all" | Tx["type"]>("all");
   const rows = state.transactions.filter((t) => filter === "all" || t.type === filter).slice(0, 100);
   const acc = (id: string) => state.accounts.find((a) => a.id === id)?.type ?? "";
-  const icon = (t: Tx["type"]) => (t === "dividend" ? Coins : t === "buy" || t === "sell" ? Receipt : t.startsWith("transfer") ? ArrowLeftRight : Banknote);
+  const icon = (t: Tx["type"]) => (t === "reward" ? Gift : t === "dividend" ? Coins : t === "buy" || t === "sell" ? Receipt : t.startsWith("transfer") ? ArrowLeftRight : Banknote);
   return (
     <>
       <div className="mb-3">
@@ -582,6 +651,7 @@ function Activity({ state }: { state: PortfolioState }) {
             { id: "dividend", label: "Dividends" },
             { id: "deposit", label: "Deposits" },
             { id: "transfer_in", label: "Transfers" },
+            { id: "reward", label: "Rewards" },
           ]}
         />
       </div>
@@ -598,7 +668,7 @@ function Activity({ state }: { state: PortfolioState }) {
                     {fmtDateTime(t.at)} · {acc(t.accountId)}
                   </p>
                 </div>
-                <Money v={t.amount} sign className="text-sm" />
+                <Money v={t.type === "reward" ? (t.value ?? t.amount) : t.amount} sign className="text-sm" />
               </li>
             );
           })}

@@ -5,7 +5,8 @@
 Shortlist is an investing app for the web, iPhone and Android. You practise with
 £10,000 of virtual money across UK and US shares, ETFs and crypto, using the
 tools the leading UK platforms offer (IG, interactive investor, InvestEngine).
-On top of that sits an asymmetric short-finder none of them has.
+A built-in Academy and an AI coach make it a fun way to learn, and an
+asymmetric short-finder sits on top that none of them has.
 
 It is a research, education and paper-trading product. It does **not** execute
 trades or hold client money.
@@ -39,6 +40,30 @@ competitor study and how each feature maps to this app.
 - **Security** — Face ID / Touch ID / fingerprint app lock in the apps, with a
   PIN fallback.
 
+**Learn and AI coach**
+
+- **Shortlist Academy** — 19 bite-sized lessons in six paths (basics, funds, UK
+  tax wrappers, charts, risk, shorting). Story-style cards, interactive
+  calculators, live charts and a three-question quiz each.
+- **Learn & Earn** — finishing a lesson pays XP and practice cash into your GIA.
+  Levels from Curious to Market Master, daily streaks, badges and a daily
+  question.
+- **Missions** — real tasks (first buy, open an ISA holding, set a stop, start a
+  savings plan) that tick themselves off when you actually do them in the app.
+- **Free practice share** — pick one of three cards to reveal a free share for
+  your practice portfolio, inspired by Robinhood's claim-stock flow.
+- **AI coach** — ask anything from any screen. It sees what you are looking at
+  (the instrument, your portfolio, the lesson) and answers in plain English with
+  links to the right lesson. It explains, it never tells you what to buy.
+- **Why it's moving** — a daily AI digest on every instrument page, plus a
+  60-second brief on the portfolio.
+- **Portfolio health check** — a score out of 100 across diversification,
+  concentration, mix, costs, cash, protection and tax wrappers, each with a
+  lesson that fixes it.
+- **Tap-to-explain** — tap jargon like RSI or OCF for a one-line definition.
+
+Celebrations reward learning and good habits, never trading more often.
+
 **Short-finder**
 
 - **Live scanner** — the market ranked best-short-first from RSI, z-score,
@@ -58,8 +83,12 @@ unlocked. Add keys to turn each piece on.
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm test           # 55 unit tests
+npm test           # unit tests
 ```
+
+The AI coach and digests run on Claude when `ANTHROPIC_API_KEY` is set. They
+use Claude Opus 5.5 by default, overridable with `AI_MODEL`. Without a key, a
+deterministic offline coach answers from the same app data.
 
 ## Going live
 
@@ -75,7 +104,7 @@ npm test           # 55 unit tests
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind · Capacitor 8 ·
 Supabase (Postgres + Auth) · Stripe · RevenueCat · Finnhub / Alpha Vantage ·
-OpenAI.
+Anthropic Claude (coach, digests) · OpenAI (short thesis).
 
 ## Project layout
 
@@ -83,11 +112,19 @@ OpenAI.
 src/
   app/                  / (landing), /portfolio, /markets, /i/[symbol],
                         /watchlist, /settings, /scan, /short/[symbol],
-                        /tracker, /pricing, /login, /api/*
+                        /tracker, /learn, /learn/[id], /pricing, /login,
+                        /api/* (incl. /api/coach, /api/digest)
   components/           Nav, DealTicket, PriceChart, AreaChart, Avatar,
                         AllocationDonut, InstrumentRow, PortfolioEngine,
-                        AlertEngine, AppLock, CloudSync, NativeBridge
+                        AlertEngine, AppLock, CloudSync, NativeBridge,
+                        HealthCard, DailyBrief, DigestCard, ExplainTerm,
+                        Celebrations, MissionEngine, coach/, learn/
   lib/
+    learn/              lessons, glossary, XP / levels / streaks / badges,
+                        missions, free share (pure, unit-tested)
+    ai/                 Claude coach + digest (server), offline coach,
+                        rate limiter, coach context
+    health.ts           portfolio health score
     instruments.ts      instrument universe + ETF look-through data
     market.ts           deterministic price simulator (random walk)
     portfolio.ts        paper-trading engine: accounts, orders, protections,

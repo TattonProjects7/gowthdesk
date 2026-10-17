@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, BellPlus, BellRing, Check, Layers, Newspaper, Plus, Radar, Star, Trash2, Users, X } from "lucide-react";
+import { ArrowLeft, BellPlus, BellRing, Check, Layers, Newspaper, Plus, Radar, Sparkles, Star, Trash2, Users, X } from "lucide-react";
 import Nav from "@/components/Nav";
 import PriceChart, { TIMEFRAMES, type Timeframe } from "@/components/PriceChart";
 import DealTicket from "@/components/DealTicket";
 import Avatar from "@/components/Avatar";
+import DigestCard from "@/components/DigestCard";
+import ExplainTerm from "@/components/ExplainTerm";
+import { useCoach } from "@/components/coach/CoachProvider";
+import type { DigestInput } from "@/lib/ai/types";
 import { ChangePill, usePriceFlash } from "@/components/InstrumentRow";
 import { Button, Card, H2, Input, Pill, Pct, Segmented, Select, Stat } from "@/components/ui";
 import { useMarket } from "@/lib/useMarket";
@@ -42,6 +46,29 @@ export default function InstrumentPage() {
   const flash = usePriceFlash(price);
   const dayChg = closes31.length >= 2 && closes31[closes31.length - 2] ? (price / closes31[closes31.length - 2] - 1) * 100 : 0;
   const signals = useMemo(() => (closes31.length ? computeSignals(closes31) : null), [closes31]);
+  const coach = useCoach();
+  // Inputs for the "why it's moving" digest — computed once the market is live.
+  const digestInput = useMemo<DigestInput | null>(() => {
+    if (!mounted || !i || !signals || !now) return null;
+    return {
+      symbol: i.symbol,
+      name: i.name,
+      type: i.type,
+      currency: i.currency,
+      price,
+      dayChangePct: dayChg,
+      trend30Pct: signals.trend30,
+      rsi: signals.rsi,
+      zscore: signals.zscore,
+      dailyVolPct: signals.volatility * 100,
+      aboveTrend: !signals.belowShortMa,
+      sentimentLongPct: clientSentiment(i.symbol, dayChg, now).longPct,
+      catalyst: i.type === "stock" ? nextCatalyst(i.symbol, now).note : undefined,
+      headlines: [],
+    };
+    // Recompute when the symbol changes or the market first loads, not every tick.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, i?.symbol, Boolean(signals), Boolean(now)]);
   const held = useMemo(() => (mounted && i ? valueHoldings(state, pricer).filter((h) => h.symbol === symbol) : []), [mounted, i, state, pricer, symbol]);
 
   if (!i) {
@@ -100,7 +127,12 @@ export default function InstrumentPage() {
               </span>
             </div>
           </div>
-          <p className="max-w-md text-sm text-ink-400">{i.description}</p>
+          <div className="max-w-md">
+            <p className="text-sm text-ink-400">{i.description}</p>
+            <button onClick={() => coach.open(`Explain ${i.name} (${i.symbol}) to me like I'm new to investing`)} className="mt-2 inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2.5 py-1 text-xs font-semibold text-violet-200 hover:bg-violet-500/25">
+              <Sparkles className="h-3.5 w-3.5" /> Ask the coach about {i.symbol}
+            </button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-5">
@@ -121,14 +153,17 @@ export default function InstrumentPage() {
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <Stat label={`${tf} high`} value={fmtNative(Math.max(...closes), i.currency)} />
                 <Stat label={`${tf} low`} value={fmtNative(Math.min(...closes), i.currency)} />
-                <Stat label="Max drawdown" value={`${maxDrawdown(closes).toFixed(1)}%`} tone="rose" sub={`over ${tf}`} />
-                <Stat label="Daily volatility" value={`${(signals.volatility * 100).toFixed(1)}%`} sub="14-day σ" />
-                <Stat label="RSI (14)" value={signals.rsi.toFixed(0)} tone={signals.rsi >= 70 ? "rose" : signals.rsi <= 30 ? "emerald" : "white"} sub={signals.rsi >= 70 ? "overbought" : signals.rsi <= 30 ? "oversold" : "neutral"} />
-                <Stat label="Dividend yield" value={`${i.dividendYieldPct.toFixed(1)}%`} sub={i.type === "etf" ? `OCF ${i.ocfPct?.toFixed(2)}%` : i.dividendYieldPct ? "trailing" : "no dividend"} />
+                <Stat label={<ExplainTerm term="Drawdown">Max drawdown</ExplainTerm>} value={`${maxDrawdown(closes).toFixed(1)}%`} tone="rose" sub={`over ${tf}`} />
+                <Stat label={<ExplainTerm term="Volatility">Daily volatility</ExplainTerm>} value={`${(signals.volatility * 100).toFixed(1)}%`} sub="14-day σ" />
+                <Stat label={<ExplainTerm term="RSI">RSI (14)</ExplainTerm>} value={signals.rsi.toFixed(0)} tone={signals.rsi >= 70 ? "rose" : signals.rsi <= 30 ? "emerald" : "white"} sub={signals.rsi >= 70 ? "overbought" : signals.rsi <= 30 ? "oversold" : "neutral"} />
+                <Stat label={<ExplainTerm term="Dividend yield">Dividend yield</ExplainTerm>} value={`${i.dividendYieldPct.toFixed(1)}%`} sub={i.type === "etf" ? `OCF ${i.ocfPct?.toFixed(2)}%` : i.dividendYieldPct ? "trailing" : "no dividend"} />
                 <Stat label="Sector" value={<span className="text-sm">{i.sector}</span>} sub={i.region} />
                 <Stat label="Trend" value={<span className="text-sm">{signals.belowShortMa ? "10d < 30d" : "10d > 30d"}</span>} tone={signals.belowShortMa ? "rose" : "emerald"} sub={signals.belowShortMa ? "bearish" : "bullish"} />
               </div>
             )}
+
+            {/* AI: why it's moving */}
+            <DigestCard input={digestInput} />
 
             {/* Your position */}
             {held.length > 0 && (

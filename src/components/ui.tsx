@@ -76,7 +76,7 @@ export function Segmented<T extends string>({ options, value, onChange, size = "
   );
 }
 
-export function Stat({ label, value, sub, tone = "white" }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "white" | "rose" | "emerald" | "amber" | "sky" }) {
+export function Stat({ label, value, sub, tone = "white" }: { label: ReactNode; value: ReactNode; sub?: ReactNode; tone?: "white" | "rose" | "emerald" | "amber" | "sky" }) {
   const c = tone === "rose" ? "text-rose-300" : tone === "emerald" ? "text-emerald-300" : tone === "amber" ? "text-amber-300" : tone === "sky" ? "text-sky-300" : "text-white";
   return (
     <div className="rounded-xl border border-ink-800 bg-ink-900 p-3">

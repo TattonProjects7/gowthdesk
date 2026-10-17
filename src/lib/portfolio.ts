@@ -69,7 +69,7 @@ export interface Order {
   trailingPct?: number | null;
 }
 
-export type TxType = "deposit" | "withdrawal" | "transfer_in" | "transfer_out" | "buy" | "sell" | "dividend";
+export type TxType = "deposit" | "withdrawal" | "transfer_in" | "transfer_out" | "buy" | "sell" | "dividend" | "reward";
 
 export interface Tx {
   id: string;
@@ -81,6 +81,7 @@ export interface Tx {
   qty?: number;
   realised?: number; // on sells
   note: string;
+  value?: number; // rewards: what was given (cash or shares), counted like a deposit
 }
 
 export interface SavingsPlan {
@@ -227,6 +228,36 @@ export function openAccount(s: PortfolioState, type: AccountType, now: number): 
     targets: {},
   };
   return { state: { ...s, accounts: [...s.accounts, account] }, account };
+}
+
+/** Practice cash earned in the Academy (Learn & Earn, missions). Counts as money in, not as return. */
+export function creditReward(s: PortfolioState, accountId: string, amount: number, now: number, note: string): PortfolioState {
+  if (!(amount > 0) || !accountById(s, accountId)) return s;
+  return {
+    ...s,
+    accounts: s.accounts.map((a) => (a.id === accountId ? { ...a, cash: r2(a.cash + amount) } : a)),
+    transactions: [{ id: uid("tx"), accountId, type: "reward", amount: r2(amount), value: r2(amount), at: now, note }, ...s.transactions],
+  };
+}
+
+/** Gift whole shares (the free practice share). Cost basis is today's value, as brokers record it. */
+export function grantShares(s: PortfolioState, accountId: string, symbol: string, qty: number, p: Pricer, note: string): { state: PortfolioState; valueGbp: number } {
+  const i = getInstrument(symbol);
+  if (!i || !(qty > 0) || !accountById(s, accountId)) return { state: s, valueGbp: 0 };
+  const u = unitGbp(symbol, p);
+  const value = r2(u * qty);
+  const native = p.price(symbol);
+  const existing = holdingFor(s, accountId, symbol);
+  const holdings = existing
+    ? s.holdings.map((h) => (h.id === existing.id ? { ...h, qty: r6(h.qty + qty), avgCost: r6((h.qty * h.avgCost + value) / (h.qty + qty)) } : h))
+    : [
+        ...s.holdings,
+        { id: uid("h"), accountId, symbol, qty, avgCost: r6(u), openedAt: p.now, stopLoss: null, takeProfit: null, trailingPct: null, highWater: native, lastDivCycle: divCycle(symbol, p.now) },
+      ];
+  return {
+    state: { ...s, holdings, transactions: [{ id: uid("tx"), accountId, type: "reward", amount: 0, value, at: p.now, symbol, qty, note }, ...s.transactions] },
+    valueGbp: value,
+  };
 }
 
 export function deposit(s: PortfolioState, accountId: string, amount: number, now: number, note = "Top-up (virtual funds)"): PortfolioState {
@@ -911,7 +942,9 @@ export function summarise(s: PortfolioState, p: Pricer): PortfolioSummary {
   const dividends = r2(s.transactions.filter((t) => t.type === "dividend").reduce((x, t) => x + t.amount, 0));
   const dayChange = r2(holdings.reduce((x, h) => x + h.dayChangeGbp, 0));
   const totalValue = r2(cash + invested);
-  const netDeposits = r2(s.transactions.filter((t) => t.type === "deposit" || t.type === "withdrawal").reduce((x, t) => x + t.amount, 0));
+  const netDeposits = r2(
+    s.transactions.reduce((x, t) => x + (t.type === "deposit" || t.type === "withdrawal" ? t.amount : t.type === "reward" ? (t.value ?? t.amount) : 0), 0),
+  );
   const totalReturn = r2(totalValue - netDeposits);
   const accounts: AccountSummary[] = s.accounts.map((a) => {
     const hs = holdings.filter((h) => h.accountId === a.id);

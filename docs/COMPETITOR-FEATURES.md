@@ -44,6 +44,39 @@ The four App Store listings studied (October 2026):
 | **Demo / practice account** (IG — missing in the new app) | ✅ The whole app is a £10,000 practice account | — |
 | **iPhone + Android apps** | ✅ Capacitor projects in `ios/` and `android/` | MOBILE.md |
 
+## Robinhood UK: fun, learning and AI
+
+The Robinhood UK claim-stock campaign (`robinhood.com/gb/en/campaign/claim-stock/`)
+was studied next, with its UK product pages:
+
+- [Digests by Robinhood Cortex in the UK](https://robinhood.com/us/en/newsroom/digests-by-robinhood-cortex-uk) — AI summaries of why a stock is moving.
+- [Robinhood Stocks & Shares ISA](https://robinhood.com/us/en/newsroom/stocks-and-shares-isa).
+- [Robinhood removed its confetti in 2021](https://www.cnbc.com/2021/03/31/robinhood-gets-rid-of-confetti-feature-amid-scrutiny-over-gamification.html) after regulators criticised it as gamifying trading.
+
+| Robinhood feature | Shortlist | Where |
+| --- | --- | --- |
+| **Claim a free stock** — pick a card, reveal a share | ✅ Free practice share, three flip cards, weighted pool of UK and US names | Portfolio banner |
+| **Cortex Digests** — AI "why is it moving" | ✅ Daily digest on every instrument, Claude when keyed, data-driven otherwise | Instrument → Why it's moving |
+| **Robinhood Learn** — articles | ✅ Shortlist Academy: 19 interactive lessons with quizzes and calculators | Learn |
+| **Cortex assistant** | ✅ AI coach on every screen that sees the instrument, portfolio or lesson in front of you | Coach button, top bar |
+| **Stocks & Shares ISA** | ✅ Practice ISA with the £20,000 allowance | Portfolio → Accounts |
+| **Celebration animations** | ✅ For learning milestones only | Lessons, levels, badges |
+
+### How Shortlist innovates on it
+
+- **Learn & Earn.** Finishing a lesson pays XP and practice cash. A perfect quiz
+  pays a bonus. You earn by learning, not by trading.
+- **Missions that check themselves.** "Hold an ISA", "Set a stop" and "Start a
+  savings plan" tick off when the app state shows you really did it.
+- **A coach that refuses to tip.** The AI explains, gives a decision framework
+  and links the lesson. It never says buy or sell.
+- **Portfolio health score.** Seven factors out of 100, including hidden
+  concentration seen through ETFs, each linked to the lesson that fixes it.
+- **Tap-to-explain jargon** across the app, backed by a 34-term glossary.
+- **Responsible fun.** Confetti, streaks and badges reward learning and good
+  habits such as diversifying, adding protection and using tax wrappers. Nothing
+  rewards trade count. This is the line Robinhood was criticised for crossing.
+
 ## Where Shortlist goes further
 
 - **Asymmetric short-finder** — scanner, squeeze-risk radar, defined-risk structuring, Black–Scholes put alternative, AI bear/bull thesis and R-multiple expectancy. None of the four apps offers this.

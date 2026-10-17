@@ -15,6 +15,7 @@
     "cap:assets": "capacitor-assets generate --iconBackgroundColor '#0d0f1a' --iconBackgroundColorDark '#0d0f1a' --splashBackgroundColor '#0d0f1a' --splashBackgroundColorDark '#0d0f1a'"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.4.1",
     "@capacitor/haptics": "^8.0.2",

@@ -15,6 +15,12 @@ import {
   Receipt,
   Repeat,
   Layers,
+  GraduationCap,
+  Bot,
+  Gift,
+  HeartPulse,
+  Trophy,
+  Newspaper,
 } from "lucide-react";
 
 // Public marketing landing page. The app itself lives at /scan.
@@ -85,6 +91,36 @@ export default function Landing() {
           <Feature icon={Repeat} title="Automate it" body="Savings plans weekly to monthly, AutoInvest for spare cash, model portfolios and one-click rebalancing to your targets." />
           <Feature icon={Layers} title="See what you really own" body="Look-through splits every ETF into the companies, sectors and regions inside it, and flags overlap." />
           <Feature icon={Bell} title="Alerts that reach you" body="Price alerts, order fills, stop triggers and dividends — as phone notifications, with Face ID / fingerprint app lock." />
+        </div>
+      </section>
+
+      {/* Learn + AI coach */}
+      <section className="border-t border-ink-800 bg-gradient-to-b from-violet-950/30 to-transparent">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8 py-16 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-violet-300 mb-2">Learn by doing</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">An academy and an AI coach in your pocket</h2>
+            <p className="mt-4 text-ink-300 leading-relaxed max-w-xl">
+              Two-minute lessons, quizzes and live calculators teach you as you go. Ask the AI coach about anything on screen
+              and get a plain-English answer with the lesson that goes deeper. It explains. It never tells you what to buy.
+            </p>
+            <div className="mt-8 grid sm:grid-cols-2 gap-3">
+              <Feature icon={GraduationCap} title="Shortlist Academy" body="19 bite-sized lessons in six paths, from your first share to ISAs, charts and defined-risk shorts." />
+              <Feature icon={Bot} title="AI coach" body="Sees the instrument, portfolio or lesson you are on, so answers are about you, not generic." />
+              <Feature icon={Trophy} title="Learn & Earn" body="XP, levels, streaks and badges, plus practice cash for every lesson. You earn by learning, not by trading." />
+              <Feature icon={Gift} title="Free practice share" body="Pick a card to reveal a free share for your practice portfolio." />
+              <Feature icon={Newspaper} title="Why it's moving" body="A daily AI digest on every instrument and a 60-second brief on your portfolio." />
+              <Feature icon={HeartPulse} title="Health score" body="Your portfolio scored out of 100, with the lesson that fixes each weak spot." />
+            </div>
+          </div>
+          <div className="mx-auto w-full max-w-[300px]">
+            <div className="rounded-[2.6rem] border border-ink-700 bg-ink-950 p-2.5 shadow-2xl shadow-violet-950/50">
+              <div className="overflow-hidden rounded-[2.1rem] border border-ink-800">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/screenshots/mobile-learn.png" alt="Shortlist Academy on iPhone: level, streak, next lesson and AI coach" className="block w-full" loading="lazy" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
