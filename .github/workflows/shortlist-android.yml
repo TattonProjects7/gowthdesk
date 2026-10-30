@@ -1,4 +1,4 @@
-name: Android
+name: Shortlist Android
 
 # Builds the Android app on every change to the native shell.
 #   - Always: a debug APK you can install on any Android phone (Actions → run → Artifacts).
@@ -12,13 +12,13 @@ on:
   push:
     branches: ["**"]
     paths:
-      - "android/**"
-      - "mobile/**"
-      - "capacitor.config.ts"
-      - "scripts/mobile-env.mjs"
-      - "package.json"
-      - "package-lock.json"
-      - ".github/workflows/android.yml"
+      - "shortlist/android/**"
+      - "shortlist/mobile/**"
+      - "shortlist/capacitor.config.ts"
+      - "shortlist/scripts/mobile-env.mjs"
+      - "shortlist/package.json"
+      - "shortlist/package-lock.json"
+      - ".github/workflows/shortlist-android.yml"
   workflow_dispatch:
     inputs:
       upload:
@@ -30,6 +30,10 @@ on:
         type: choice
         default: internal
         options: [internal, alpha, beta, production]
+
+defaults:
+  run:
+    working-directory: shortlist
 
 jobs:
   build:
@@ -50,6 +54,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: shortlist/package-lock.json
 
       - run: npm ci
 
@@ -64,18 +69,18 @@ jobs:
         run: node scripts/mobile-env.mjs && npx cap sync android
 
       - name: Build debug APK
-        working-directory: android
+        working-directory: shortlist/android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: shortlist-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: shortlist/android/app/build/outputs/apk/debug/*.apk
           retention-days: 14
 
       - name: Build signed release bundle
         if: env.HAS_KEYSTORE == 'true'
-        working-directory: android
+        working-directory: shortlist/android
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -91,7 +96,7 @@ jobs:
         if: env.HAS_KEYSTORE == 'true'
         with:
           name: shortlist-release-aab
-          path: android/app/build/outputs/bundle/release/*.aab
+          path: shortlist/android/app/build/outputs/bundle/release/*.aab
           retention-days: 30
 
       - name: Upload to Google Play
@@ -102,6 +107,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.shortlist.app
-          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          releaseFiles: shortlist/android/app/build/outputs/bundle/release/*.aab
           track: ${{ inputs.track || vars.PLAY_TRACK || 'internal' }}
           status: draft

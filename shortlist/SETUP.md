@@ -12,6 +12,7 @@ real data, and subscriptions. Budget ~20–30 minutes.
 ## 0. Run the demo locally
 
 ```bash
+cd shortlist   # from the repository root
 npm install
 npm run dev          # http://localhost:3000
 ```

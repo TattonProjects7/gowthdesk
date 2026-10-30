@@ -43,6 +43,7 @@ the URL the apps use, or use a custom domain.
 ## 2. Sync and open
 
 ```bash
+cd shortlist   # from the repository root
 npm install
 npm run cap:ios       # bakes the URL in, syncs plugins, opens Xcode
 npm run cap:android   # same for Android Studio

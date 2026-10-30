@@ -1,9 +1,21 @@
-name: CI
+name: Shortlist CI
+
+# Shortlist lives in shortlist/; GrowthDesk and SiteCalc at the root are built by Vercel.
 
 on:
   push:
     branches: ["**"]
+    paths:
+      - "shortlist/**"
+      - ".github/workflows/shortlist-ci.yml"
   pull_request:
+    paths:
+      - "shortlist/**"
+      - ".github/workflows/shortlist-ci.yml"
+
+defaults:
+  run:
+    working-directory: shortlist
 
 jobs:
   build:
@@ -15,6 +27,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: shortlist/package-lock.json
 
       - name: Install dependencies
         run: npm ci

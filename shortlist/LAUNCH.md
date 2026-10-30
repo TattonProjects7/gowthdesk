@@ -48,5 +48,5 @@ Vercel · Supabase · Stripe · Finnhub · Alpha Vantage · OpenAI (optional) ·
 Apple Developer ($99/yr) · Google Play ($25 once) · RevenueCat · Firebase.
 
 ### Health checks
-- CI (`.github/workflows/ci.yml`) runs typecheck + tests + build on every push.
+- CI (`.github/workflows/shortlist-ci.yml`) runs typecheck + tests + build on every push that touches `shortlist/`.
 - Locally: `npm test`, `npx tsc --noEmit`, `npm run build`.

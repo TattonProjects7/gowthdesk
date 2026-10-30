@@ -1,4 +1,4 @@
-name: iOS
+name: Shortlist iOS
 
 # Builds the iPhone app on a macOS runner.
 #   - Always: compiles the app for the simulator (no Apple account needed), so a
@@ -12,19 +12,23 @@ on:
   push:
     branches: ["**"]
     paths:
-      - "ios/**"
-      - "mobile/**"
-      - "capacitor.config.ts"
-      - "scripts/mobile-env.mjs"
-      - "package.json"
-      - "package-lock.json"
-      - ".github/workflows/ios.yml"
+      - "shortlist/ios/**"
+      - "shortlist/mobile/**"
+      - "shortlist/capacitor.config.ts"
+      - "shortlist/scripts/mobile-env.mjs"
+      - "shortlist/package.json"
+      - "shortlist/package-lock.json"
+      - ".github/workflows/shortlist-ios.yml"
   workflow_dispatch:
     inputs:
       upload:
         description: "Archive and upload to TestFlight"
         type: boolean
         default: false
+
+defaults:
+  run:
+    working-directory: shortlist
 
 jobs:
   build:
@@ -40,6 +44,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: shortlist/package-lock.json
 
       - run: npm ci
 

@@ -14,10 +14,12 @@ Install Node 20+ and Git, then get the code.
 node -v
 git --version
 
-# clone your repo and switch to the feature branch (or merge PR #3 to main first)
+# clone your repo (Shortlist is in the shortlist/ folder; use the feature
+# branch until PR #3 is merged)
 git clone https://github.com/TattonProjects7/gowthdesk.git
 cd gowthdesk
 git checkout claude/stock-trading-app-idea-aaj8rv
+cd shortlist   # every command in this runbook runs from here
 
 # install dependencies
 npm install

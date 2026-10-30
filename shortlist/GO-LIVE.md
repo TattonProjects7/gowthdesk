@@ -19,19 +19,22 @@ accounts, payment details or legal sign-off, in the order to do them.
 
 ## 1. Put the web app live (about 10 minutes)
 
-The existing Vercel project `gowthdesk` serves the GrowthDesk app from `main`.
-**Do not merge PR #3 into `main` as it stands**, or it replaces GrowthDesk.
-Give Shortlist its own Vercel project instead:
+Shortlist lives in the `shortlist/` folder of the `TattonProjects7/gowthdesk`
+repository, next to GrowthDesk and SiteCalc. The existing Vercel project
+`gowthdesk` keeps serving GrowthDesk from the repository root. Shortlist gets
+its own Vercel project, pointed at the `shortlist/` folder:
 
-1. Vercel → **Add New → Project** → import `TattonProjects7/gowthdesk`.
-2. Name it `shortlist`. Framework: **Next.js**. Root directory: `.`
-3. Add the environment variables below, then **Deploy**. This first deploy
-   builds `main` (GrowthDesk), which is expected. Ignore it.
-4. Project → **Settings → Git → Production Branch**: set it to
-   `claude/stock-trading-app-idea-aaj8rv` and save.
-5. **Deployments → Create Deployment** → enter
-   `claude/stock-trading-app-idea-aaj8rv` → **Create**. From now on every push
-   to that branch updates the live site.
+1. Merge PR #3 into `main`. It only adds the `shortlist/` folder and its build
+   workflows (and tells GrowthDesk's TypeScript settings to ignore that
+   folder), so GrowthDesk and SiteCalc carry on exactly as before.
+2. Vercel → **Add New → Project** → import `TattonProjects7/gowthdesk`.
+3. Name it `shortlist`. Framework: **Next.js**. Next to **Root Directory**,
+   click **Edit** and choose `shortlist`.
+4. Add the environment variables below, then **Deploy**. From now on every
+   push to `main` updates the live site.
+5. Optional: **Settings → Git → Ignored Build Step** → "Only build if there are
+   changes in a folder", so each project only rebuilds when its own code
+   changes. Do the same on the `gowthdesk` project if you like.
 6. Optional: **Settings → Domains** → add your own domain.
 7. Upgrade the Vercel team to **Pro** before you switch adverts or payments
    on. The free Hobby plan is for non-commercial use only, and Shortlist earns
@@ -161,7 +164,7 @@ Without this, everything still works and each user's data stays on their device.
 4. Add these repository **secrets**: `ANDROID_KEYSTORE_BASE64` (the base64
    output), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`upload`) and
    `ANDROID_KEY_PASSWORD`.
-5. GitHub → **Actions → Android** → open the latest run → **Re-run all jobs**.
+5. GitHub → **Actions → Shortlist Android** → open the latest run → **Re-run all jobs**.
    Download `shortlist-release-aab` from the run, and upload it in the Play
    Console as your first release. Turn on Play App Signing when asked.
 6. Later releases can go up automatically. Create a Play service account with
@@ -179,7 +182,8 @@ Without this, everything still works and each user's data stays on their device.
 Every Android run also produces `shortlist-debug-apk`, which you can install on
 any Android phone to test straight away.
 
-> The **Run workflow** button only appears once these workflows are on `main`.
+> The **Run workflow** button only appears once these workflows are on `main`
+> (after PR #3 is merged).
 > Until then, re-run the latest run, which uses your current secrets and
 > variables.
 
@@ -197,7 +201,7 @@ any Android phone to test straight away.
    `ASC_ISSUER_ID`, `ASC_KEY_P8` (the full contents of the .p8 file) and
    `APPLE_TEAM_ID` (from your Membership page).
 4. Add the repository variable `TESTFLIGHT_AUTO_UPLOAD` = `true`. Then
-   GitHub → **Actions → iOS** → open the latest run → **Re-run all jobs**. The
+   GitHub → **Actions → Shortlist iOS** → open the latest run → **Re-run all jobs**. The
    build appears in TestFlight after processing.
 5. Test it in TestFlight, then submit for review with the screenshots in
    `store/screenshots/ios-6.9in` and the copy in `store/LISTING.md`. In the

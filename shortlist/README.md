@@ -165,6 +165,7 @@ deterministic simulated market, on-device storage and all Pro features
 unlocked. Add keys to turn each piece on.
 
 ```bash
+cd shortlist   # from the repository root
 npm install
 npm run dev        # http://localhost:3000
 npm test           # unit tests
