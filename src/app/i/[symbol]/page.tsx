@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -247,6 +248,9 @@ export default function InstrumentPage() {
 
             {/* News & research */}
             <NewsSection symbol={i.symbol} closes={closes31} now={now} mounted={mounted} />
+
+            {/* Web only, well below the deal ticket; never in real-money mode. */}
+            <AdSlot placement="quote-bottom" />
           </div>
 
           {/* Side column: deal ticket, watchlist, alerts */}

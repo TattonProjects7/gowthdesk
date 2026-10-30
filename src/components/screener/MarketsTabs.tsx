@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Globe, LayoutGrid, Layers, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, CandlestickChart, Globe, LayoutGrid, Layers, Newspaper, SlidersHorizontal } from "lucide-react";
 
 // Sub-navigation for the market tools, shown at the top of each of them.
 const TABS = [
@@ -10,6 +10,8 @@ const TABS = [
   { href: "/screener", label: "Screener", icon: SlidersHorizontal },
   { href: "/maps", label: "Heatmap", icon: LayoutGrid },
   { href: "/groups", label: "Groups", icon: Layers },
+  { href: "/charts", label: "Charts", icon: CandlestickChart },
+  { href: "/news", label: "News", icon: Newspaper },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
 ];
 

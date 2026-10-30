@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Privacy Policy — Shortlist" };
 
 export default function Privacy() {
   return (
-    <LegalShell title="Privacy Policy" updated="17 October 2026">
+    <LegalShell title="Privacy Policy" updated="30 October 2026">
       <p>
         Shortlist (“we”, “us”) is an investing research, education and paper-trading app. This policy explains what personal data
         we collect, why, and your choices. We do not sell your personal data.
@@ -34,11 +34,39 @@ export default function Privacy() {
       <ul>
         <li><a href="https://supabase.com/privacy">Supabase</a> — authentication and database hosting.</li>
         <li><a href="https://stripe.com/privacy">Stripe</a> — web payments.</li>
-        <li><a href="https://www.revenuecat.com/privacy">RevenueCat</a> and the Apple App Store / Google Play — mobile in-app purchases.</li>
+        <li><a href="https://www.revenuecat.com/privacy">RevenueCat</a> and the Apple App Store / Google Play — mobile in-app purchases. If you are signed in, we link your purchase to your account so a plan bought in the app also applies on the web.</li>
+        <li><a href="https://policies.google.com/privacy">Google</a> (AdSense and AdMob) — adverts in the free version. See “Advertising” below.</li>
         <li>Market-data providers (e.g. Finnhub, Alpha Vantage) — to display prices. Requests are for ticker data, not about you.</li>
         <li><a href="https://www.trading212.com/legal-documentation">Trading 212</a> — only if you connect a real account. Your API key is checked with Trading 212 and then stored encrypted in a secure, httpOnly cookie on your device, never in our database. It is sent only to Trading 212, to read your balances and positions and to place the orders you confirm. Disconnecting deletes the cookie.</li>
         <li><a href="https://www.anthropic.com/legal/privacy">Anthropic</a> — to power the AI coach and the “Why it’s moving” digests. We send your question, the screen you are on, a summary of your paper portfolio and your learning level. We never send your name, email or account details.</li>
         <li><a href="https://openai.com/policies/privacy-policy">OpenAI</a> — to generate the optional AI thesis; only the trade setup, never your identity, is sent.</li>
+      </ul>
+
+      <h2>Advertising</h2>
+      <p>
+        The free version of Shortlist shows adverts on research and learning screens. We never show adverts on trading,
+        account or sign-in screens, or anywhere while you are viewing a real broker account.
+      </p>
+      <ul>
+        <li>
+          On the web, adverts are served by <a href="https://policies.google.com/technologies/ads">Google AdSense</a>; in the
+          iPhone and Android apps, by <a href="https://policies.google.com/technologies/ads">Google AdMob</a>. Google may use
+          cookies or your device&apos;s advertising identifier to show and measure adverts, and to limit how often you see them.
+        </li>
+        <li>
+          In the UK and EU we ask for your consent before any personalised advertising, using Google&apos;s consent message.
+          If you say no, Google shows non-personalised adverts based on the page you&apos;re on. You can change your choice at
+          any time (in the apps from Settings → Adverts → Ad privacy choices). On iPhone, Apple asks whether Shortlist may
+          track you; saying no doesn&apos;t limit any features.
+        </li>
+        <li>
+          We don&apos;t share your portfolio, watchlists, broker data or Trading 212 key with advertisers, and adverts never
+          change what our tools show you.
+        </li>
+        <li>
+          The ad-free plan ({"£6.99"} a month, or included with Pro) turns adverts off on every device you sign in to, and the
+          ad scripts aren&apos;t loaded at all.
+        </li>
       </ul>
 
       <h2>Data retention & deletion</h2>

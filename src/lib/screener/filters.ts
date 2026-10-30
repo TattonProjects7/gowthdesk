@@ -7,7 +7,7 @@
 // know what PEG or ATR means; Shortlist doesn't.
 
 import { INSTRUMENTS } from "../instruments";
-import { INDEX_LABEL, type IndexCode } from "../universe";
+import { INDEX_LABEL, THEMES, type IndexCode } from "../universe";
 import { CANDLE_LABEL, PATTERN_LABEL, type CandleId, type PatternId } from "./patterns";
 import type { SignalId, Snapshot } from "./snapshot";
 
@@ -138,6 +138,13 @@ export const FILTERS: FilterDef[] = [
     options: INDUSTRIES.map((x) => ({ id: slug(x), label: x, test: (s: Snapshot) => s.i.industry === x })),
   },
   {
+    id: "theme",
+    label: "Theme",
+    group: "descriptive",
+    help: "The big investment stories, like AI or obesity drugs. A share can belong to several.",
+    options: Object.entries(THEMES).map(([id, t]) => ({ id, label: t.label, test: (s: Snapshot) => t.symbols.includes(s.symbol) })),
+  },
+  {
     id: "geo",
     label: "Country / region",
     group: "descriptive",
@@ -209,6 +216,23 @@ export const FILTERS: FilterDef[] = [
     options: [
       ...[1, 1.5, 2, 3, 5].map((x) => ({ id: `o${x}`, label: `Over ${x}×`, test: over((s) => s.relVolume, x) })),
       ...[1, 0.5].map((x) => ({ id: `u${x}`, label: `Under ${x}×`, test: under((s) => s.relVolume, x) })),
+    ],
+  },
+  {
+    id: "curvol",
+    label: "Current volume",
+    group: "descriptive",
+    help: "Shares traded so far today.",
+    options: [100e3, 500e3, 1e6, 5e6, 10e6, 50e6].map((x) => ({ id: `o${x / 1e3}k`, label: `Over ${x >= 1e6 ? `${x / 1e6}M` : `${x / 1e3}K`}`, test: over((s) => s.volume, x) })),
+  },
+  {
+    id: "shares",
+    label: "Shares outstanding",
+    group: "descriptive",
+    help: "How many shares the company has issued.",
+    options: [
+      ...[500, 1000].map((x) => ({ id: `u${x}m`, label: `Under ${x >= 1000 ? `${x / 1000}B` : `${x}M`}`, test: under((s) => s.i.sharesM, x) })),
+      ...[500, 1000, 5000, 10000].map((x) => ({ id: `o${x}m`, label: `Over ${x >= 1000 ? `${x / 1000}B` : `${x}M`}`, test: over((s) => s.i.sharesM, x) })),
     ],
   },
   {
@@ -491,6 +515,8 @@ export const SIGNAL_LABEL = new Map(SIGNALS.map((s) => [s.id, s.label]));
 export interface Screen {
   filters: string[]; // "filter:option"
   signal?: SignalId | "";
+  /** Limit the screen to these symbols (Finviz's Tickers box). */
+  tickers?: string[];
 }
 
 /** Apply a screen. Unknown tokens are ignored so old saved screens keep working. */
@@ -505,7 +531,8 @@ export function runScreen(snaps: Snapshot[], screen: Screen): Snapshot[] {
     grouped.set(fid, [...(grouped.get(fid) ?? []), opt]);
   }
   for (const opts of grouped.values()) tests.push((s) => opts.some((o) => o.test(s)));
-  return snaps.filter((s) => (!screen.signal || s.signals.includes(screen.signal)) && tests.every((t) => t(s)));
+  const only = screen.tickers?.length ? new Set(screen.tickers.map((t) => t.toUpperCase())) : null;
+  return snaps.filter((s) => (!only || only.has(s.symbol)) && (!screen.signal || s.signals.includes(screen.signal)) && tests.every((t) => t(s)));
 }
 
 /** Plain-English label for a token, e.g. "cap:large" → "Market cap: Large ($10bn–$200bn)". */

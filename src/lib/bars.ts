@@ -137,3 +137,29 @@ export function scaleBars(bars: Bar[], last: number, today?: { o?: number; h?: n
   if (today?.pc && out.length > 1) out[out.length - 2].c = today.pc;
   return out;
 }
+
+/** Roll daily bars up into weekly (Monday-start) or monthly bars. */
+export function aggregateBars(bars: Bar[], period: "W" | "M"): Bar[] {
+  const out: Bar[] = [];
+  let key = "";
+  for (const b of bars) {
+    const d = new Date(b.t);
+    let k: string;
+    if (period === "M") k = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+    else {
+      const monday = Math.floor((b.t / DAY + 3) / 7); // weeks since the first Monday after the epoch
+      k = `w${monday}`;
+    }
+    const last = out[out.length - 1];
+    if (k !== key || !last) {
+      out.push({ ...b });
+      key = k;
+    } else {
+      last.h = Math.max(last.h, b.h);
+      last.l = Math.min(last.l, b.l);
+      last.c = b.c;
+      last.v += b.v;
+    }
+  }
+  return out;
+}

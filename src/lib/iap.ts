@@ -10,6 +10,9 @@ import { isNative, platformName } from "./platform";
 const IOS_KEY = process.env.NEXT_PUBLIC_REVENUECAT_IOS_KEY;
 const ANDROID_KEY = process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY;
 const ENTITLEMENT = "pro";
+// The £6.99/month ad-free plan: its own entitlement and offering in RevenueCat.
+export const AD_FREE_ENTITLEMENT = "ad_free";
+const AD_FREE_OFFERING = "ad_free";
 
 export function iapConfigured(): boolean {
   return isNative() && Boolean(platformName() === "ios" ? IOS_KEY : ANDROID_KEY);
@@ -23,6 +26,53 @@ export async function initIap(): Promise<void> {
   const apiKey = (platformName() === "ios" ? IOS_KEY : ANDROID_KEY) as string;
   await Purchases.configure({ apiKey });
   configured = true;
+}
+
+/**
+ * Tie purchases to the signed-in Shortlist account, so RevenueCat's webhook can
+ * unlock the same plan on the web. Anonymous purchases still work on the device.
+ */
+export async function linkIapUser(userId: string | null): Promise<void> {
+  if (!iapConfigured()) return;
+  try {
+    await initIap();
+    const { Purchases } = await import("@revenuecat/purchases-capacitor");
+    if (userId) await Purchases.logIn({ appUserID: userId });
+  } catch {
+    /* offline or not configured: try again next launch */
+  }
+}
+
+/** Active entitlements from the store: { pro, adFree }. */
+export async function nativeEntitlements(): Promise<{ pro: boolean; adFree: boolean }> {
+  if (!iapConfigured()) return { pro: false, adFree: false };
+  try {
+    await initIap();
+    const { Purchases } = await import("@revenuecat/purchases-capacitor");
+    const info = await Purchases.getCustomerInfo();
+    const active = info.customerInfo.entitlements.active;
+    return { pro: Boolean(active[ENTITLEMENT]), adFree: Boolean(active[AD_FREE_ENTITLEMENT]) };
+  } catch {
+    return { pro: false, adFree: false };
+  }
+}
+
+/** Buy the £6.99/month ad-free plan through the App Store or Google Play. */
+export async function purchaseAdFree(): Promise<{ ok: boolean; message?: string }> {
+  if (!isNative()) return { ok: false, message: "Not on a device" };
+  if (!iapConfigured()) return { ok: false, message: "In-app purchases aren’t configured yet (set RevenueCat keys)." };
+  try {
+    await initIap();
+    const { Purchases } = await import("@revenuecat/purchases-capacitor");
+    const offerings = await Purchases.getOfferings();
+    const pkg = offerings.all?.[AD_FREE_OFFERING]?.availablePackages?.[0];
+    if (!pkg) return { ok: false, message: "The ad-free plan isn’t available yet." };
+    const res = await Purchases.purchasePackage({ aPackage: pkg });
+    return { ok: Boolean(res.customerInfo.entitlements.active[AD_FREE_ENTITLEMENT]) };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Purchase failed";
+    return { ok: false, message: /cancel/i.test(msg) ? "Purchase cancelled." : msg };
+  }
 }
 
 export async function isProNative(): Promise<boolean> {
@@ -61,7 +111,8 @@ export async function restorePurchases(): Promise<boolean> {
     await initIap();
     const { Purchases } = await import("@revenuecat/purchases-capacitor");
     const info = await Purchases.restorePurchases();
-    return Boolean(info.customerInfo.entitlements.active[ENTITLEMENT]);
+    const active = info.customerInfo.entitlements.active;
+    return Boolean(active[ENTITLEMENT] || active[AD_FREE_ENTITLEMENT]);
   } catch {
     return false;
   }

@@ -73,6 +73,28 @@ competitor study and how each feature maps to this app.
   is set. Everything else uses sector-shaped demo figures, labelled as demo
   wherever they appear.
 
+- **News** — market, stocks, ETF and crypto headlines (live from Finnhub, never
+  invented), by time or source, plus a **Market Pulse** written from today's
+  data: breadth, leading sectors, big movers with their volume and levels.
+- **Charts** — one, two or four candlestick charts side by side, daily, weekly
+  or monthly, with volume, 20/50/200-day averages, auto-drawn trendlines and a
+  crosshair readout. Layouts live in the URL.
+- **Screener extras** — tickers box, order by with asc/desc, numbered pages,
+  compare up to five shares (with a rebased performance chart), live/paused
+  results, investment **themes** (AI, obesity drugs, defence…), and Tickers,
+  Stats, TA and Custom-column views.
+
+**Adverts and the ad-free plan**
+
+- Google AdSense on the web and an AdMob banner in the iOS and Android apps,
+  only on research and learning screens. Never on trading, account or legal
+  screens, never in real-money mode. Google's consent form and Apple's tracking
+  prompt are handled in the apps.
+- **Ad-free for £6.99/month**: Stripe on the web, App Store / Google Play in the
+  apps (RevenueCat). One purchase removes ads everywhere the person signs in.
+  Pro includes it.
+- Until the ad networks are set up, the spaces show Shortlist promos.
+
 **Demo and real modes**
 
 - **Demo / Real switch** in the top bar. Demo is the practice portfolio. Real

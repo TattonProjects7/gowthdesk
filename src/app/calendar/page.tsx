@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Landmark, Moon, Sun } from "lucide-react";
@@ -81,8 +82,9 @@ export default function Calendar() {
           <Card className="text-center text-sm text-ink-400">Nothing scheduled for {mine ? "your holdings and watchlists" : "this view"} in the next two weeks.</Card>
         ) : (
           <div className="space-y-4">
-            {days.map(({ date, list }) => (
+            {days.map(({ date, list }, k) => (
               <section key={date}>
+                {k === 2 && <AdSlot placement="calendar-inline" />}
                 <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-white">
                   {fmtEventDate(date)}
                   {date === today && <Pill tone="violet">Today</Pill>}

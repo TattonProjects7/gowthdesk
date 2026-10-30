@@ -29,5 +29,5 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   // Run on app routes but skip static assets and the Stripe webhook.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stripe/webhook|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stripe/webhook|api/revenuecat/webhook|ads.txt|app-ads.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

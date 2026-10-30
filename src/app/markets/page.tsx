@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, CalendarDays, Flame, Globe, Radar, Search } from "lucide-react";
@@ -77,6 +78,7 @@ export default function Markets() {
         </div>
 
         {!q && <MarketPulse />}
+        {!q && <AdSlot placement="markets-overview" />}
 
         {!q && (
           <>

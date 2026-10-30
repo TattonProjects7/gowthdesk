@@ -45,7 +45,7 @@ import RealBanner from "@/components/broker/RealBanner";
 // Markets sub-navigation, keeping the bottom bar at five tabs.
 const LINKS: { href: string; label: string; icon: React.ElementType; match?: string[]; desktopOnly?: boolean }[] = [
   { href: "/portfolio", label: "Portfolio", icon: Wallet },
-  { href: "/markets", label: "Markets", icon: Globe, match: ["/markets", "/i/", "/maps", "/groups", "/calendar", "/screener"] },
+  { href: "/markets", label: "Markets", icon: Globe, match: ["/markets", "/i/", "/maps", "/groups", "/calendar", "/screener", "/charts", "/news"] },
   { href: "/screener", label: "Screener", icon: SlidersHorizontal, match: ["/screener"], desktopOnly: true },
   { href: "/learn", label: "Learn", icon: GraduationCap },
   { href: "/watchlist", label: "Watchlist", icon: Star },
@@ -245,7 +245,8 @@ export default function Nav() {
       </div>
 
       {/* Mobile bottom tab bar */}
-      <nav className="sm:hidden fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] bg-ink-950/[0.94] backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
+      {/* Sits above the in-app ad banner when one is showing (see NativeAdBanner). */}
+      <nav style={{ bottom: "var(--ad-banner-h, 0px)" }} className="sm:hidden fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] bg-ink-950/[0.94] backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5 px-1 pt-1">
           {LINKS.filter((l) => !l.desktopOnly).map((l) => {
             const Icon = l.icon;

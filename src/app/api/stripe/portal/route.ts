@@ -16,7 +16,8 @@ export async function POST() {
   if (!supabase || !user) return NextResponse.json({ error: "Please sign in first" }, { status: 401 });
 
   const { data: sub } = await supabase.from("subscriptions").select("stripe_customer_id").eq("user_id", user.id).maybeSingle();
-  const customerId = sub?.stripe_customer_id as string | undefined;
+  const { data: ent } = await supabase.from("entitlements").select("stripe_customer_id").eq("user_id", user.id).eq("source", "stripe").not("stripe_customer_id", "is", null).limit(1).maybeSingle();
+  const customerId = (sub?.stripe_customer_id ?? ent?.stripe_customer_id) as string | undefined;
   if (!customerId) return NextResponse.json({ error: "No subscription found" }, { status: 404 });
 
   const session = await stripe.billingPortal.sessions.create({

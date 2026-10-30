@@ -130,3 +130,6 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   .chart-draw { animation: none; stroke-dashoffset: 0; }
   .chart-fade, .chart-pulse { animation: none; }
 }
+
+/* Room for the in-app AdMob banner, when one is showing. */
+body { padding-bottom: var(--ad-banner-h, 0px); }

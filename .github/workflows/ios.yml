@@ -50,6 +50,13 @@ jobs:
       - name: Sync the native project
         run: node scripts/mobile-env.mjs && npx cap sync ios
 
+      # AdMob app ID (repository variable). Unset: Google's sample ID stays, no live ads.
+      - name: Set the AdMob app ID
+        if: ${{ vars.ADMOB_APP_ID_IOS != '' }}
+        env:
+          ADMOB_APP_ID_IOS: ${{ vars.ADMOB_APP_ID_IOS }}
+        run: /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $ADMOB_APP_ID_IOS" ios/App/App/Info.plist
+
       - name: Build for the simulator (no signing)
         run: |
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \

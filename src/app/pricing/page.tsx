@@ -3,19 +3,21 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, ShieldOff } from "lucide-react";
 import Nav from "@/components/Nav";
 import { useAuth } from "@/lib/auth";
-import { useSubscription } from "@/lib/subscription";
+import { refreshSubscription, useSubscription } from "@/lib/subscription";
 import { isNative } from "@/lib/platform";
-import { purchasePro, restorePurchases } from "@/lib/iap";
+import { purchaseAdFree, purchasePro, restorePurchases } from "@/lib/iap";
+import { AD_FREE_PRICE } from "@/lib/ads";
 
 const FREE = ["UK & US shares, ETFs and crypto with live charts", "Paper portfolio: GIA, ISA & SIPP, fractional from £1", "Watchlists, price alerts & market calendar", "Savings plans, AutoInvest & one-click rebalance", "Look-through analytics & income projection", "Short scanner, squeeze radar & tracker", "Shortlist Academy, missions & AI coach", "Demo and real modes with Trading 212"];
-const PRO = ["Everything in Free", "AI bear + steel-manned bull thesis", "Defined-risk put alternatives", "Real-time alerts across devices", "Priority data refresh"];
+const PRO = ["Everything in Free", "No adverts, on the web and in the apps", "AI bear + steel-manned bull thesis", "Defined-risk put alternatives", "Real-time alerts across devices", "Priority data refresh"];
+const AD_FREE = ["Everything in Free", "No adverts anywhere in Shortlist", "Works on the web, iPhone and Android", "One subscription for every device you sign in to", "Cancel any time"];
 
 export default function Pricing() {
   const { enabled, user } = useAuth();
-  const { pro, billingEnabled } = useSubscription();
+  const { pro, adFree, billingEnabled, adFreeBilling } = useSubscription();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -53,6 +55,34 @@ export default function Pricing() {
     }
   };
 
+  // The £6.99/month ad-free plan: App Store / Google Play in the apps, Stripe on the web.
+  const goAdFree = async () => {
+    setBusy(true);
+    setErr(null);
+    try {
+      if (native) {
+        const r = await purchaseAdFree();
+        if (r.ok) {
+          refreshSubscription();
+          router.push("/settings?adfree=1");
+        } else setErr(r.message || "Purchase failed.");
+        return;
+      }
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      const res = await fetch("/api/stripe/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: "ad_free" }) });
+      const j = await res.json();
+      if (j.url) window.location.href = j.url;
+      else setErr(j.error || "Could not start checkout.");
+    } catch {
+      setErr("Could not start checkout.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const restore = async () => {
     setBusy(true);
     setErr(null);
@@ -69,10 +99,10 @@ export default function Pricing() {
   return (
     <div className="min-h-screen">
       <Nav />
-      <main className="mx-auto max-w-4xl px-5 sm:px-8 py-12">
+      <main className="mx-auto max-w-5xl px-5 sm:px-8 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white">Trade smarter, not more.</h1>
-          <p className="mt-2 text-ink-300">Start free. Upgrade for the AI thesis, put structures and cross-device alerts.</p>
+          <p className="mt-2 text-ink-300">Start free. Remove the adverts for {AD_FREE_PRICE} a month, or go Pro for the AI thesis, put structures, cross-device alerts and no adverts.</p>
           {!billingEnabled && (
             <p className="mt-3 inline-block rounded-full border border-amber-900 bg-amber-950/40 px-3 py-1 text-xs text-amber-300">
               Billing not configured — all Pro features are unlocked in demo mode.
@@ -80,8 +110,42 @@ export default function Pricing() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <Plan name="Free" price="£0" tagline="Everything you need to find and track shorts." features={FREE} cta={<Link href="/scan" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Open the scanner</Link>} />
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <Plan name="Free" price="£0" tagline="Everything you need to learn, invest and research, with adverts." features={FREE} cta={<Link href="/markets" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Explore markets</Link>} />
+
+          <div id="ad-free" className="relative scroll-mt-24 rounded-2xl border border-violet-500/40 bg-gradient-to-br from-violet-950/40 to-ink-900 p-6">
+            <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-violet-400 to-sky-400 px-3 py-0.5 text-xs font-bold text-ink-950">
+              <ShieldOff className="h-3 w-3" /> AD-FREE
+            </span>
+            <h2 className="text-lg font-bold text-white">Ad-free</h2>
+            <p className="mt-1 text-3xl font-bold text-white">
+              {AD_FREE_PRICE}
+              <span className="text-base font-normal text-ink-400">/mo</span>
+            </p>
+            <p className="mt-1 text-sm text-ink-300">Shortlist without the adverts, everywhere you use it.</p>
+            <ul className="mt-4 space-y-2">
+              {AD_FREE.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-ink-200">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" /> {f}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-6">
+              {adFree ? (
+                <div className="rounded-lg border border-emerald-800 bg-emerald-950 px-4 py-2.5 text-center text-sm font-semibold text-emerald-300">{pro && billingEnabled ? "Included with Pro ✓" : "You’re ad-free ✓"}</div>
+              ) : (
+                <button
+                  onClick={goAdFree}
+                  disabled={busy || !adFreeBilling}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-400 to-sky-400 px-4 py-2.5 text-sm font-bold text-ink-950 hover:brightness-105 disabled:opacity-60"
+                >
+                  {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {!adFreeBilling ? "Coming soon" : native ? `Go ad-free · ${AD_FREE_PRICE}/mo` : !user ? "Sign in to go ad-free" : `Go ad-free · ${AD_FREE_PRICE}/mo`}
+                </button>
+              )}
+              <p className="mt-2 text-center text-[11px] text-ink-500">{native ? "Billed by the App Store or Google Play. Sign in to remove ads on the web too." : "Billed monthly by Stripe. Sign in on the apps to remove ads there too."}</p>
+            </div>
+          </div>
 
           <div className="rounded-2xl border border-rose-800 bg-gradient-to-br from-rose-950/40 to-ink-900 p-6 relative">
             <span className="absolute -top-3 left-6 rounded-full bg-brand shadow-glow-rose px-3 py-0.5 text-xs font-bold text-white">PRO</span>
@@ -123,6 +187,9 @@ export default function Pricing() {
             </div>
           </div>
         </div>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-xs leading-relaxed text-ink-500">
+          Subscriptions renew monthly until cancelled. Cancel any time: on the web from Settings → Manage billing, in the apps from your App Store or Google Play subscriptions. Paid plans apply to your Shortlist account on every device you sign in to. See the <Link href="/terms" className="underline">terms</Link>.
+        </p>
       </main>
     </div>
   );

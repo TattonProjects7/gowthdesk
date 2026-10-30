@@ -256,3 +256,26 @@ function build(r: Row, k: number): Instrument {
 }
 
 export const EXTRA_STOCKS: Instrument[] = ROWS.map(build);
+
+// Investment themes — the stories people actually invest in. A share can sit in
+// several. Used by the screener's Theme filter.
+export const THEMES: Record<string, { label: string; symbols: string[] }> = {
+  ai: { label: "Artificial intelligence", symbols: ["NVDA", "MSFT", "GOOGL", "META", "AMZN", "AVGO", "AMD", "PLTR", "ORCL", "MU", "ARM", "DELL", "ANET", "CRM", "NOW", "SNOW", "TSLA", "IBM", "CEG"] },
+  chips: { label: "Semiconductors", symbols: ["NVDA", "AMD", "AVGO", "INTC", "QCOM", "TXN", "MU", "AMAT", "ARM"] },
+  cloud: { label: "Cloud and software", symbols: ["MSFT", "AMZN", "GOOGL", "ORCL", "CRM", "ADBE", "NOW", "INTU", "SNOW", "SHOP", "SGE", "PLTR"] },
+  cyber: { label: "Cybersecurity", symbols: ["CRWD", "PANW", "CSCO", "MSFT"] },
+  ev: { label: "Electric vehicles", symbols: ["TSLA", "GM", "F"] },
+  obesity: { label: "Obesity and diabetes drugs", symbols: ["LLY", "NVO", "AZN", "AMGN"] },
+  defence: { label: "Defence and aerospace", symbols: ["LMT", "RTX", "BA", "GE", "RR"] },
+  energy_transition: { label: "Clean energy and nuclear", symbols: ["NEE", "CEG", "SSE", "NG", "FCX"] },
+  oil: { label: "Oil and gas", symbols: ["XOM", "CVX", "COP", "OXY", "SLB", "BP", "SHEL"] },
+  crypto: { label: "Crypto-linked", symbols: ["COIN", "HOOD", "BTC", "ETH", "SOL"] },
+  fintech: { label: "Payments and fintech", symbols: ["V", "MA", "PYPL", "AXP", "SHOP", "COIN", "HOOD"] },
+  banks: { label: "Banks", symbols: ["JPM", "BAC", "WFC", "GS", "MS", "LLOY", "BARC", "HSBA", "NWG", "STAN"] },
+  brands: { label: "Consumer brands", symbols: ["AAPL", "KO", "PEP", "MCD", "NKE", "SBUX", "PG", "DIS", "ULVR", "DGE", "RKT", "HLN", "MDLZ"] },
+  income: { label: "Dividend stalwarts", symbols: ["KO", "PG", "JNJ", "PEP", "MCD", "VZ", "T", "XOM", "CVX", "ABBV", "O", "LGEN", "BATS", "IMB", "NG", "ULVR", "SHEL", "HSBA"] },
+  streaming: { label: "Streaming and media", symbols: ["NFLX", "DIS", "SPOT", "CMCSA", "GOOGL"] },
+  uk_retail: { label: "UK high street", symbols: ["TSCO", "SBRY", "MKS", "ABF", "JD", "OCDO", "CPG"] },
+  miners: { label: "Mining and metals", symbols: ["RIO", "GLEN", "AAL", "FCX", "NEM"] },
+  travel: { label: "Travel and leisure", symbols: ["BKNG", "ABNB", "IAG", "UBER", "CPG"] },
+};

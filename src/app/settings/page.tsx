@@ -11,6 +11,7 @@ import { portfolio } from "@/lib/portfolioStore";
 import { cloudAttached } from "@/lib/docstore";
 import { celebrateTrade, setFxPref, useFxPrefs } from "@/lib/effects";
 import { broker, switchMode, useBroker, useMode } from "@/lib/broker/client";
+import AdSettings from "@/components/ads/AdSettings";
 
 // Settings — app lock (Face ID / Touch ID or PIN), notifications, account and
 // data. The security features are what IG and ii lead with in their stores.
@@ -55,6 +56,9 @@ export default function SettingsPage() {
           <SettingsIcon className="h-6 w-6 text-ink-300" /> Settings
         </h1>
         <p className="text-sm text-ink-400">Security, notifications, account and data.</p>
+
+        {/* Adverts and the ad-free plan */}
+        <AdSettings />
 
         {/* Real trading */}
         <H2>

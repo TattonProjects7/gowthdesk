@@ -92,7 +92,7 @@ export const COLUMNS: Column[] = [
 const BY_ID = new Map(COLUMNS.map((c) => [c.id, c]));
 export const getColumn = (id: string) => BY_ID.get(id);
 
-export type ViewId = "overview" | "valuation" | "financial" | "ownership" | "performance" | "technical" | "charts";
+export type ViewId = "overview" | "valuation" | "financial" | "ownership" | "performance" | "technical" | "ta" | "custom" | "charts" | "tickers" | "stats";
 
 export const VIEWS: { id: ViewId; label: string; cols: string[] }[] = [
   { id: "overview", label: "Overview", cols: ["ticker", "company", "sector", "industry", "country", "cap", "pe", "price", "change", "volume"] },
@@ -101,8 +101,15 @@ export const VIEWS: { id: ViewId; label: string; cols: string[] }[] = [
   { id: "ownership", label: "Ownership", cols: ["ticker", "cap", "insider", "inst", "short", "recom", "target", "avgvol", "price", "change", "volume"] },
   { id: "performance", label: "Performance", cols: ["ticker", "perfw", "perfm", "perfq", "perfh", "perfytd", "perfy", "volw", "volm", "relvol", "avgvol", "price", "change"] },
   { id: "technical", label: "Technical", cols: ["ticker", "beta", "atr", "sma20", "sma50", "sma200", "hi52", "lo52", "rsi", "price", "change", "gap", "pattern", "candle"] },
+  { id: "ta", label: "TA", cols: ["ticker", "rsi", "atr", "volw", "volm", "beta", "sma20", "sma50", "sma200", "hi52", "lo52", "pattern", "candle", "relvol", "change"] },
+  { id: "custom", label: "Custom", cols: [] },
   { id: "charts", label: "Charts", cols: [] },
+  { id: "tickers", label: "Tickers", cols: [] },
+  { id: "stats", label: "Stats", cols: [] },
 ];
+
+/** Columns offered in the Custom view's picker (everything except the ticker, which is always first). */
+export const CUSTOM_DEFAULT = ["company", "cap", "pe", "div", "perfy", "rsi", "price", "change"];
 
 export const SORTABLE = COLUMNS.map((c) => c.id);
 

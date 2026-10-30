@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { ArrowUpRight, LayoutGrid } from "lucide-react";
@@ -219,6 +220,7 @@ export default function Maps() {
               <HeatLegend span={span} fmt={legendFmt} />
               <p className="text-xs text-ink-400">{COLOURS.find((c) => c.id === colour)?.help}</p>
             </div>
+            <AdSlot placement="maps-bottom" />
           </div>
 
           <aside className="space-y-3">

@@ -13,6 +13,7 @@ export interface SavedScreen {
   name: string;
   filters: string[];
   signal: SignalId | "";
+  tickers?: string[];
   sort: string;
   view: ViewId;
   alert: boolean;
@@ -51,8 +52,9 @@ export function setScreenMatches(id: string, symbols: string[]): void {
 }
 
 /** Encode a screen as URL search params for sharing. */
-export function screenToQuery(s: { filters: string[]; signal?: string; sort?: string; view?: string }): string {
+export function screenToQuery(s: { filters: string[]; signal?: string; sort?: string; view?: string; tickers?: string[] }): string {
   const p = new URLSearchParams();
+  if (s.tickers?.length) p.set("t", s.tickers.join(","));
   if (s.filters.length) p.set("f", s.filters.join(","));
   if (s.signal) p.set("s", s.signal);
   if (s.sort && s.sort !== "-cap") p.set("o", s.sort);

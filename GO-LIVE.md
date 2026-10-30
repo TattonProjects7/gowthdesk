@@ -12,6 +12,8 @@ accounts, payment details or legal sign-off, in the order to do them.
 | Accounts and sync | Needs a Supabase project. The free plan is full (step 4). |
 | Android app | Built by GitHub Actions. Needs a Play account and signing key (step 5). |
 | iPhone app | Compiled by GitHub Actions. Needs an Apple Developer account (step 6). |
+| Adverts | Built in. Shortlist promos fill the ad spaces until Google approves AdSense / AdMob (step 7). |
+| Ad-free plan (£6.99/month) | Built in. Needs Stripe, App Store / Google Play products and RevenueCat (step 8). |
 
 ---
 
@@ -169,6 +171,90 @@ any Android phone to test straight away.
 The iOS workflow also compiles the app for the simulator on every native
 change, with no Apple account needed, so build breaks show up early.
 
+## 7. Adverts (web and apps)
+
+Ads appear on research and learning screens: Markets, Screener, Heatmap,
+Groups, Charts, News, Calendar, Watchlist, Learn, and quote pages on the web.
+They never appear on trading, portfolio, account, sign-in or legal screens,
+inside a lesson, or anywhere while someone is in real-money mode. Ad-free and
+Pro subscribers see none, and the ad scripts aren't even loaded for them.
+Until the ad networks approve you, those spaces show Shortlist promos.
+
+**Website: Google AdSense**
+
+1. Sign up at **adsense.google.com** with your business details and add your
+   live website address. Google reviews the site, which can take a few days.
+2. When approved, go to **Ads → By ad unit → Display ads**. Create a
+   responsive unit called "Shortlist display" and copy its **slot ID** (the
+   number in `data-ad-slot`).
+3. In Vercel, add `NEXT_PUBLIC_ADSENSE_CLIENT` (your `ca-pub-…` ID) and
+   `NEXT_PUBLIC_ADSENSE_SLOT`, then redeploy. `yoursite/ads.txt` is generated
+   automatically from your publisher ID.
+4. **Privacy & messaging → European regulations**: create and publish the
+   consent message. It's required to show personalised ads in the UK and EU.
+5. **Blocking controls**: block gambling, "get rich quick" and other sensitive
+   categories. Consider blocking crypto and CFD advertisers too: adverts sit
+   next to an investing app.
+
+**Apps: Google AdMob** (AdSense isn't allowed inside apps)
+
+1. At **admob.google.com**, add two apps, Shortlist for iOS and Shortlist for
+   Android, and create a **banner** ad unit in each. Note each app's **App ID**
+   (`ca-app-pub-…~…`) and each banner's **ad unit ID** (`ca-app-pub-…/…`).
+2. GitHub → **Settings → Secrets and variables → Actions → Variables**: add
+   `ADMOB_APP_ID_ANDROID` and `ADMOB_APP_ID_IOS` (the App IDs).
+3. Vercel: add `NEXT_PUBLIC_ADMOB_BANNER_ANDROID` and
+   `NEXT_PUBLIC_ADMOB_BANNER_IOS` (the ad unit IDs), then redeploy.
+4. AdMob → **Privacy & messaging**: publish the European regulations message
+   and the iOS "IDFA explainer". The app shows Google's consent form and then
+   Apple's tracking prompt before the first ad.
+5. List your website on both store listings. AdMob checks
+   `yoursite/app-ads.txt`, which is generated automatically.
+6. Re-run the Android and iOS builds so the App IDs are baked in.
+7. To check everything before launch, set `NEXT_PUBLIC_ADMOB_TEST=1` in Vercel
+   for Google's test ads. Remove it before release.
+
+**Store declarations (required)**
+
+- **Google Play**: App content → **Ads → "Yes, my app contains ads"**. In Data
+  safety, declare **Device or other IDs** collected and shared for
+  **Advertising**.
+- **App Store**: App Privacy → **Identifiers → Device ID**, used for
+  **Third-Party Advertising** and **tracking**. The tracking prompt text is
+  already in the app.
+
+## 8. The ad-free plan (£6.99 a month)
+
+One purchase removes ads on the web and in both apps for that person's account,
+so it needs accounts (step 4). Pro (£12) includes ad-free.
+
+1. **Supabase**: run `supabase/migrations/0003_entitlements.sql` in the SQL
+   editor.
+2. **Stripe (web)**: Products → **Add product** "Shortlist Ad-free", recurring,
+   **£6.99 monthly**. Copy its price ID (`price_…`) into Vercel as
+   `NEXT_PUBLIC_STRIPE_ADFREE_PRICE_ID`. Make sure your Stripe webhook (pointing
+   at `/api/stripe/webhook`) sends `checkout.session.completed` and
+   `customer.subscription.*` events.
+3. **App Store Connect (iPhone)**: your app → **Subscriptions** → create a
+   group "Shortlist" and an auto-renewable subscription, product ID
+   `shortlist_adfree_monthly`, price **£6.99**, duration 1 month.
+4. **Google Play Console (Android)**: Monetise → **Subscriptions** → create
+   `shortlist_adfree_monthly` with a monthly base plan at **£6.99**.
+5. **RevenueCat**:
+   - Add both store products.
+   - Create an **entitlement** called `ad_free` and attach both products.
+   - Create an **offering** with the identifier `ad_free`, containing a monthly
+     package with both products.
+   - Under **Integrations → Webhooks**, add `https://yoursite/api/revenuecat/webhook`
+     with an Authorization header value of your choice, then put the same value
+     in Vercel as `REVENUECAT_WEBHOOK_AUTH`.
+6. Redeploy. The **Ad-free** card on the Pricing page and Settings → Adverts
+   switch from "Coming soon" to a working purchase button.
+
+Subscribers manage or cancel on the web from Settings → Adverts → Manage
+(Stripe portal), and in the apps from their App Store or Google Play
+subscriptions.
+
 ---
 
 ## Secrets and variables at a glance
@@ -184,3 +270,8 @@ change, with no Apple account needed, so build breaks show up early.
 | GitHub secret | `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | Signing the Play bundle |
 | GitHub secret | `PLAY_SERVICE_ACCOUNT_JSON` | Uploading to Google Play |
 | GitHub secret | `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `APPLE_TEAM_ID` | Signing and uploading to TestFlight |
+| Vercel | `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT` (+ optional `NEXT_PUBLIC_ADSENSE_INFEED_SLOT`) | Website adverts (AdSense) |
+| Vercel | `NEXT_PUBLIC_ADMOB_BANNER_IOS`, `NEXT_PUBLIC_ADMOB_BANNER_ANDROID` (+ `NEXT_PUBLIC_ADMOB_TEST=1` for test ads) | App adverts (AdMob) |
+| GitHub variable | `ADMOB_APP_ID_IOS`, `ADMOB_APP_ID_ANDROID` | AdMob app IDs baked into the app builds |
+| Vercel | `NEXT_PUBLIC_STRIPE_ADFREE_PRICE_ID` | The £6.99 ad-free plan on the web |
+| Vercel | `REVENUECAT_WEBHOOK_AUTH` | Lets app-store purchases remove ads on the web |

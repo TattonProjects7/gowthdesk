@@ -1,9 +1,10 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bell, BellOff, Check, Download, Link2, Loader2, RotateCcw, Save, Sparkles, Star, Trash2, Wand2, X } from "lucide-react";
+import { ArrowDownUp, Bell, BellOff, Check, Download, Link2, Loader2, Pause, Play, RotateCcw, Save, Scale, Sparkles, Star, Trash2, Wand2, X } from "lucide-react";
 import Nav from "@/components/Nav";
 import Avatar from "@/components/Avatar";
 import MarketsTabs, { DataBadges } from "@/components/screener/MarketsTabs";
@@ -11,7 +12,8 @@ import MiniCandles from "@/components/screener/MiniCandles";
 import { Card, Segmented } from "@/components/ui";
 import { useScreener } from "@/lib/screener/useScreener";
 import { FILTERS, PRESETS, SIGNALS, getFilter, runScreen, tokenLabel, type FilterGroup } from "@/lib/screener/filters";
-import { COLUMNS, VIEWS, getColumn, sortSnaps, toCsv, type ViewId } from "@/lib/screener/columns";
+import { COLUMNS, CUSTOM_DEFAULT, VIEWS, getColumn, sortSnaps, toCsv, type ViewId } from "@/lib/screener/columns";
+import { ColumnPicker, CompareSheet, Pager, StatsPanel, TickerCloud } from "@/components/screener/ScreenerViews";
 import { deleteScreen, saveScreen, screenToQuery, setScreenAlert, useSavedScreens } from "@/lib/screener/screens";
 import { parseScreenOffline, type ParsedScreen } from "@/lib/screener/nlp";
 import { toggleSymbol, useWatchlists } from "@/lib/watchlists";
@@ -25,7 +27,8 @@ const GROUPS: { id: FilterGroup | "all"; label: string }[] = [
   { id: "all", label: "All" },
 ];
 
-const PAGE = 40;
+const PAGE = 20;
+const CUSTOM_KEY = "shortlist.screener.columns.v1";
 
 export default function Screener() {
   const params = useSearchParams();
@@ -37,9 +40,36 @@ export default function Screener() {
   const signal = (params.get("s") ?? "") as SignalId | "";
   const sort = params.get("o") ?? "-cap";
   const view = (VIEWS.some((v) => v.id === params.get("v")) ? params.get("v") : "overview") as ViewId;
+  const tickers = useMemo(() => (params.get("t") ?? "").split(/[\s,]+/).map((x) => x.trim().toUpperCase()).filter(Boolean).slice(0, 50), [params]);
 
   const [group, setGroup] = useState<FilterGroup | "all">("descriptive");
-  const [shown, setShown] = useState(PAGE);
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [comparing, setComparing] = useState(false);
+  const [live, setLive] = useState(true);
+  const frozen = useRef<Snapshot[] | null>(null);
+  const [tickerText, setTickerText] = useState("");
+  const [custom, setCustom] = useState<string[]>(CUSTOM_DEFAULT);
+  useEffect(() => {
+    setTickerText(tickers.join(", "));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CUSTOM_KEY);
+      if (raw) setCustom((JSON.parse(raw) as string[]).filter((c) => getColumn(c)));
+    } catch {
+      /* private mode: keep the defaults */
+    }
+  }, []);
+  const saveCustom = (cols: string[]) => {
+    setCustom(cols);
+    try {
+      localStorage.setItem(CUSTOM_KEY, JSON.stringify(cols));
+    } catch {
+      /* ignore */
+    }
+  };
   const [ask, setAsk] = useState("");
   const [asking, setAsking] = useState(false);
   const [explain, setExplain] = useState<ParsedScreen | null>(null);
@@ -47,12 +77,12 @@ export default function Screener() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const push = useCallback(
-    (next: { filters?: string[]; signal?: string; sort?: string; view?: string }) => {
-      const q = screenToQuery({ filters: next.filters ?? filters, signal: next.signal ?? signal, sort: next.sort ?? sort, view: next.view ?? view });
+    (next: { filters?: string[]; signal?: string; sort?: string; view?: string; tickers?: string[] }) => {
+      const q = screenToQuery({ filters: next.filters ?? filters, signal: next.signal ?? signal, sort: next.sort ?? sort, view: next.view ?? view, tickers: next.tickers ?? tickers });
       router.replace(`/screener${q}`, { scroll: false });
-      setShown(PAGE);
+      setPage(1);
     },
-    [filters, signal, sort, view, router],
+    [filters, signal, sort, view, tickers, router],
   );
 
   const flash = (m: string) => {
@@ -62,7 +92,16 @@ export default function Screener() {
   };
   useEffect(() => () => void (toastTimer.current && clearTimeout(toastTimer.current)), []);
 
-  const results = useMemo(() => sortSnaps(runScreen(snaps, { filters, signal }), sort), [snaps, filters, signal, sort]);
+  // Live: results move with the market. Paused: they hold still while you read.
+  const data = live || !frozen.current ? snaps : frozen.current;
+  const results = useMemo(() => sortSnaps(runScreen(data, { filters, signal, tickers }), sort), [data, filters, signal, tickers, sort]);
+  const pages = Math.max(1, Math.ceil(results.length / PAGE));
+  const pageRows = results.slice((Math.min(page, pages) - 1) * PAGE, Math.min(page, pages) * PAGE);
+  const toggleLive = () => {
+    if (live) frozen.current = snaps;
+    setLive(!live);
+  };
+  const toggleSelect = (sym: string) => setSelected((cur) => (cur.includes(sym) ? cur.filter((x) => x !== sym) : cur.length >= 5 ? cur : [...cur, sym]));
 
   const setFilter = (fid: string, oid: string) => {
     const rest = filters.filter((t) => !t.startsWith(`${fid}:`));
@@ -85,10 +124,11 @@ export default function Screener() {
     push({ filters: r.filters, signal: r.signal ?? "", sort: r.sort ?? sort });
   };
 
-  const cols = (VIEWS.find((v) => v.id === view)?.cols ?? VIEWS[0].cols).map((c) => getColumn(c)).filter((c): c is NonNullable<typeof c> => !!c);
+  const colIds = view === "custom" ? ["ticker", ...custom] : (VIEWS.find((v) => v.id === view)?.cols ?? []).length ? VIEWS.find((v) => v.id === view)!.cols : VIEWS[0].cols;
+  const cols = colIds.map((c) => getColumn(c)).filter((c): c is NonNullable<typeof c> => !!c);
 
   const exportCsv = () => {
-    const csv = toCsv(results, view === "charts" ? VIEWS[0].cols : VIEWS.find((v) => v.id === view)!.cols);
+    const csv = toCsv(results, colIds);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -111,7 +151,7 @@ export default function Screener() {
   const save = () => {
     const name = window.prompt("Name this screen", explain?.explanation ? ask.slice(0, 40) : "My screen");
     if (name == null) return;
-    const id = saveScreen({ name, filters, signal, sort, view, alert: false });
+    const id = saveScreen({ name, filters, signal, tickers, sort, view, alert: false });
     flash(id ? "Screen saved" : "You've reached the limit of saved screens");
   };
 
@@ -119,7 +159,8 @@ export default function Screener() {
   const addAllToWatchlist = () => {
     const wl = lists[0];
     if (!wl) return;
-    const toAdd = results.slice(0, 50).filter((s) => !wl.symbols.includes(s.symbol));
+    const pick = selected.length ? results.filter((s) => selected.includes(s.symbol)) : results.slice(0, 50);
+    const toAdd = pick.filter((s) => !wl.symbols.includes(s.symbol));
     for (const s of toAdd) toggleSymbol(wl.id, s.symbol);
     flash(toAdd.length ? `Added ${toAdd.length} to ${wl.name}` : `Already in ${wl.name}`);
   };
@@ -207,6 +248,35 @@ export default function Screener() {
                 ))}
               </select>
             </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                push({ tickers: tickerText.split(/[\s,]+/).map((x) => x.trim().toUpperCase()).filter(Boolean) });
+              }}
+              className="flex items-center gap-2"
+            >
+              <label htmlFor="tickers" className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+                Tickers
+              </label>
+              <input id="tickers" value={tickerText} onChange={(e) => setTickerText(e.target.value)} placeholder="e.g. AAPL, LLOY, NVDA" className="w-44 rounded-xl border border-white/10 bg-ink-950/60 px-3 py-2 text-sm text-white placeholder-ink-500 focus:border-violet-400/60 focus:outline-none sm:w-56" />
+            </form>
+            <div className="flex items-center gap-1.5">
+              <label htmlFor="order" className="text-xs font-semibold uppercase tracking-wider text-ink-400">
+                Order by
+              </label>
+              <select id="order" value={sort.replace(/^-/, "")} onChange={(e) => push({ sort: sort.startsWith("-") ? `-${e.target.value}` : e.target.value })} className="rounded-xl border border-white/10 bg-ink-950/60 px-2.5 py-2 text-sm text-white focus:outline-none">
+                {COLUMNS.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+              <button onClick={() => push({ sort: sort.startsWith("-") ? sort.slice(1) : `-${sort}` })} aria-label={sort.startsWith("-") ? "Sorted high to low; switch to low to high" : "Sorted low to high; switch to high to low"} className="flex items-center gap-1 rounded-xl border border-white/10 bg-ink-950/60 px-2.5 py-2 text-xs font-semibold text-ink-200">
+                <ArrowDownUp className="h-3.5 w-3.5" /> {sort.startsWith("-") ? "Desc" : "Asc"}
+              </button>
+            </div>
+          </div>
+          <div className="mt-3 flex justify-end">
             <Segmented size="sm" value={group} onChange={setGroup} options={GROUPS.map((g) => ({ id: g.id, label: g.id === "all" ? g.label : `${g.label}${activeCount(g.id as FilterGroup) ? ` · ${activeCount(g.id as FilterGroup)}` : ""}` }))} />
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2.5 sm:grid-cols-3 lg:grid-cols-5">
@@ -231,8 +301,13 @@ export default function Screener() {
               );
             })}
           </div>
-          {(filters.length > 0 || signal) && (
+          {(filters.length > 0 || signal || tickers.length > 0) && (
             <div className="mt-4 flex flex-wrap items-center gap-1.5">
+              {tickers.length > 0 && (
+                <Chip onRemove={() => push({ tickers: [] })} tone="amber">
+                  Tickers: {tickers.join(", ")}
+                </Chip>
+              )}
               {signal && (
                 <Chip onRemove={() => push({ signal: "" })} tone="amber">
                   Signal: {SIGNALS.find((s) => s.id === signal)?.label}
@@ -243,12 +318,14 @@ export default function Screener() {
                   {tokenLabel(t)}
                 </Chip>
               ))}
-              <button onClick={() => (setExplain(null), push({ filters: [], signal: "" }))} className="ml-1 inline-flex items-center gap-1 text-xs font-semibold text-ink-400 hover:text-white">
+              <button onClick={() => (setExplain(null), push({ filters: [], signal: "", tickers: [] }))} className="ml-1 inline-flex items-center gap-1 text-xs font-semibold text-ink-400 hover:text-white">
                 <RotateCcw className="h-3 w-3" /> Reset
               </button>
             </div>
           )}
         </Card>
+
+        <AdSlot placement="screener-top" />
 
         {/* Toolbar */}
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -256,10 +333,12 @@ export default function Screener() {
             <span className="font-bold text-white">{mounted ? results.length : "…"}</span> of {snaps.length} match
           </p>
           <div className="flex flex-wrap gap-1.5">
+            <ToolButton onClick={toggleLive} icon={live ? Pause : Play} label={live ? "Live" : "Paused"} />
+            {selected.length >= 2 && <ToolButton onClick={() => setComparing(true)} icon={Scale} label={`Compare ${selected.length}`} />}
             <ToolButton onClick={save} icon={Save} label="Save" />
             <ToolButton onClick={share} icon={Link2} label="Share" />
             <ToolButton onClick={exportCsv} icon={Download} label="CSV" />
-            <ToolButton onClick={addAllToWatchlist} icon={Star} label="Watch all" />
+            <ToolButton onClick={addAllToWatchlist} icon={Star} label={selected.length ? `Watch ${selected.length}` : "Watch all"} />
           </div>
         </div>
         <div className="mb-3">
@@ -273,18 +352,27 @@ export default function Screener() {
             <p className="font-semibold text-white">Nothing matches all of those filters</p>
             <p className="mt-1 text-sm text-ink-400">Remove a filter or two — every one you add has to be true at once.</p>
           </Card>
+        ) : view === "tickers" ? (
+          <TickerCloud rows={results} />
+        ) : view === "stats" ? (
+          <StatsPanel rows={results} />
         ) : view === "charts" ? (
-          <ChartsGrid rows={results.slice(0, shown)} />
+          <>
+            <ChartsGrid rows={pageRows} />
+            <Pager page={Math.min(page, pages)} pages={pages} onPage={setPage} />
+          </>
         ) : (
-          <ResultsTable rows={results.slice(0, shown)} cols={cols} sort={sort} onSort={(id) => push({ sort: sort === `-${id}` ? id : `-${id}` })} />
+          <>
+            {view === "custom" && <ColumnPicker value={custom} onChange={saveCustom} />}
+            <ResultsTable rows={pageRows} offset={(Math.min(page, pages) - 1) * PAGE} cols={cols} sort={sort} onSort={(id) => push({ sort: sort === `-${id}` ? id : `-${id}` })} selected={selected} onToggle={toggleSelect} />
+            <Pager page={Math.min(page, pages)} pages={pages} onPage={setPage} />
+            <p className="mt-2 text-center text-xs text-ink-500">Tick up to five rows to compare them side by side.</p>
+          </>
         )}
-        {results.length > shown && (
-          <button onClick={() => setShown((n) => n + PAGE)} className="mx-auto mt-4 block rounded-full border border-white/10 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-ink-200 hover:bg-white/[0.08]">
-            Show more ({results.length - shown} left)
-          </button>
-        )}
+        {comparing && <CompareSheet rows={results.filter((s) => selected.includes(s.symbol))} onClose={() => setComparing(false)} />}
 
         <SavedScreens />
+        <AdSlot placement="screener-bottom" />
 
         {fund === "live" && (
           <p className="mt-6 text-xs leading-relaxed text-ink-500">
@@ -326,12 +414,18 @@ function ToolButton({ onClick, icon: Icon, label }: { onClick: () => void; icon:
   );
 }
 
-function ResultsTable({ rows, cols, sort, onSort }: { rows: Snapshot[]; cols: (typeof COLUMNS)[number][]; sort: string; onSort: (id: string) => void }) {
+function ResultsTable({ rows, cols, sort, onSort, offset, selected, onToggle }: { rows: Snapshot[]; cols: (typeof COLUMNS)[number][]; sort: string; onSort: (id: string) => void; offset: number; selected: string[]; onToggle: (sym: string) => void }) {
   return (
     <div className="overflow-x-auto rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card">
       <table className="w-full min-w-[720px] text-sm">
         <thead>
           <tr className="border-b border-white/[0.06] text-[11px] uppercase tracking-wider text-ink-400">
+            <th scope="col" className="w-8 px-2 py-2.5 text-right font-semibold">
+              No.
+            </th>
+            <th scope="col" className="w-6 px-1 py-2.5">
+              <span className="sr-only">Select</span>
+            </th>
             {cols.map((c, k) => {
               const active = sort.replace(/^-/, "") === c.id;
               return (
@@ -346,8 +440,12 @@ function ResultsTable({ rows, cols, sort, onSort }: { rows: Snapshot[]; cols: (t
           </tr>
         </thead>
         <tbody>
-          {rows.map((s) => (
-            <tr key={s.symbol} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03]">
+          {rows.map((s, r) => (
+            <tr key={s.symbol} className={`border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] ${selected.includes(s.symbol) ? "bg-violet-500/[0.06]" : ""}`}>
+              <td className="num px-2 py-2 text-right font-mono text-xs text-ink-500">{offset + r + 1}</td>
+              <td className="px-1 py-2">
+                <input type="checkbox" checked={selected.includes(s.symbol)} onChange={() => onToggle(s.symbol)} aria-label={`Select ${s.symbol} to compare`} className="accent-violet-400" />
+              </td>
               {cols.map((c, k) => {
                 const v = c.get(s);
                 const tone = c.signed && typeof v === "number" ? (v > 0 ? "text-emerald-300" : v < 0 ? "text-rose-300" : "text-ink-300") : "text-ink-200";

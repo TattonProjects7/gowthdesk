@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { serviceSupabase } from "@/lib/supabase/server";
+import { planForPrice } from "@/lib/entitlements";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,25 @@ export async function POST(req: Request) {
     const periodEndSecs =
       (sub as unknown as { current_period_end?: number }).current_period_end ??
       (sub.items?.data?.[0] as unknown as { current_period_end?: number } | undefined)?.current_period_end;
+    // The ad-free plan is an entitlement shared with the app stores; Pro keeps
+    // its original subscriptions row.
+    const priceId = sub.items?.data?.[0]?.price?.id;
+    if (planForPrice(priceId, { adFreePrice: process.env.NEXT_PUBLIC_STRIPE_ADFREE_PRICE_ID }) === "ad_free") {
+      await db.from("entitlements").upsert(
+        {
+          user_id: userId,
+          entitlement: "ad_free",
+          source: "stripe",
+          active: ["active", "trialing", "past_due"].includes(sub.status),
+          expires_at: periodEndSecs ? new Date(periodEndSecs * 1000).toISOString() : null,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: sub.id,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,entitlement,source" },
+      );
+      return;
+    }
     await db.from("subscriptions").upsert(
       {
         user_id: userId,

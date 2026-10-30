@@ -39,6 +39,8 @@ jobs:
       NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL }}
       VERSION_CODE: ${{ github.run_number }}
       VERSION_NAME: "1.0.${{ github.run_number }}"
+      # AdMob app ID (repository variable). Unset: Google's sample ID, no live ads.
+      ADMOB_APP_ID_ANDROID: ${{ vars.ADMOB_APP_ID_ANDROID }}
       HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
       HAS_PLAY: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
     steps:

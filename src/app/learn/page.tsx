@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { BookOpen, Check, ChevronRight, Flame, Gift, GraduationCap, Lock, Search, Sparkles, Trophy } from "lucide-react";
@@ -207,6 +208,8 @@ export default function LearnHub() {
             );
           })}
         </div>
+
+        <AdSlot placement="learn-bottom" />
 
         <p className="mt-10 text-center text-xs text-ink-600 max-w-xl mx-auto leading-relaxed">
           Learn & Earn pays practice cash into your paper portfolio — it isn&apos;t real money. Lessons are general education, not financial advice.

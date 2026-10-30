@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
@@ -171,6 +172,8 @@ export default function Groups() {
             </ul>
           )}
         </Card>
+
+        <AdSlot placement="groups-middle" />
 
         <div className="mb-3 mt-8 flex items-center justify-between gap-2">
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-ink-400">Group table</h2>

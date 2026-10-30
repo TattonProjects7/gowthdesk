@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Terms of Service — Shortlist" };
 
 export default function Terms() {
   return (
-    <LegalShell title="Terms of Service" updated="17 October 2026">
+    <LegalShell title="Terms of Service" updated="30 October 2026">
       <p>By using Shortlist you agree to these terms. If you do not agree, please do not use the app.</p>
 
       <h2>What Shortlist is</h2>
@@ -42,10 +42,20 @@ export default function Terms() {
         secure. You must be at least 18.
       </p>
 
+      <h2>Adverts</h2>
+      <p>
+        The free version of Shortlist is supported by adverts from third parties. Adverts are not recommendations or
+        endorsements by Shortlist, and we don&apos;t check the products they promote. Be especially careful with adverts for
+        investments: check that any firm is authorised on the FCA register before you deal with it.
+      </p>
+
       <h2>Subscriptions & billing</h2>
       <ul>
-        <li>Pro is a paid subscription. On the web, payments are processed by Stripe; in the mobile apps, by the Apple
-          App Store or Google Play via in-app purchase.</li>
+        <li>We offer two paid subscriptions: <strong>Ad-free</strong> (£6.99 a month), which removes adverts, and <strong>Pro</strong>,
+          which adds the Pro tools and also removes adverts. On the web, payments are processed by Stripe; in the mobile
+          apps, by the Apple App Store or Google Play via in-app purchase.</li>
+        <li>A subscription belongs to your Shortlist account and applies on the web and in the apps wherever you are signed
+          in. A subscription bought in an app while signed out applies only on that device until you sign in.</li>
         <li>Subscriptions renew automatically until cancelled. Manage or cancel via the billing portal (web) or your
           App Store / Google Play account (mobile).</li>
         <li>Refunds follow the policy of the relevant payment platform.</li>

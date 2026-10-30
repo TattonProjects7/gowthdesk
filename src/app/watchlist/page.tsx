@@ -1,5 +1,6 @@
 "use client";
 
+import AdSlot from "@/components/ads/AdSlot";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BellRing, ChevronDown, ChevronUp, Pencil, Plus, Search, Star, Trash2, X } from "lucide-react";
@@ -196,6 +197,7 @@ export default function WatchlistPage() {
             </Card>
           </>
         )}
+        <AdSlot placement="watchlist-bottom" />
       </main>
     </div>
   );

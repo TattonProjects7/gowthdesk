@@ -144,3 +144,34 @@ export async function fetchCompanyNews(providerSymbol: string): Promise<Provider
     return [];
   }
 }
+
+export interface MarketHeadline extends ProviderNews {
+  related: string[];
+  image?: string;
+}
+
+// Market-wide news via Finnhub (categories: general, forex, crypto, merger).
+export async function fetchMarketNews(category: "general" | "forex" | "crypto" | "merger"): Promise<MarketHeadline[]> {
+  if (!FINNHUB) return [];
+  const res = await withTimeout(`https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB}`, 5000);
+  if (!res) return [];
+  try {
+    const j = (await res.json()) as { id?: number; headline?: string; summary?: string; source?: string; url?: string; datetime?: number; related?: string; image?: string }[];
+    if (!Array.isArray(j)) return [];
+    return j
+      .filter((n) => n.headline && n.url)
+      .slice(0, 60)
+      .map((n, i) => ({
+        id: `m:${n.id ?? i}`,
+        headline: n.headline as string,
+        summary: (n.summary ?? "").slice(0, 280),
+        source: n.source ?? "News",
+        url: n.url as string,
+        at: (n.datetime ?? 0) * 1000,
+        related: (n.related ?? "").split(",").map((s) => s.trim()).filter(Boolean).slice(0, 4),
+        image: n.image || undefined,
+      }));
+  } catch {
+    return [];
+  }
+}

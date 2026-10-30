@@ -21,7 +21,7 @@ function Runner() {
     if (!snaps.length) return;
     for (const scr of screensStore.get() ?? []) {
       if (!scr.alert) continue;
-      const matches = runScreen(snaps, { filters: scr.filters, signal: scr.signal }).map((s) => s.symbol);
+      const matches = runScreen(snaps, { filters: scr.filters, signal: scr.signal, tickers: scr.tickers }).map((s) => s.symbol);
       if (scr.last) {
         const prev = new Set(scr.last);
         const day = Math.floor(now / 86400_000);
