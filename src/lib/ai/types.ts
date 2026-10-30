@@ -24,6 +24,8 @@ export interface CoachInstrument {
   dividendYieldPct: number;
   ocfPct?: number;
   sector: string;
+  industry?: string;
+  exchange?: string;
   region: string;
   description: string;
 }

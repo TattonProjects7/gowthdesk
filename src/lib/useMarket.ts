@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { priceAt } from "./market";
 import { simCloses } from "./signals";
+import { scaleBars, simBars, type Bar } from "./bars";
 
 type Source = "loading" | "simulated" | "live";
 
 interface MarketPayload {
   source: "simulated" | "live";
   quotes?: Record<string, number | null>;
+  ohlc?: Record<string, { o?: number; h?: number; l?: number; pc?: number }>;
   closes?: Record<string, number[] | null>;
 }
 
@@ -22,6 +24,8 @@ export function useMarket(): {
   now: number;
   priceFor: (symbol: string) => number;
   closesFor: (symbol: string, n?: number) => number[];
+  barsFor: (symbol: string, n?: number) => Bar[];
+  isLive: (symbol: string) => boolean;
 } {
   const [now, setNow] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -99,5 +103,21 @@ export function useMarket(): {
     [source, now],
   );
 
-  return { mounted, source, now, priceFor, closesFor };
+  // Daily OHLCV bars ending now. Live mode re-bases the simulated shape onto the
+  // real last price and drops in the real open/high/low/previous close.
+  const barsFor = useCallback(
+    (symbol: string, n = 260): Bar[] => {
+      const bars = simBars(symbol, now, n);
+      if (source === "live") {
+        const q = data.current.quotes?.[symbol];
+        if (typeof q === "number" && q > 0) return scaleBars(bars, q, data.current.ohlc?.[symbol]);
+      }
+      return bars;
+    },
+    [source, now],
+  );
+
+  const isLive = useCallback((symbol: string) => source === "live" && typeof data.current.quotes?.[symbol] === "number", [source]);
+
+  return { mounted, source, now, priceFor, closesFor, barsFor, isLive };
 }

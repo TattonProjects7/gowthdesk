@@ -27,8 +27,10 @@ competitor study and how each feature maps to this app.
 
 - **Portfolio** — total value with a scrubbable chart, practice GIA / ISA / SIPP
   accounts, P&L, dividends and projected income on one screen.
-- **Markets** — 33 instruments: US and UK shares (LSE, priced in pence), UCITS
-  ETFs and crypto. Risers and fallers, sortable lists and a quick-quote search.
+- **Markets** — 154 instruments: 143 US and UK shares across all 11
+  sectors (LSE priced in pence), UCITS ETFs and crypto. A Finviz-style front
+  page with index tiles, market breadth and live signal tables, plus risers and
+  fallers and a quick-quote search.
 - **Instrument pages** — 1W–1Y charts with MA 10/30, Bollinger Bands, RSI and
   MACD. Key stats, client sentiment, results date, news and research, plus fund
   look-through for ETFs.
@@ -44,6 +46,32 @@ competitor study and how each feature maps to this app.
   on a % move, in-app and as phone notifications.
 - **Security** — Face ID / Touch ID / fingerprint app lock in the apps, with a
   PIN fallback.
+
+**Market tools (Finviz-style)**
+
+- **Screener** — 54 Descriptive, Fundamental and Technical filters (468
+  options), each with a plain-English explainer, plus 34 signals: gainers and losers, new
+  highs, unusual volume, overbought and oversold, gaps, golden crosses,
+  breakouts and auto-detected chart patterns. Seven views (overview, valuation,
+  financial, ownership, performance, technical, charts), sorting, CSV export,
+  shareable URLs and eight starter screens.
+- **Plain-English screens** — type "cheap UK dividend payers near their lows"
+  and Claude builds the filters (with an offline keyword fallback).
+- **Saved screens with alerts** — get an alert, and a phone notification, when
+  a share newly enters a screen.
+- **Heatmap** — squarified treemap by sector, sized by market cap, coloured by
+  1D–1Y performance, relative volume, P/E, yield, RSI or distance from the
+  52-week high. US, UK, ETFs, crypto, your watchlist, or your own portfolio
+  (real broker positions in real mode).
+- **Groups** — cap-weighted performance by sector, industry, country, size and
+  index, with drill-down into the screener.
+- **Calendar** — results (before open / after close) and economic releases for
+  the next two weeks, filterable to what you own or watch.
+- **Quote snapshot** — ~50 key stats, the detected chart pattern drawn with its
+  trendlines, today's candlestick, and an industry peer table.
+- Fundamentals for US companies are live from Finnhub when `FINNHUB_API_KEY`
+  is set. Everything else uses sector-shaped demo figures, labelled as demo
+  wherever they appear.
 
 **Demo and real modes**
 
@@ -136,10 +164,12 @@ Public API (real mode) · Geist.
 
 ```
 src/
-  app/                  / (landing), /portfolio, /markets, /i/[symbol],
+  app/                  / (landing), /portfolio, /markets, /screener, /maps,
+                        /groups, /calendar, /i/[symbol],
                         /watchlist, /settings, /scan, /short/[symbol],
                         /tracker, /learn, /learn/[id], /pricing, /login,
-                        /api/* (incl. /api/coach, /api/digest)
+                        /api/* (incl. /api/coach, /api/digest,
+                        /api/fundamentals, /api/screener/ai)
   components/           Nav, DealTicket, PriceChart, AreaChart, Avatar,
                         AllocationDonut, InstrumentRow, PortfolioEngine,
                         AlertEngine, AppLock, CloudSync, NativeBridge,
@@ -157,7 +187,13 @@ src/
                         cookie (server) and demo/real mode store (client)
     effects.ts          trade celebration bus and preferences
     instruments.ts      instrument universe + ETF look-through data
-    market.ts           deterministic price simulator (random walk)
+    universe.ts         the wider screener universe: industry, index, shares
+    market.ts           deterministic price simulator (factor-model walk)
+    bars.ts             daily OHLCV bars and the volume model
+    fundamentals.ts     live (Finnhub) and labelled demo fundamentals
+    screener/           snapshots, filters, signals, chart-pattern and
+                        candlestick detection, treemap, plain-English parser,
+                        saved screens (pure parts unit-tested)
     portfolio.ts        paper-trading engine: accounts, orders, protections,
                         savings plans, AutoInvest, rebalance, dividends,
                         analytics, model portfolios (pure, unit-tested)

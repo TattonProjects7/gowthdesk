@@ -11,6 +11,8 @@ import { useMarket } from "@/lib/useMarket";
 import { INSTRUMENTS, MARKET_TABS, instrumentsFor, searchInstruments, fmtNative, type Instrument, type MarketTab } from "@/lib/instruments";
 import { upcomingEvents, fmtEventDate } from "@/lib/events";
 import { gbpUsd } from "@/lib/fx";
+import MarketsTabs from "@/components/screener/MarketsTabs";
+import MarketPulse from "@/components/screener/MarketPulse";
 
 // Markets — interactive investor's risers & fallers across UK, US and
 // international markets, IG's instrument browse and a quick quote search that
@@ -20,6 +22,7 @@ export default function Markets() {
   const [tab, setTab] = useState<MarketTab>("all");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"name" | "risers" | "fallers">("name");
+  const [shown, setShown] = useState(30);
 
   const rows = useMemo(() => {
     if (!mounted) return [];
@@ -51,6 +54,7 @@ export default function Markets() {
     <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
+        <MarketsTabs />
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <Globe className="h-6 w-6 text-rose-400" /> Markets
@@ -72,6 +76,8 @@ export default function Markets() {
           />
         </div>
 
+        {!q && <MarketPulse />}
+
         {!q && (
           <>
             {/* Movers — swipeable cards with logos */}
@@ -79,7 +85,7 @@ export default function Markets() {
             <MoverStrip title="Top fallers today" tone="down" rows={movers.down} />
 
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <Segmented options={MARKET_TABS} value={tab} onChange={setTab} />
+              <Segmented options={MARKET_TABS} value={tab} onChange={(t) => (setTab(t), setShown(30))} />
               <Segmented size="sm" value={sort} onChange={setSort} options={[{ id: "name", label: "A–Z" }, { id: "risers", label: "Risers" }, { id: "fallers", label: "Fallers" }]} />
             </div>
           </>
@@ -88,8 +94,18 @@ export default function Markets() {
         <div className="space-y-2">
           {!mounted && Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[62px] rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />)}
           {mounted && rows.length === 0 && <p className="py-8 text-center text-sm text-ink-500">Nothing matches “{q}”.</p>}
-          {mounted && rows.map((r, idx) => <InstrumentRow key={r.i.symbol} i={r.i} price={r.price} closes={r.closes} rank={sort === "name" ? undefined : idx + 1} />)}
+          {mounted && rows.slice(0, shown).map((r, idx) => <InstrumentRow key={r.i.symbol} i={r.i} price={r.price} closes={r.closes} rank={sort === "name" ? undefined : idx + 1} />)}
         </div>
+        {mounted && rows.length > shown && (
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <button onClick={() => setShown((n) => n + 30)} className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-ink-200 hover:bg-white/[0.08]">
+              Show more ({rows.length - shown})
+            </button>
+            <Link href="/screener" className="rounded-full px-4 py-2 text-sm font-semibold text-violet-300 hover:underline">
+              Open the screener
+            </Link>
+          </div>
+        )}
 
         {!q && (
           <>
@@ -131,7 +147,7 @@ export default function Markets() {
         )}
 
         <p className="mt-10 text-center text-xs text-ink-600 max-w-xl mx-auto leading-relaxed">
-          Prices are {source === "live" ? "live from the configured data provider" : "simulated"}. Shortlist is a research and paper-trading app — it does not place real orders and this is not investment advice.
+          Prices are {source === "live" ? "live from the configured data provider" : "simulated"}. Demo mode uses practice money; real mode sends only the orders you confirm to your own Trading 212 account. Not investment advice.
         </p>
       </main>
     </div>

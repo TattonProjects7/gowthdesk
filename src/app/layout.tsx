@@ -12,6 +12,7 @@ import MissionEngine from "@/components/MissionEngine";
 import { CoachProvider } from "@/components/coach/CoachProvider";
 import NativeBridge from "@/components/NativeBridge";
 import PortfolioEngine from "@/components/PortfolioEngine";
+import ScreenAlertEngine from "@/components/screener/ScreenAlertEngine";
 import { AuthProvider } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PortfolioEngine />
           <MissionEngine />
           <BrokerEngine />
+          <ScreenAlertEngine />
           <AppLock />
           <CoachProvider>
             {children}

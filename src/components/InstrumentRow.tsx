@@ -28,7 +28,7 @@ export default function InstrumentRow({ i, price, closes, rank, right, sub }: { 
         </div>
       </Link>
       <div className="hidden md:block">
-        <Sparkline points={closes} width={84} height={28} />
+        <Sparkline points={closes} width={84} height={28} stroke="#34d399" downStroke="#fb7185" />
       </div>
       <div className="text-right">
         <p className={`inline-block font-mono text-[15px] font-semibold text-white rounded px-1 -mx-1 ${flash}`}>{fmtNative(price, i.currency)}</p>

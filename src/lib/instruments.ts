@@ -7,6 +7,8 @@
 // region, asset class, currency, dividend yield) plus the simulator parameters
 // that keep the whole thing working with zero API keys.
 
+import { EXTRA_STOCKS, PROFILES, type IndexCode } from "./universe";
+
 export type InstrumentType = "stock" | "etf" | "crypto";
 export type Currency = "USD" | "GBP" | "GBX"; // GBX = pence sterling (LSE convention)
 export type Region = "US" | "UK" | "Europe" | "Asia" | "Emerging" | "Global";
@@ -42,6 +44,11 @@ export interface Instrument {
   ocfPct?: number; // ongoing charge figure
   // Live-data symbol mapping (Finnhub). Omit when the free tier can't serve it.
   finnhub?: string;
+  // Screener reference data (shares only; see universe.ts).
+  industry?: string;
+  indices?: IndexCode[];
+  sharesM?: number; // shares outstanding, millions
+  country?: string;
 }
 
 const US = (
@@ -55,7 +62,7 @@ const US = (
   symbol,
   name,
   type: "stock",
-  exchange: symbol === "COIN" || symbol === "PLTR" || symbol === "SHOP" || symbol === "DIS" ? "NYSE" : "NASDAQ",
+  exchange: symbol === "DIS" ? "NYSE" : "NASDAQ",
   currency: "USD",
   region: "US",
   sector,
@@ -96,7 +103,7 @@ const UK = (
   finnhub: `${symbol}.L`,
 });
 
-export const INSTRUMENTS: Instrument[] = [
+const BASE: Instrument[] = [
   // --- US shares (the original short-scanner universe) ------------------------
   US("AAPL", "Apple", "Technology", 0.5, [212.4, 0.018, 0.05, 1], "Consumer electronics, services and the world's most valuable brand."),
   US("NVDA", "NVIDIA", "Technology", 0.03, [124.8, 0.034, 0.18, 2], "Accelerated computing and AI data-centre chips."),
@@ -465,6 +472,16 @@ export const INSTRUMENTS: Instrument[] = [
   },
 ];
 
+// The original list plus the wider screener universe, each share carrying its
+// industry, index membership and share count.
+export const INSTRUMENTS: Instrument[] = [
+  ...BASE.map((i) => {
+    const p = PROFILES[i.symbol];
+    return p ? { ...i, ...p, exchange: p.exchange ?? i.exchange } : i;
+  }),
+  ...EXTRA_STOCKS,
+];
+
 const BY_SYMBOL = new Map(INSTRUMENTS.map((i) => [i.symbol, i]));
 
 export function getInstrument(symbol: string): Instrument | undefined {
@@ -508,9 +525,9 @@ export const MARKET_TABS: { id: MarketTab; label: string }[] = [
 export function instrumentsFor(tab: MarketTab): Instrument[] {
   switch (tab) {
     case "uk":
-      return INSTRUMENTS.filter((i) => i.type === "stock" && i.region === "UK");
+      return INSTRUMENTS.filter((i) => i.type === "stock" && i.exchange === "LSE");
     case "us":
-      return INSTRUMENTS.filter((i) => i.type === "stock" && i.region === "US");
+      return INSTRUMENTS.filter((i) => i.type === "stock" && i.exchange !== "LSE");
     case "etf":
       return INSTRUMENTS.filter((i) => i.type === "etf");
     case "crypto":

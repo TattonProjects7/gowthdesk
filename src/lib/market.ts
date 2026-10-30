@@ -11,13 +11,18 @@
 // bounded around the anchor price. Within a day the price glides from one
 // day's level to the next, with small fast waves so live prices tick.
 //
+// Shocks follow a simple factor model, as real returns do: each day's move is
+// part market, part region, part sector and part company-specific. That makes
+// green days and red days, sectors that move together, and breadth figures and
+// heatmaps that look like a real tape instead of independent coin flips.
+//
 // The instrument list itself lives in instruments.ts (US + UK shares, ETFs and
 // crypto). `UNIVERSE` is kept as the *shortable* subset so the short scanner,
 // squeeze radar and catalyst engine keep working exactly as before.
 
 import { INSTRUMENTS, getInstrument, type Instrument } from "./instruments";
 
-export type Ticker = Pick<Instrument, "symbol" | "name" | "base" | "vol" | "drift" | "seed">;
+export type Ticker = Pick<Instrument, "symbol" | "name" | "base" | "vol" | "drift" | "seed"> & Partial<Pick<Instrument, "type" | "sector" | "exchange" | "assetClass">>;
 
 // Shortable US stocks — the short-scanner universe.
 export const UNIVERSE: Ticker[] = INSTRUMENTS.filter((i) => i.shortable);
@@ -29,7 +34,7 @@ const LIMIT = 0.26; // soft cap on |log move| from the anchor → price stays wi
 const ANCHOR_DAY = Math.floor(Date.UTC(2019, 0, 1) / DAY);
 
 // Integer hash → uniform [0, 1). Pure integer maths, identical on every JS engine.
-function hash01(a: number): number {
+export function hash01(a: number): number {
   a |= 0;
   a = (a + 0x6d2b79f5) | 0;
   let t = Math.imul(a ^ (a >>> 15), 1 | a);
@@ -37,10 +42,67 @@ function hash01(a: number): number {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
-// Roughly standard-normal daily shock for (instrument, day): sum of three uniforms.
-function shock(seed: number, day: number): number {
+// Roughly standard-normal daily shock for (seed, day): sum of three uniforms.
+export function shock(seed: number, day: number): number {
   const k = seed * 1_000_003 + day * 3;
   return (hash01(k) + hash01(k + 1) + hash01(k + 2) - 1.5) * 2;
+}
+
+// Factor seeds: one global equity factor, one per region, one per sector, and
+// separate drivers for crypto, gilts and gold.
+const F_WORLD = 9001;
+const F_CRYPTO = 9002;
+const F_BONDS = 9003;
+const F_GOLD = 9004;
+const F_REGION: Record<string, number> = { LSE: 9011, US: 9012 };
+
+function strSeed(s: string): number {
+  let h = 7;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return 9100 + (Math.abs(h) % 800);
+}
+
+interface Loadings {
+  world: number;
+  region: number;
+  sector: number;
+  regionSeed: number;
+  sectorSeed: number;
+  idio: number;
+  other?: { seed: number; w: number };
+}
+
+const LOADINGS = new Map<number, Loadings>();
+
+function loadingsFor(t: Ticker): Loadings {
+  const hit = LOADINGS.get(t.seed);
+  if (hit) return hit;
+  const regionSeed = F_REGION[t.exchange === "LSE" ? "LSE" : "US"];
+  const sectorSeed = strSeed(t.sector ?? "Other");
+  let l: Loadings;
+  if (t.type === "crypto") {
+    l = { world: 0.2, region: 0, sector: 0, regionSeed, sectorSeed, idio: 0.42, other: { seed: F_CRYPTO, w: 0.88 } };
+  } else if (t.assetClass === "Bond") {
+    l = { world: -0.1, region: 0, sector: 0, regionSeed, sectorSeed, idio: 0.3, other: { seed: F_BONDS, w: 0.95 } };
+  } else if (t.assetClass === "Commodity") {
+    l = { world: 0.1, region: 0, sector: 0, regionSeed, sectorSeed, idio: 0.35, other: { seed: F_GOLD, w: 0.93 } };
+  } else if (t.type === "etf") {
+    l = { world: 0.85, region: 0.45, sector: 0, regionSeed, sectorSeed, idio: 0.27 };
+  } else {
+    l = { world: 0.6, region: 0.3, sector: 0.38, regionSeed, sectorSeed, idio: 0.64 };
+  }
+  LOADINGS.set(t.seed, l);
+  return l;
+}
+
+// The instrument's standardised shock for a day (unit variance, factor-mixed).
+export function instrumentShock(t: Ticker, day: number): number {
+  const l = loadingsFor(t);
+  let z = l.idio * shock(t.seed, day) + l.world * shock(F_WORLD, day);
+  if (l.region) z += l.region * shock(l.regionSeed, day);
+  if (l.sector) z += l.sector * shock(l.sectorSeed, day);
+  if (l.other) z += l.other.w * shock(l.other.seed, day);
+  return z;
 }
 
 // Per-instrument cache of daily walk levels, filled forward from the anchor.
@@ -52,7 +114,7 @@ function dailyLevel(t: Ticker, day: number): number {
     let x = 0;
     let w = 1;
     for (let j = 0; j < 220; j++) {
-      x += w * t.vol * SHOCK_SCALE * shock(t.seed, day - j);
+      x += w * t.vol * SHOCK_SCALE * instrumentShock(t, day - j);
       w *= PHI;
     }
     return x;
@@ -63,7 +125,7 @@ function dailyLevel(t: Ticker, day: number): number {
     LEVELS.set(t.seed, arr);
   }
   for (let i = arr.length; i <= day - ANCHOR_DAY; i++) {
-    arr.push(arr[i - 1] * PHI + t.vol * SHOCK_SCALE * shock(t.seed, ANCHOR_DAY + i));
+    arr.push(arr[i - 1] * PHI + t.vol * SHOCK_SCALE * instrumentShock(t, ANCHOR_DAY + i));
   }
   return arr[day - ANCHOR_DAY];
 }

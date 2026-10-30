@@ -31,15 +31,54 @@ async function withTimeout(url: string, ms = 4000): Promise<Response | null> {
   }
 }
 
-// Real-time last price via Finnhub. `providerSymbol` is Finnhub's own ticker
+export interface LiveQuote {
+  c: number; // last
+  o?: number; // today's open
+  h?: number; // today's high
+  l?: number; // today's low
+  pc?: number; // previous close
+}
+
+// Real-time quote via Finnhub. `providerSymbol` is Finnhub's own ticker
 // (e.g. "AAPL", "LLOY.L", "BINANCE:BTCUSDT"). Returns null if unconfigured or on error.
-export async function fetchQuote(providerSymbol: string): Promise<number | null> {
+export async function fetchLiveQuote(providerSymbol: string): Promise<LiveQuote | null> {
   if (!FINNHUB) return null;
   const res = await withTimeout(`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`);
   if (!res) return null;
   try {
-    const j = (await res.json()) as { c?: number };
-    return typeof j.c === "number" && j.c > 0 ? j.c : null;
+    const j = (await res.json()) as { c?: number; o?: number; h?: number; l?: number; pc?: number };
+    if (!(typeof j.c === "number" && j.c > 0)) return null;
+    const pos = (n?: number) => (typeof n === "number" && n > 0 ? n : undefined);
+    return { c: j.c, o: pos(j.o), h: pos(j.h), l: pos(j.l), pc: pos(j.pc) };
+  } catch {
+    return null;
+  }
+}
+
+// Last price only (kept for callers that just need a number).
+export async function fetchQuote(providerSymbol: string): Promise<number | null> {
+  return (await fetchLiveQuote(providerSymbol))?.c ?? null;
+}
+
+// Finnhub basic financials + analyst recommendation trend (both free-tier).
+export async function fetchFinnhubFundamentals(
+  providerSymbol: string,
+): Promise<{ metric: Record<string, number | null>; recommendation: { strongBuy?: number; buy?: number; hold?: number; sell?: number; strongSell?: number } | null } | null> {
+  if (!FINNHUB) return null;
+  const [m, r] = await Promise.all([
+    withTimeout(`https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(providerSymbol)}&metric=all&token=${FINNHUB}`, 6000),
+    withTimeout(`https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`, 6000),
+  ]);
+  if (!m) return null;
+  try {
+    const mj = (await m.json()) as { metric?: Record<string, number | null> };
+    if (!mj.metric || !Object.keys(mj.metric).length) return null;
+    let rec = null;
+    if (r) {
+      const rj = (await r.json()) as { strongBuy?: number; buy?: number; hold?: number; sell?: number; strongSell?: number }[];
+      rec = Array.isArray(rj) && rj.length ? rj[0] : null;
+    }
+    return { metric: mj.metric, recommendation: rec };
   } catch {
     return null;
   }

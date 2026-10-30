@@ -81,6 +81,8 @@ export function useCoachContext(): { build: () => CoachContext; ready: boolean }
         dividendYieldPct: inst.dividendYieldPct,
         ocfPct: inst.ocfPct,
         sector: inst.sector,
+        industry: inst.industry,
+        exchange: inst.exchange,
         region: inst.region,
         description: inst.description,
       };

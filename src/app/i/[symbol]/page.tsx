@@ -9,6 +9,7 @@ import PriceChart, { TIMEFRAMES, type Timeframe } from "@/components/PriceChart"
 import TradeTicket from "@/components/TradeTicket";
 import Avatar from "@/components/Avatar";
 import DigestCard from "@/components/DigestCard";
+import QuoteSnapshot from "@/components/screener/QuoteSnapshot";
 import ExplainTerm from "@/components/ExplainTerm";
 import { useCoach } from "@/components/coach/CoachProvider";
 import type { DigestInput } from "@/lib/ai/types";
@@ -164,6 +165,9 @@ export default function InstrumentPage() {
 
             {/* AI: why it's moving */}
             <DigestCard input={digestInput} />
+
+            {/* Finviz-style snapshot: pattern with trendlines, 50 key stats, peers */}
+            <QuoteSnapshot symbol={i.symbol} />
 
             {/* Your position */}
             {held.length > 0 && (

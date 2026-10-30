@@ -7,7 +7,7 @@ import { nativeNotify } from "./native";
 // The in-app alert feed. Short-side alerts (target/stop/A-grade) and the
 // investing-side ones (price alerts, order fills, protections, savings plans,
 // dividends) all land here, so the bell in the header is the one inbox.
-export type AlertType = "target" | "stop" | "agrade" | "price" | "order" | "protection" | "plan" | "income";
+export type AlertType = "target" | "stop" | "agrade" | "price" | "order" | "protection" | "plan" | "income" | "screen";
 
 export interface Alert {
   id: string; // also the dedupe key — pushing an existing id is a no-op

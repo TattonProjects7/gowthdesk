@@ -161,7 +161,7 @@ function explainInstrument(inst: NonNullable<CoachContext["instrument"]>, risksO
     !sector || sector === "Crypto" ? "" : sector === "Diversified" ? "spread across many sectors" : /bond/i.test(sector) ? "that holds bonds" : sector === "Precious Metals" ? "that tracks precious metals" : `in the ${sector.toLowerCase()} sector`;
   const regionPhrase = (region: string) =>
     region === "Global" ? "with global exposure" : region === "Emerging" ? "focused on emerging markets" : `focused on the ${region}`;
-  const kind = inst.type === "etf" ? "an exchange-traded fund (ETF)" : inst.type === "crypto" ? "a cryptocurrency" : `a ${inst.region === "UK" ? "UK" : "US"}-listed share`;
+  const kind = inst.type === "etf" ? "an exchange-traded fund (ETF)" : inst.type === "crypto" ? "a cryptocurrency" : `a ${inst.exchange ? (inst.exchange === "LSE" ? "UK" : "US") : inst.region === "UK" ? "UK" : "US"}-listed share`;
   const vol = inst.dailyVolPct;
   const volWord = vol >= 3 ? "very volatile" : vol >= 1.8 ? "fairly volatile" : vol >= 0.8 ? "moderately volatile" : "relatively steady";
   const risks: string[] = [];

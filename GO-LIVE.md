@@ -37,7 +37,7 @@ Give Shortlist its own Vercel project instead:
 | `NEXT_PUBLIC_APP_URL` | Your live address, e.g. `https://shortlist.vercel.app`. The apps load this. |
 | `BROKER_SECRET` | A long random string, needed for real mode. Mac: `openssl rand -base64 48`. Windows: see below. |
 | `ANTHROPIC_API_KEY` | Turns on the live AI coach and digests. Optional. |
-| `FINNHUB_API_KEY` | Live prices. Strongly recommended before real mode. |
+| `FINNHUB_API_KEY` | Live prices and live company fundamentals for the screener. Strongly recommended before real mode. |
 | `ALPHAVANTAGE_API_KEY` | Daily price history. Optional. |
 
 **Making `BROKER_SECRET` on Windows:** open PowerShell and run:
@@ -76,7 +76,13 @@ Before you offer real mode to the public:
 
 ## 3. Live prices
 
-Add `FINNHUB_API_KEY` (free at finnhub.io) for real-time quotes. The free tier
+Add `FINNHUB_API_KEY` (free at finnhub.io) for real-time quotes and live
+fundamentals for US companies (P/E, margins, growth, analyst ratings) in the
+screener. UK and other non-US companies, and everything when there's no key,
+show sample fundamentals labelled "demo". Calls are
+cached on the server and spread out to stay within the free tier's rate limit,
+so after a fresh deploy the cache fills as people use the app: every quote
+within a few minutes, every company's fundamentals within about 20. The free tier
 covers US shares and crypto. London-listed quotes need a paid Finnhub plan.
 Add `ALPHAVANTAGE_API_KEY` for daily candles.
 
@@ -171,7 +177,7 @@ change, with no Apple account needed, so build breaks show up early.
 | --- | --- | --- |
 | Vercel | `NEXT_PUBLIC_APP_URL` | Live address, also loaded by the apps |
 | Vercel | `BROKER_SECRET` | Encrypting Trading 212 keys (real mode) |
-| Vercel | `FINNHUB_API_KEY`, `ALPHAVANTAGE_API_KEY` | Live prices |
+| Vercel | `FINNHUB_API_KEY`, `ALPHAVANTAGE_API_KEY` | Live prices and screener fundamentals |
 | Vercel | `ANTHROPIC_API_KEY` | AI coach and digests |
 | GitHub variable | `APP_URL` | Address the native apps open |
 | GitHub variable | `PLAY_AUTO_UPLOAD`, `PLAY_TRACK`, `TESTFLIGHT_AUTO_UPLOAD` | Turning store uploads on |

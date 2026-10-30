@@ -112,3 +112,49 @@ export async function aiDigest(d: DigestInput): Promise<Digest | null> {
     return null;
   }
 }
+
+const SCREEN_SCHEMA = {
+  type: "object",
+  properties: {
+    filters: { type: "array", items: { type: "string" }, description: 'Screener tokens, each "filterId:optionId", taken only from the catalogue.' },
+    signal: { type: "string", description: "One signal id from the catalogue, or an empty string for none." },
+    sort: { type: "string", description: 'Column to sort by, e.g. "-change", "pe", "-div", "-cap". A leading minus sorts high to low.' },
+    explanation: { type: "string", description: "One or two plain-English sentences describing the screen you built, for a beginner." },
+  },
+  required: ["filters", "signal", "sort", "explanation"],
+  additionalProperties: false,
+};
+
+/** Turn a plain-English request into screener tokens. The caller validates them. Returns null on any failure. */
+export async function aiScreen(q: string, catalogue: string, columns: string[]): Promise<{ filters: string[]; signal: string; sort: string; explanation: string } | null> {
+  const system = `You build stock screens for Shortlist, a UK investing app with a Finviz-style screener covering UK and US shares, ETFs and crypto. Translate the user's request into filter tokens from this catalogue. Use only tokens that appear in it, written "filterId:optionId". Choose the fewest filters that capture the intent; options of the same filter are OR-ed, different filters are AND-ed. If the request is vague, pick sensible beginner-friendly defaults and say what you assumed. This is a screening tool, not advice: describe what the screen finds, never tell the user to buy or sell.
+
+Sortable columns: ${columns.join(", ")}
+
+Catalogue:
+${catalogue}`;
+  const res = await anthropic().beta.messages.create({
+    model: MODEL,
+    max_tokens: 1024,
+    betas: [FALLBACK_BETA],
+    fallbacks: "default",
+    output_config: { effort: "low", format: { type: "json_schema", schema: SCREEN_SCHEMA } },
+    system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
+    messages: [{ role: "user", content: q }],
+  });
+  if (res.stop_reason === "refusal" || res.stop_reason === "max_tokens") return null;
+  const text = res.content.find((b) => b.type === "text");
+  if (!text || text.type !== "text") return null;
+  try {
+    const j = JSON.parse(text.text) as { filters?: unknown; signal?: unknown; sort?: unknown; explanation?: unknown };
+    if (!Array.isArray(j.filters) || typeof j.explanation !== "string") return null;
+    return {
+      filters: j.filters.filter((t): t is string => typeof t === "string"),
+      signal: typeof j.signal === "string" ? j.signal : "",
+      sort: typeof j.sort === "string" ? j.sort : "",
+      explanation: j.explanation,
+    };
+  } catch {
+    return null;
+  }
+}

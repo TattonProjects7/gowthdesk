@@ -6,11 +6,14 @@ export default function Sparkline({
   width = 120,
   height = 34,
   stroke = "#fb7185",
+  downStroke = "#34d399",
 }: {
   points: number[];
   width?: number;
   height?: number;
   stroke?: string;
+  /** Colour when the series ended lower than it started. */
+  downStroke?: string;
 }) {
   if (!points || points.length < 2) return <svg width={width} height={height} aria-hidden />;
 
@@ -31,7 +34,7 @@ export default function Sparkline({
 
   return (
     <svg width={width} height={height} className="overflow-visible" aria-hidden>
-      <path d={d} fill="none" stroke={up ? stroke : "#34d399"} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={d} fill="none" stroke={up ? stroke : downStroke} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   );
 }

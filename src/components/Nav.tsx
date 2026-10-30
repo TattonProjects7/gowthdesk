@@ -24,6 +24,7 @@ import {
   Shield,
   GraduationCap,
   Flame,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useAlerts, type Alert } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
@@ -39,9 +40,13 @@ import RealBanner from "@/components/broker/RealBanner";
 // Primary navigation: Markets · Portfolio · Watchlist · Shorts, plus the alert
 // bell, account menu and settings. On phones the same destinations become a
 // bottom tab bar, as in the IG / ii / InvestEngine apps.
-const LINKS = [
+// The market tools (screener, heatmap, groups, calendar) live under Markets; on
+// desktop the screener also gets its own tab. Phones reach them from the
+// Markets sub-navigation, keeping the bottom bar at five tabs.
+const LINKS: { href: string; label: string; icon: React.ElementType; match?: string[]; desktopOnly?: boolean }[] = [
   { href: "/portfolio", label: "Portfolio", icon: Wallet },
-  { href: "/markets", label: "Markets", icon: Globe, match: ["/markets", "/i/"] },
+  { href: "/markets", label: "Markets", icon: Globe, match: ["/markets", "/i/", "/maps", "/groups", "/calendar", "/screener"] },
+  { href: "/screener", label: "Screener", icon: SlidersHorizontal, match: ["/screener"], desktopOnly: true },
   { href: "/learn", label: "Learn", icon: GraduationCap },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/scan", label: "Shorts", icon: Radar, match: ["/scan", "/short", "/tracker"] },
@@ -58,7 +63,12 @@ export default function Nav() {
   const learnState = useLearn();
   const streak = mounted ? liveStreak(learnState.streak, Date.now()) : 0;
 
-  const isActive = (l: (typeof LINKS)[number]) => (l.match ?? [l.href]).some((m) => path.startsWith(m));
+  // The most specific matching tab wins, so /screener lights Screener rather than Markets on desktop.
+  const isActive = (l: (typeof LINKS)[number]) => {
+    const hit = (x: (typeof LINKS)[number]) => (x.match ?? [x.href]).some((m) => path.startsWith(m));
+    if (!hit(l)) return false;
+    return !LINKS.some((o) => o !== l && o.desktopOnly && hit(o) && !l.desktopOnly);
+  };
 
   const toggle = () => {
     const next = !open;
@@ -102,12 +112,15 @@ export default function Nav() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
+                  title={l.label}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium transition-all xl:px-3 ${
                     active ? "bg-white/[0.09] text-white ring-1 ring-white/10" : "text-ink-300 hover:text-white hover:bg-white/[0.04]"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
-                  {l.label}
+                  {/* Icons only on tablets, so the bar never overflows; labels from 1280px. */}
+                  <span className="sr-only xl:not-sr-only">{l.label}</span>
                   {l.href === "/learn" && streak > 0 && (
                     <span className="ml-0.5 inline-flex items-center gap-0.5 rounded-full bg-orange-500/15 px-1.5 text-[10px] font-bold text-orange-300">
                       <Flame className="h-3 w-3" />
@@ -234,7 +247,7 @@ export default function Nav() {
       {/* Mobile bottom tab bar */}
       <nav className="sm:hidden fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] bg-ink-950/[0.94] backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
         <div className="grid grid-cols-5 px-1 pt-1">
-          {LINKS.map((l) => {
+          {LINKS.filter((l) => !l.desktopOnly).map((l) => {
             const Icon = l.icon;
             const active = (l.match ?? [l.href]).some((m) => path.startsWith(m));
             return (
@@ -271,6 +284,7 @@ const ICONS: Record<Alert["type"], { icon: React.ElementType; color: string }> =
   protection: { icon: Shield, color: "text-rose-300" },
   plan: { icon: Repeat, color: "text-violet-300" },
   income: { icon: Coins, color: "text-emerald-300" },
+  screen: { icon: SlidersHorizontal, color: "text-sky-300" },
 };
 
 function AlertRow({ a, onClick }: { a: Alert; onClick: () => void }) {
