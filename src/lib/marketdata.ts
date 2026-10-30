@@ -9,6 +9,8 @@
 
 const FINNHUB = process.env.FINNHUB_API_KEY;
 const ALPHA = process.env.ALPHAVANTAGE_API_KEY;
+// Overridable so tests can point at a local mock.
+const FH = (process.env.FINNHUB_API_URL || "https://finnhub.io/api/v1").replace(/\/$/, "");
 
 export function hasLiveData(): boolean {
   return Boolean(FINNHUB || ALPHA);
@@ -37,19 +39,20 @@ export interface LiveQuote {
   h?: number; // today's high
   l?: number; // today's low
   pc?: number; // previous close
+  t?: number; // time of the last price, epoch ms
 }
 
 // Real-time quote via Finnhub. `providerSymbol` is Finnhub's own ticker
 // (e.g. "AAPL", "LLOY.L", "BINANCE:BTCUSDT"). Returns null if unconfigured or on error.
 export async function fetchLiveQuote(providerSymbol: string): Promise<LiveQuote | null> {
   if (!FINNHUB) return null;
-  const res = await withTimeout(`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`);
+  const res = await withTimeout(`${FH}/quote?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`);
   if (!res) return null;
   try {
-    const j = (await res.json()) as { c?: number; o?: number; h?: number; l?: number; pc?: number };
+    const j = (await res.json()) as { c?: number; o?: number; h?: number; l?: number; pc?: number; t?: number };
     if (!(typeof j.c === "number" && j.c > 0)) return null;
     const pos = (n?: number) => (typeof n === "number" && n > 0 ? n : undefined);
-    return { c: j.c, o: pos(j.o), h: pos(j.h), l: pos(j.l), pc: pos(j.pc) };
+    return { c: j.c, o: pos(j.o), h: pos(j.h), l: pos(j.l), pc: pos(j.pc), t: pos(j.t) ? (j.t as number) * 1000 : undefined };
   } catch {
     return null;
   }
@@ -66,8 +69,8 @@ export async function fetchFinnhubFundamentals(
 ): Promise<{ metric: Record<string, number | null>; recommendation: { strongBuy?: number; buy?: number; hold?: number; sell?: number; strongSell?: number } | null } | null> {
   if (!FINNHUB) return null;
   const [m, r] = await Promise.all([
-    withTimeout(`https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(providerSymbol)}&metric=all&token=${FINNHUB}`, 6000),
-    withTimeout(`https://finnhub.io/api/v1/stock/recommendation?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`, 6000),
+    withTimeout(`${FH}/stock/metric?symbol=${encodeURIComponent(providerSymbol)}&metric=all&token=${FINNHUB}`, 6000),
+    withTimeout(`${FH}/stock/recommendation?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`, 6000),
   ]);
   if (!m) return null;
   try {
@@ -122,7 +125,7 @@ export async function fetchCompanyNews(providerSymbol: string): Promise<Provider
   const from = new Date(to.getTime() - 14 * 86400_000);
   const d = (x: Date) => x.toISOString().slice(0, 10);
   const res = await withTimeout(
-    `https://finnhub.io/api/v1/company-news?symbol=${encodeURIComponent(providerSymbol)}&from=${d(from)}&to=${d(to)}&token=${FINNHUB}`,
+    `${FH}/company-news?symbol=${encodeURIComponent(providerSymbol)}&from=${d(from)}&to=${d(to)}&token=${FINNHUB}`,
     5000,
   );
   if (!res) return [];
@@ -153,7 +156,7 @@ export interface MarketHeadline extends ProviderNews {
 // Market-wide news via Finnhub (categories: general, forex, crypto, merger).
 export async function fetchMarketNews(category: "general" | "forex" | "crypto" | "merger"): Promise<MarketHeadline[]> {
   if (!FINNHUB) return [];
-  const res = await withTimeout(`https://finnhub.io/api/v1/news?category=${category}&token=${FINNHUB}`, 5000);
+  const res = await withTimeout(`${FH}/news?category=${category}&token=${FINNHUB}`, 5000);
   if (!res) return [];
   try {
     const j = (await res.json()) as { id?: number; headline?: string; summary?: string; source?: string; url?: string; datetime?: number; related?: string; image?: string }[];

@@ -7,7 +7,7 @@ import { checkPriceAlerts, describeAlert } from "@/lib/pricealerts";
 import { raise } from "@/lib/alerts";
 import { getInstrument, fmtNative } from "@/lib/instruments";
 
-// Mounted once in the layout. On every market tick it fills working orders,
+// Mounted once in the layout. Every second or so it fills working orders,
 // enforces stop-loss / take-profit / trailing stops and fires price alerts;
 // every ~30s it also runs the slower automation — savings plans, AutoInvest
 // and dividend credits. All state changes go through portfolioStore so every
@@ -15,9 +15,15 @@ import { getInstrument, fmtNative } from "@/lib/instruments";
 export default function PortfolioEngine() {
   const { mounted, now, priceFor, closesFor } = useMarket();
   const lastFull = useRef(0);
+  const lastRun = useRef(0);
 
   useEffect(() => {
     if (!mounted || !now) return;
+    // Real-time prices update several times a second; checking orders, stops
+    // and alerts once a second is plenty and keeps storage writes down.
+    const t = Date.now();
+    if (t - lastRun.current < 1000) return;
+    lastRun.current = t;
     const p = makePricer(now, priceFor, closesFor);
 
     // Skip the heavy pass when there is nothing to do.

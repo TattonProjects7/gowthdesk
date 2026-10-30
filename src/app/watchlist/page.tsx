@@ -7,7 +7,7 @@ import { BellRing, ChevronDown, ChevronUp, Pencil, Plus, Search, Star, Trash2, X
 import Nav from "@/components/Nav";
 import InstrumentRow from "@/components/InstrumentRow";
 import { Button, Card, Empty, Input, Segmented } from "@/components/ui";
-import { useMarket } from "@/lib/useMarket";
+import { useMarket, useLiveFocus } from "@/lib/useMarket";
 import { getInstrument, searchInstruments } from "@/lib/instruments";
 import { useWatchlists, createWatchlist, deleteWatchlist, renameWatchlist, toggleSymbol, reorderSymbol, MAX_WATCHLISTS } from "@/lib/watchlists";
 import { usePriceAlerts, describeAlert, removePriceAlert } from "@/lib/pricealerts";
@@ -20,6 +20,7 @@ export default function WatchlistPage() {
   const alerts = usePriceAlerts();
   const [active, setActive] = useState(lists[0]?.id ?? "");
   const list = lists.find((l) => l.id === active) ?? lists[0];
+  useLiveFocus(list?.symbols ?? []);
   const [q, setQ] = useState("");
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState("");

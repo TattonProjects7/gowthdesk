@@ -28,6 +28,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run on app routes but skip static assets and the Stripe webhook.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stripe/webhook|api/revenuecat/webhook|ads.txt|app-ads.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Run on app routes but skip static assets, webhooks and the price feeds.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/stripe/webhook|api/revenuecat/webhook|api/stream|api/candles|ads.txt|app-ads.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

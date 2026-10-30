@@ -75,7 +75,7 @@ export async function GET() {
     // LSE quotes arrive in pence for shares and pounds for most ETFs — Finnhub
     // reports both in the listing currency, which matches our instrument metadata.
     quotes[i.symbol] = q?.c ?? null;
-    if (q) ohlc[i.symbol] = { o: q.o, h: q.h, l: q.l, pc: q.pc };
+    if (q) ohlc[i.symbol] = { o: q.o, h: q.h, l: q.l, pc: q.pc, t: q.t };
     const c = closesCache.get(i.symbol)?.c;
     if (c) closes[i.symbol] = c;
   }

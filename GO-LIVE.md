@@ -8,7 +8,7 @@ accounts, payment details or legal sign-off, in the order to do them.
 | Web app | Ready. Needs a Vercel project and environment variables (step 1). |
 | Demo mode | Works with zero setup. |
 | Real mode (Trading 212) | Ready. Needs `BROKER_SECRET` on the server (step 2). |
-| Live prices | Simulated until you add a market-data key (step 3). |
+| Live prices | Crypto streams in real time with no setup. US shares stream with a free Finnhub key; UK shares need a paid feed (step 3). |
 | Accounts and sync | Needs a Supabase project. The free plan is full (step 4). |
 | Android app | Built by GitHub Actions. Needs a Play account and signing key (step 5). |
 | iPhone app | Compiled by GitHub Actions. Needs an Apple Developer account (step 6). |
@@ -33,14 +33,18 @@ Give Shortlist its own Vercel project instead:
    `claude/stock-trading-app-idea-aaj8rv` → **Create**. From now on every push
    to that branch updates the live site.
 6. Optional: **Settings → Domains** → add your own domain.
+7. Upgrade the Vercel team to **Pro** before you switch adverts or payments
+   on. The free Hobby plan is for non-commercial use only, and Shortlist earns
+   money from ads and subscriptions.
 
 | Variable | Value |
 | --- | --- |
 | `NEXT_PUBLIC_APP_URL` | Your live address, e.g. `https://shortlist.vercel.app`. The apps load this. |
 | `BROKER_SECRET` | A long random string, needed for real mode. Mac: `openssl rand -base64 48`. Windows: see below. |
 | `ANTHROPIC_API_KEY` | Turns on the live AI coach and digests. Optional. |
-| `FINNHUB_API_KEY` | Live prices and live company fundamentals for the screener. Strongly recommended before real mode. |
-| `ALPHAVANTAGE_API_KEY` | Daily price history. Optional. |
+| `FINNHUB_API_KEY` | Real-time US share prices, delayed quotes and live company fundamentals. Strongly recommended before real mode. |
+| `TWELVEDATA_API_KEY` | Real daily price history for US shares and ETFs (charts and indicators). Optional. |
+| `ALPHAVANTAGE_API_KEY` | Daily price history for the short-scanner names. Optional. |
 
 **Making `BROKER_SECRET` on Windows:** open PowerShell and run:
 
@@ -78,15 +82,44 @@ Before you offer real mode to the public:
 
 ## 3. Live prices
 
-Add `FINNHUB_API_KEY` (free at finnhub.io) for real-time quotes and live
-fundamentals for US companies (P/E, margins, growth, analyst ratings) in the
-screener. UK and other non-US companies, and everything when there's no key,
-show sample fundamentals labelled "demo". Calls are
-cached on the server and spread out to stay within the free tier's rate limit,
-so after a fresh deploy the cache fills as people use the app: every quote
-within a few minutes, every company's fundamentals within about 20. The free tier
-covers US shares and crypto. London-listed quotes need a paid Finnhub plan.
-Add `ALPHAVANTAGE_API_KEY` for daily candles.
+Every price carries a label, so nobody mistakes sample data for real:
+**Real-time** (streaming trade by trade), **Delayed** (a real quote refreshed
+every few minutes), **Market closed** (the last real price) or **Simulated**.
+
+| What | Real-time source | Setup | Cost |
+| --- | --- | --- | --- |
+| Crypto (BTC, ETH, SOL, XRP, DOGE) | Coinbase public feed, 24/7 | None, works straight away | Free |
+| Crypto price history | Coinbase daily candles | None | Free |
+| US shares | Finnhub WebSocket, during US market hours | `FINNHUB_API_KEY` (free at finnhub.io) | Free plan: 50 shares at a time |
+| Every other US share | Finnhub delayed quotes, refreshed in rotation | Same key | Free |
+| US price history | Twelve Data daily candles | `TWELVEDATA_API_KEY` (free at twelvedata.com) | Free plan: 800 calls a day |
+| UK shares and London-listed ETFs | Needs a paid London feed | See below | Paid |
+
+How the 50 free US slots are used: the shares people are looking at right now
+(quote page, watchlist, holdings, charts) get slots first; the rest go to the
+largest companies. Everything else shows a delayed quote.
+
+The stream runs through `/api/stream` on your own server, so keys never reach
+the browser. The app holds one connection to each provider per server and
+shares it between viewers. It closes while the app is in the background, to
+save battery and data.
+
+**Before you scale up:**
+
+- **Commercial use.** Free data plans are for personal use. Once Shortlist has
+  paying users or adverts, move to each provider's commercial plan (Finnhub,
+  Twelve Data), and check Coinbase's market-data terms.
+- **UK real-time.** Real-time London Stock Exchange prices need an LSE
+  data licence through a vendor. Ask Finnhub, Twelve Data or EODHD for their
+  London real-time plans and the LSE's display licence terms. Until then, UK
+  shares show simulated prices, or delayed ones on a paid Finnhub plan.
+- **Many users at once.** Each server instance opens its own upstream
+  connection. Finnhub's free plan allows one connection per key, so at
+  higher traffic either upgrade, or move the relay to one always-on server.
+
+After a fresh deploy, quotes fill within a few minutes and US company
+fundamentals within about 20, as the server spreads requests across the free
+tier's limit.
 
 ## 4. Accounts and cross-device sync (optional)
 
@@ -139,6 +172,9 @@ Without this, everything still works and each user's data stays on their device.
 7. In the Play Console, complete Data safety, content rating (18+), the
    Financial features declaration and the store listing. Copy and
    screenshots are in `store/`.
+8. A new **personal** Play developer account has to run a closed test with
+   at least 12 testers for 14 days before it can publish. Organisation
+   accounts skip this, so register as Tatton Projects if you can.
 
 Every Android run also produces `shortlist-debug-apk`, which you can install on
 any Android phone to test straight away.
@@ -263,7 +299,9 @@ subscriptions.
 | --- | --- | --- |
 | Vercel | `NEXT_PUBLIC_APP_URL` | Live address, also loaded by the apps |
 | Vercel | `BROKER_SECRET` | Encrypting Trading 212 keys (real mode) |
-| Vercel | `FINNHUB_API_KEY`, `ALPHAVANTAGE_API_KEY` | Live prices and screener fundamentals |
+| Vercel | `FINNHUB_API_KEY` | Real-time US prices, delayed quotes and screener fundamentals |
+| Vercel | `TWELVEDATA_API_KEY`, `ALPHAVANTAGE_API_KEY` | Real daily price history |
+| Vercel | `FINNHUB_WS_SYMBOLS` (optional, default 50), `LIVE_STREAM=off` (optional) | Streaming slots on a paid plan, or turning streaming off |
 | Vercel | `ANTHROPIC_API_KEY` | AI coach and digests |
 | GitHub variable | `APP_URL` | Address the native apps open |
 | GitHub variable | `PLAY_AUTO_UPLOAD`, `PLAY_TRACK`, `TESTFLIGHT_AUTO_UPLOAD` | Turning store uploads on |

@@ -13,7 +13,7 @@ import { INSTRUMENTS, MARKET_TABS, instrumentsFor, searchInstruments, fmtNative,
 import { upcomingEvents, fmtEventDate } from "@/lib/events";
 import { notCovered } from "@/lib/search";
 import { gbpUsd } from "@/lib/fx";
-import MarketsTabs from "@/components/screener/MarketsTabs";
+import MarketsTabs, { DataBadges } from "@/components/screener/MarketsTabs";
 import MarketPulse from "@/components/screener/MarketPulse";
 
 // Markets — interactive investor's risers & fallers across UK, US and
@@ -61,9 +61,9 @@ export default function Markets() {
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <Globe className="h-6 w-6 text-rose-400" /> Markets
           </h1>
-          <span className={`ml-auto rounded-full border px-2.5 py-1 text-xs font-semibold ${source === "live" ? "border-emerald-800 bg-emerald-950 text-emerald-300" : "border-ink-700 bg-ink-800 text-ink-400"}`}>
-            {source === "live" ? "LIVE data" : source === "loading" ? "…" : "SIM data"}
-          </span>
+          <div className="ml-auto">
+            <DataBadges source={source} />
+          </div>
           {mounted && <span className="text-xs text-ink-500 font-mono">GBP/USD {gbpUsd(now).toFixed(4)}</span>}
         </div>
 

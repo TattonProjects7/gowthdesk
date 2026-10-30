@@ -69,6 +69,15 @@ competitor study and how each feature maps to this app.
   the next two weeks, filterable to what you own or watch.
 - **Quote snapshot** — ~50 key stats, the detected chart pattern drawn with its
   trendlines, today's candlestick, and an industry peer table.
+- **Real-time prices** — crypto streams trade by trade from Coinbase with no
+  setup; US shares stream from Finnhub with a free key (50 at a time, the ones
+  on screen first) and the rest show delayed quotes. Every price is labelled
+  Real-time, Delayed, Market closed or Simulated, with US and London market
+  hours and holidays built in. Real daily candles come from Coinbase and
+  Twelve Data. See GO-LIVE.md step 3.
+- **Search from anywhere** — ⌘K / Ctrl+K or "/": typo-tolerant, knows
+  nicknames and brands ("google", "footsie", "primark"), group words ("banks",
+  "ai") and hands anything else to the screener.
 - Fundamentals for US companies are live from Finnhub when `FINNHUB_API_KEY`
   is set. Everything else uses sector-shaped demo figures, labelled as demo
   wherever they appear.

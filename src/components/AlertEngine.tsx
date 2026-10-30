@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMarket } from "@/lib/useMarket";
 import { useTakenShorts, shortState } from "@/lib/store";
 import { scanMarket } from "@/lib/shorts";
@@ -12,9 +12,14 @@ import { pushAlert } from "@/lib/alerts";
 export default function AlertEngine() {
   const { mounted, priceFor, closesFor } = useMarket();
   const { items } = useTakenShorts();
+  const lastRun = useRef(0);
 
   useEffect(() => {
     if (!mounted) return;
+    // A full market scan; every two seconds is enough even with real-time prices.
+    const t = Date.now();
+    if (t - lastRun.current < 2000) return;
+    lastRun.current = t;
 
     const notify = (title: string, body: string) => {
       if (typeof Notification !== "undefined" && Notification.permission === "granted") {

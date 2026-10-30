@@ -9,7 +9,7 @@ import MarketsTabs, { DataBadges } from "@/components/screener/MarketsTabs";
 import CandleChart, { type ChartOptions } from "@/components/charts/CandleChart";
 import AdSlot from "@/components/ads/AdSlot";
 import { Segmented } from "@/components/ui";
-import { useMarket } from "@/lib/useMarket";
+import { useMarket, useLiveFocus } from "@/lib/useMarket";
 import { aggregateBars } from "@/lib/bars";
 import { INSTRUMENTS, getInstrument, fmtNative } from "@/lib/instruments";
 
@@ -45,6 +45,7 @@ export default function ChartsPage() {
   const off = new Set((params.get("off") ?? "").split(","));
   const opts: ChartOptions = { sma20: !off.has("sma20"), sma50: !off.has("sma50"), sma200: !off.has("sma200"), trendlines: !off.has("trendlines"), volume: !off.has("volume") };
   const tfDef = TF.find((t) => t.id === tf)!;
+  useLiveFocus(symbols);
 
   const push = (next: { l?: string; tf?: string; s?: string[]; off?: string[] }) => {
     const p = new URLSearchParams();

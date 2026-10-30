@@ -24,8 +24,10 @@ Copy `.env.local.example` to `.env.local` and fill in only the sections you want
 
 | Provider | Env var | Free tier gives |
 | --- | --- | --- |
-| [Finnhub](https://finnhub.io) | `FINNHUB_API_KEY` | real-time quotes |
+| [Finnhub](https://finnhub.io) | `FINNHUB_API_KEY` | real-time US prices and quotes |
+| [Twelve Data](https://twelvedata.com) | `TWELVEDATA_API_KEY` | real daily candles for US shares |
 | [Alpha Vantage](https://www.alphavantage.co/support/#api-key) | `ALPHAVANTAGE_API_KEY` | daily candles |
+| Coinbase | none | real-time crypto, on by default |
 
 With neither set the scanner uses the built-in simulator. The header shows
 **LIVE** vs **SIM** so you always know which is active.

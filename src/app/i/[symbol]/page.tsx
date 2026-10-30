@@ -16,7 +16,9 @@ import { useCoach } from "@/components/coach/CoachProvider";
 import type { DigestInput } from "@/lib/ai/types";
 import { ChangePill, usePriceFlash } from "@/components/InstrumentRow";
 import { Button, Card, H2, Input, Pill, Pct, Segmented, Select, Stat } from "@/components/ui";
-import { useMarket } from "@/lib/useMarket";
+import { useMarket, useLiveFocus } from "@/lib/useMarket";
+import { FreshnessBadge } from "@/components/LiveBadge";
+import { describeSession, marketFor, sessionAt } from "@/lib/sessions";
 import { getInstrument, fmtNative, fmtGbp } from "@/lib/instruments";
 import { makePricer, usePortfolio } from "@/lib/portfolioStore";
 import type { OrderSide, Pricer } from "@/lib/portfolio";
@@ -36,7 +38,8 @@ export default function InstrumentPage() {
   const params = useParams<{ symbol: string }>();
   const symbol = (params.symbol || "").toUpperCase();
   const i = getInstrument(symbol);
-  const { mounted, source, now, priceFor, closesFor } = useMarket();
+  const { mounted, source, now, priceFor, closesFor, freshness, isLive } = useMarket();
+  useLiveFocus(i ? [i.symbol] : []);
   const [tf, setTf] = useState<Timeframe>("3M");
   const state = usePortfolio();
 
@@ -123,11 +126,9 @@ export default function InstrumentPage() {
               {mounted && <ChangePill v={dayChg} size="md" />}
               <span className="text-ink-500">today</span>
               {mounted && i.currency !== "GBP" && <span className="font-mono text-ink-500">· ≈ {fmtGbp(toGbp(price, i.currency, now))}</span>}
-              <span className={`ml-1 inline-flex items-center gap-1 text-[10px] font-semibold uppercase ${source === "live" ? "text-emerald-400" : "text-ink-600"}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${source === "live" ? "bg-emerald-400 live-dot" : "bg-ink-600"}`} />
-                {source === "live" ? "live" : "simulated"}
-              </span>
+              {mounted && <FreshnessBadge f={freshness(i.symbol)} className="ml-1" />}
             </div>
+            {mounted && now > 0 && <p className="mt-1 text-xs text-ink-500">{sessionAt(marketFor(i), now).label} · {describeSession(sessionAt(marketFor(i), now), now)}</p>}
           </div>
           <div className="max-w-md">
             <p className="text-sm text-ink-400">{i.description}</p>
@@ -255,16 +256,16 @@ export default function InstrumentPage() {
 
           {/* Side column: deal ticket, watchlist, alerts */}
           <aside className="space-y-4 lg:sticky lg:top-20 self-start">
-            <div className="hidden lg:block">{mounted ? <TradeTicket symbol={i.symbol} pricer={pricer} priceLive={source === "live"} /> : <div className="h-96 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />}</div>
+            <div className="hidden lg:block">{mounted ? <TradeTicket symbol={i.symbol} pricer={pricer} priceLive={isLive(i.symbol)} /> : <div className="h-96 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />}</div>
             <WatchlistCard symbol={i.symbol} />
             {mounted && <PriceAlertCard symbol={i.symbol} price={price} currency={i.currency} />}
           </aside>
         </div>
 
-        {mounted && <MobileTradeBar symbol={i.symbol} pricer={pricer} priceLive={source === "live"} />}
+        {mounted && <MobileTradeBar symbol={i.symbol} pricer={pricer} priceLive={isLive(i.symbol)} />}
 
         <p className="mt-10 text-center text-xs text-ink-600 max-w-xl mx-auto leading-relaxed">
-          Paper trading with {source === "live" ? "live" : "simulated"} prices. Not investment advice. Capital at risk when investing for real.
+          Paper trading with {isLive(i.symbol) ? "real" : "simulated"} prices. Not investment advice. Capital at risk when investing for real.
         </p>
       </main>
     </div>

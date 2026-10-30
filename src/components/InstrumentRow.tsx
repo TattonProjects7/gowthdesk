@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import Avatar from "@/components/Avatar";
 import Sparkline from "@/components/Sparkline";
 import { fmtNative, type Instrument } from "@/lib/instruments";
+import { isStreaming, tickFor } from "@/lib/live/client";
+import { marketFor, sessionAt } from "@/lib/sessions";
 
 // One line in any instrument list (markets, watchlist, search): logo avatar,
 // symbol + name, sparkline, live price that flashes on change, and a coloured
@@ -14,6 +16,8 @@ export default function InstrumentRow({ i, price, closes, rank, right, sub }: { 
   const chg = prev ? (price / prev - 1) * 100 : 0;
   const flash = usePriceFlash(price);
   const tag = i.type === "etf" ? "ETF" : i.type === "crypto" ? "Crypto" : i.exchange === "LSE" ? "LSE" : "US";
+  // Re-rendered by the parent whenever prices move, so reading the store here is current.
+  const realtime = !!tickFor(i.symbol) && isStreaming(i.symbol) && sessionAt(marketFor(i), Date.now()).open;
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-ink-800/80 bg-ink-900 px-3.5 py-3 transition-colors hover:border-ink-600 active:bg-ink-800/60">
       {rank !== undefined && <span className="hidden sm:block w-5 text-center text-xs font-semibold text-ink-500">{rank}</span>}
@@ -31,7 +35,10 @@ export default function InstrumentRow({ i, price, closes, rank, right, sub }: { 
         <Sparkline points={closes} width={84} height={28} stroke="#34d399" downStroke="#fb7185" />
       </div>
       <div className="text-right">
-        <p className={`inline-block font-mono text-[15px] font-semibold text-white rounded px-1 -mx-1 ${flash}`}>{fmtNative(price, i.currency)}</p>
+        <p className={`inline-flex items-center gap-1.5 font-mono text-[15px] font-semibold text-white rounded px-1 -mx-1 ${flash}`}>
+          {realtime && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 live-dot" title="Real-time" aria-label="Real-time price" />}
+          {fmtNative(price, i.currency)}
+        </p>
         <div>
           <ChangePill v={chg} />
         </div>

@@ -44,7 +44,7 @@ import { START_TRACK } from "@/lib/learn/content";
 import Avatar from "@/components/Avatar";
 import { ChangePill } from "@/components/InstrumentRow";
 import { Button, Card, Empty, H2, Input, Money, Pill, Segmented, Select, Stat, fmtDateTime } from "@/components/ui";
-import { useMarket } from "@/lib/useMarket";
+import { useMarket, useLiveFocus } from "@/lib/useMarket";
 import { getInstrument, searchInstruments, fmtGbp, fmtNative, INSTRUMENTS } from "@/lib/instruments";
 import { toGbp } from "@/lib/fx";
 import { makePricer, portfolio, usePortfolio } from "@/lib/portfolioStore";
@@ -103,6 +103,7 @@ function PortfolioInner() {
 
   const { mounted, now, priceFor, closesFor } = useMarket();
   const state = usePortfolio();
+  useLiveFocus([...new Set(state.holdings.map((h) => h.symbol))]);
   const pricer = useMemo(() => makePricer(now, priceFor, closesFor), [now, priceFor, closesFor]);
   const summary = useMemo(() => (mounted ? summarise(state, pricer) : null), [mounted, state, pricer]);
   const mode = useMode();
