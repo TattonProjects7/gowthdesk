@@ -70,8 +70,8 @@ export const PROFILES: Record<string, Profile> = {
   GSK: { industry: "Drug Manufacturers - General", sharesM: 4050, indices: ["UKX"] },
 };
 
-// symbol, name, exchange, sector, industry, price, shares (M), yield %, vol multiplier, indices, description, region?
-type Row = [string, string, Instrument["exchange"], string, string, number, number, number, number, IndexCode[], string, Region?];
+// symbol, name, exchange, sector, industry, price, shares (M), yield %, vol multiplier, indices, description, region?, country?
+type Row = [string, string, Instrument["exchange"], string, string, number, number, number, number, IndexCode[], string, Region?, string?];
 
 const S = ["SPX"] as IndexCode[];
 const SN = ["SPX", "NDX"] as IndexCode[];
@@ -221,6 +221,22 @@ const ROWS: Row[] = [
   ["SGE", "Sage Group", "LSE", "Technology", "Software - Application", 1150, 1000, 1.8, 0.9, UKX, "Accounting and payroll software for small businesses."],
   ["WPP", "WPP", "LSE", "Communication Services", "Advertising Agencies", 350, 1080, 4.0, 1.4, UKX, "The world's largest advertising group, in the middle of a reset."],
   ["OCDO", "Ocado Group", "LSE", "Consumer Staples", "Grocery Stores", 230, 830, 0, 2.2, MCX, "Online grocery and warehouse-robotics technology."],
+  // --- Names people search for most (added with the search upgrade) -------------
+  ["PLUS", "Plus500", "LSE", "Financials", "Capital Markets", 3300, 71, 3.0, 1.2, MCX, "Online trading platform for CFDs and share dealing, expanding into US futures."],
+  ["RMV", "Rightmove", "LSE", "Communication Services", "Internet Content & Information", 720, 770, 1.4, 1.0, UKX, "The UK's biggest property portal."],
+  ["NXT", "Next", "LSE", "Consumer Discretionary", "Apparel Retail", 12500, 117, 1.8, 0.9, UKX, "Clothing and homeware retailer with a strong online business."],
+  ["PSN", "Persimmon", "LSE", "Consumer Discretionary", "Residential Construction", 1250, 320, 4.8, 1.3, UKX, "One of the UK's largest housebuilders."],
+  ["EZJ", "easyJet", "LSE", "Industrials", "Airlines", 500, 758, 2.4, 1.4, UKX, "Europe's second-largest low-cost airline, plus easyJet holidays."],
+  ["CNA", "Centrica", "LSE", "Utilities", "Utilities - Diversified", 160, 4800, 2.8, 1.0, UKX, "Owner of British Gas, with energy trading and gas storage."],
+  ["KGF", "Kingfisher", "LSE", "Consumer Discretionary", "Home Improvement Retail", 270, 1780, 4.6, 1.1, UKX, "B&Q, Screwfix and Castorama."],
+  ["AUTO", "Auto Trader Group", "LSE", "Communication Services", "Internet Content & Information", 760, 880, 1.3, 0.9, UKX, "The UK's largest marketplace for buying and selling cars."],
+  ["GAW", "Games Workshop", "LSE", "Consumer Discretionary", "Leisure", 15000, 33, 3.0, 1.3, UKX, "Warhammer miniatures, plus licensing for video games and TV."],
+  ["ADM", "Admiral Group", "LSE", "Financials", "Insurance - Property & Casualty", 3300, 306, 5.5, 0.9, UKX, "Car and home insurer known for its low-cost model."],
+  ["TSM", "Taiwan Semiconductor", "NYSE", "Technology", "Semiconductors", 280, 5187, 1.2, 1.2, [], "Makes most of the world's advanced chips, including Nvidia's and Apple's.", "Asia", "Taiwan"],
+  ["ASML", "ASML", "NASDAQ", "Technology", "Semiconductor Equipment & Materials", 900, 390, 0.9, 1.2, ["NDX"], "The only maker of the EUV machines that print leading-edge chips.", "Europe", "Netherlands"],
+  ["BABA", "Alibaba", "NYSE", "Consumer Discretionary", "Internet Retail", 140, 2300, 1.0, 1.6, [], "China's largest e-commerce group, with a fast-growing cloud business.", "Asia", "China"],
+  ["GME", "GameStop", "NYSE", "Consumer Discretionary", "Specialty Retail", 25, 447, 0, 2.2, [], "Video-game retailer, famous for the 2021 meme-stock squeeze."],
+  ["MSTR", "Strategy (MicroStrategy)", "NASDAQ", "Technology", "Software - Application", 350, 280, 0, 2.5, ["NDX"], "Software company turned bitcoin holder: its shares move with the price of bitcoin."],
 ];
 
 function driftFor(seed: number): number {
@@ -228,7 +244,7 @@ function driftFor(seed: number): number {
 }
 
 function build(r: Row, k: number): Instrument {
-  const [symbol, name, exchange, sector, industry, price, sharesM, yieldPct, volMult, indices, description, region] = r;
+  const [symbol, name, exchange, sector, industry, price, sharesM, yieldPct, volMult, indices, description, region, country] = r;
   const lse = exchange === "LSE";
   const seed = 101 + k;
   const currency: Currency = lse ? "GBX" : "USD";
@@ -252,6 +268,7 @@ function build(r: Row, k: number): Instrument {
     industry,
     indices,
     sharesM,
+    ...(country ? { country } : {}),
   };
 }
 
@@ -260,8 +277,8 @@ export const EXTRA_STOCKS: Instrument[] = ROWS.map(build);
 // Investment themes — the stories people actually invest in. A share can sit in
 // several. Used by the screener's Theme filter.
 export const THEMES: Record<string, { label: string; symbols: string[] }> = {
-  ai: { label: "Artificial intelligence", symbols: ["NVDA", "MSFT", "GOOGL", "META", "AMZN", "AVGO", "AMD", "PLTR", "ORCL", "MU", "ARM", "DELL", "ANET", "CRM", "NOW", "SNOW", "TSLA", "IBM", "CEG"] },
-  chips: { label: "Semiconductors", symbols: ["NVDA", "AMD", "AVGO", "INTC", "QCOM", "TXN", "MU", "AMAT", "ARM"] },
+  ai: { label: "Artificial intelligence", symbols: ["NVDA", "MSFT", "GOOGL", "META", "AMZN", "AVGO", "AMD", "PLTR", "ORCL", "MU", "ARM", "DELL", "ANET", "CRM", "NOW", "SNOW", "TSLA", "IBM", "CEG", "TSM"] },
+  chips: { label: "Semiconductors", symbols: ["NVDA", "AMD", "AVGO", "INTC", "QCOM", "TXN", "MU", "AMAT", "ARM", "TSM", "ASML"] },
   cloud: { label: "Cloud and software", symbols: ["MSFT", "AMZN", "GOOGL", "ORCL", "CRM", "ADBE", "NOW", "INTU", "SNOW", "SHOP", "SGE", "PLTR"] },
   cyber: { label: "Cybersecurity", symbols: ["CRWD", "PANW", "CSCO", "MSFT"] },
   ev: { label: "Electric vehicles", symbols: ["TSLA", "GM", "F"] },
@@ -269,13 +286,13 @@ export const THEMES: Record<string, { label: string; symbols: string[] }> = {
   defence: { label: "Defence and aerospace", symbols: ["LMT", "RTX", "BA", "GE", "RR"] },
   energy_transition: { label: "Clean energy and nuclear", symbols: ["NEE", "CEG", "SSE", "NG", "FCX"] },
   oil: { label: "Oil and gas", symbols: ["XOM", "CVX", "COP", "OXY", "SLB", "BP", "SHEL"] },
-  crypto: { label: "Crypto-linked", symbols: ["COIN", "HOOD", "BTC", "ETH", "SOL"] },
-  fintech: { label: "Payments and fintech", symbols: ["V", "MA", "PYPL", "AXP", "SHOP", "COIN", "HOOD"] },
+  crypto: { label: "Crypto-linked", symbols: ["COIN", "HOOD", "MSTR", "BTC", "ETH", "SOL", "XRP", "DOGE"] },
+  fintech: { label: "Payments and fintech", symbols: ["V", "MA", "PYPL", "AXP", "SHOP", "COIN", "HOOD", "PLUS"] },
   banks: { label: "Banks", symbols: ["JPM", "BAC", "WFC", "GS", "MS", "LLOY", "BARC", "HSBA", "NWG", "STAN"] },
   brands: { label: "Consumer brands", symbols: ["AAPL", "KO", "PEP", "MCD", "NKE", "SBUX", "PG", "DIS", "ULVR", "DGE", "RKT", "HLN", "MDLZ"] },
   income: { label: "Dividend stalwarts", symbols: ["KO", "PG", "JNJ", "PEP", "MCD", "VZ", "T", "XOM", "CVX", "ABBV", "O", "LGEN", "BATS", "IMB", "NG", "ULVR", "SHEL", "HSBA"] },
   streaming: { label: "Streaming and media", symbols: ["NFLX", "DIS", "SPOT", "CMCSA", "GOOGL"] },
-  uk_retail: { label: "UK high street", symbols: ["TSCO", "SBRY", "MKS", "ABF", "JD", "OCDO", "CPG"] },
+  uk_retail: { label: "UK high street", symbols: ["TSCO", "SBRY", "MKS", "ABF", "JD", "OCDO", "CPG", "NXT", "KGF"] },
   miners: { label: "Mining and metals", symbols: ["RIO", "GLEN", "AAL", "FCX", "NEM"] },
-  travel: { label: "Travel and leisure", symbols: ["BKNG", "ABNB", "IAG", "UBER", "CPG"] },
+  travel: { label: "Travel and leisure", symbols: ["BKNG", "ABNB", "IAG", "UBER", "CPG", "EZJ"] },
 };

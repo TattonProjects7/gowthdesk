@@ -8,6 +8,7 @@
 // that keep the whole thing working with zero API keys.
 
 import { EXTRA_STOCKS, PROFILES, type IndexCode } from "./universe";
+import { search } from "./search";
 
 export type InstrumentType = "stock" | "etf" | "crypto";
 export type Currency = "USD" | "GBP" | "GBX"; // GBX = pence sterling (LSE convention)
@@ -470,6 +471,42 @@ const BASE: Instrument[] = [
     seed: 63,
     finnhub: "BINANCE:SOLUSDT",
   },
+  {
+    symbol: "XRP",
+    name: "XRP",
+    type: "crypto",
+    exchange: "CRYPTO",
+    currency: "USD",
+    region: "Global",
+    sector: "Crypto",
+    assetClass: "Crypto",
+    dividendYieldPct: 0,
+    shortable: false,
+    description: "Payments-focused token linked to Ripple. Trades 24/7 and swings hard on legal and ETF news.",
+    base: 2.4,
+    vol: 0.05,
+    drift: 0.0,
+    seed: 64,
+    finnhub: "BINANCE:XRPUSDT",
+  },
+  {
+    symbol: "DOGE",
+    name: "Dogecoin",
+    type: "crypto",
+    exchange: "CRYPTO",
+    currency: "USD",
+    region: "Global",
+    sector: "Crypto",
+    assetClass: "Crypto",
+    dividendYieldPct: 0,
+    shortable: false,
+    description: "The original meme coin. Very volatile and driven largely by sentiment.",
+    base: 0.2,
+    vol: 0.065,
+    drift: -0.02,
+    seed: 65,
+    finnhub: "BINANCE:DOGEUSDT",
+  },
 ];
 
 // The original list plus the wider screener universe, each share carrying its
@@ -492,24 +529,9 @@ export function isInstrument(symbol: string): boolean {
   return BY_SYMBOL.has(symbol.toUpperCase());
 }
 
-// Simple ranked text search for the "quick quote" box.
+// Ranked, typo-tolerant search for every search box (see search.ts).
 export function searchInstruments(q: string, limit = 8): Instrument[] {
-  const s = q.trim().toLowerCase();
-  if (!s) return [];
-  const scored = INSTRUMENTS.map((i) => {
-    const sym = i.symbol.toLowerCase();
-    const name = i.name.toLowerCase();
-    let score = 0;
-    if (sym === s) score = 100;
-    else if (sym.startsWith(s)) score = 80;
-    else if (name.startsWith(s)) score = 60;
-    else if (name.includes(s)) score = 40;
-    else if (i.sector.toLowerCase().includes(s)) score = 20;
-    return { i, score };
-  })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || a.i.symbol.localeCompare(b.i.symbol));
-  return scored.slice(0, limit).map((x) => x.i);
+  return search(INSTRUMENTS, q, limit).map((h) => h.i);
 }
 
 // Human label for a market segment (used by the Markets tabs).

@@ -36,6 +36,7 @@ import { useLearn } from "@/lib/learn/store";
 import { liveStreak } from "@/lib/learn/progress";
 import ModeSwitch from "@/components/broker/ModeSwitch";
 import RealBanner from "@/components/broker/RealBanner";
+import SearchPalette from "@/components/SearchPalette";
 
 // Primary navigation: Markets · Portfolio · Watchlist · Shorts, plus the alert
 // bell, account menu and settings. On phones the same destinations become a
@@ -131,6 +132,8 @@ export default function Nav() {
               );
             })}
           </div>
+
+          <SearchPalette />
 
           {/* Alerts bell */}
           <div className="relative">

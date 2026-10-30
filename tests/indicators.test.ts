@@ -62,7 +62,7 @@ describe("instruments & market", () => {
     const uk = instrumentsFor("uk");
     expect(uk.every((i) => i.region === "UK" && i.type === "stock")).toBe(true);
     expect(instrumentsFor("etf").every((i) => i.type === "etf")).toBe(true);
-    expect(instrumentsFor("crypto").length).toBe(3);
+    expect(instrumentsFor("crypto").map((i) => i.symbol)).toEqual(["BTC", "ETH", "SOL", "XRP", "DOGE"]);
   });
 
   it("every instrument simulates a sane price near its anchor", () => {

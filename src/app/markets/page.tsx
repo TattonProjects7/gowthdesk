@@ -11,6 +11,7 @@ import { Card, H2, Pill, Segmented } from "@/components/ui";
 import { useMarket } from "@/lib/useMarket";
 import { INSTRUMENTS, MARKET_TABS, instrumentsFor, searchInstruments, fmtNative, type Instrument, type MarketTab } from "@/lib/instruments";
 import { upcomingEvents, fmtEventDate } from "@/lib/events";
+import { notCovered } from "@/lib/search";
 import { gbpUsd } from "@/lib/fx";
 import MarketsTabs from "@/components/screener/MarketsTabs";
 import MarketPulse from "@/components/screener/MarketPulse";
@@ -72,7 +73,7 @@ export default function Markets() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Quick quote — search shares, ETFs or crypto (e.g. Lloyds, VUSA, BTC)"
+            placeholder="Quick quote — a company, ticker, fund or coin (e.g. Lloyds, Rolls Royce, S&P 500, bitcoin)"
             className="w-full rounded-2xl border border-ink-700 bg-ink-900 pl-10 pr-3 py-3 text-sm text-white placeholder-ink-500 focus:border-rose-600 focus:outline-none"
           />
         </div>
@@ -95,7 +96,7 @@ export default function Markets() {
 
         <div className="space-y-2">
           {!mounted && Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[62px] rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />)}
-          {mounted && rows.length === 0 && <p className="py-8 text-center text-sm text-ink-500">Nothing matches “{q}”.</p>}
+          {mounted && q.trim() && <SearchHint q={q} empty={rows.length === 0} />}
           {mounted && rows.slice(0, shown).map((r, idx) => <InstrumentRow key={r.i.symbol} i={r.i} price={r.price} closes={r.closes} rank={sort === "name" ? undefined : idx + 1} />)}
         </div>
         {mounted && rows.length > shown && (
@@ -178,6 +179,29 @@ function MoverStrip({ title, tone, rows }: { title: string; tone: "up" | "down";
           </Link>
         ))}
       </div>
+    </div>
+  );
+}
+
+// Under the quick-quote results: say plainly when a well-known company isn't
+// covered, and offer the screener for descriptions rather than names.
+function SearchHint({ q, empty }: { q: string; empty: boolean }) {
+  const missing = notCovered(q);
+  if (!missing && !empty) return null;
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-ink-900/70 px-4 py-3 text-sm">
+      <p className="text-ink-300">
+        {missing ? (
+          <>
+            {missing.name} ({missing.listing}) isn&apos;t on Shortlist yet.{empty ? "" : " These are the closest matches."}
+          </>
+        ) : (
+          <>No share, fund or coin matches &ldquo;{q.trim()}&rdquo;. Check the spelling or try the ticker.</>
+        )}
+      </p>
+      <Link href={`/screener?ask=${encodeURIComponent(q.trim())}`} className="mt-1.5 inline-block text-sm font-semibold text-violet-300 hover:underline">
+        Screen for &ldquo;{q.trim()}&rdquo; instead
+      </Link>
     </div>
   );
 }

@@ -108,21 +108,37 @@ export default function Screener() {
     push({ filters: oid ? [...rest, `${fid}:${oid}`] : rest });
   };
 
-  const buildFromText = async () => {
-    const q = ask.trim();
+  const buildFromText = async (text?: string) => {
+    const q = (text ?? ask).trim();
     if (!q) return;
     setAsking(true);
     let r: ParsedScreen;
+    // Never leave people waiting on the AI: after 9 seconds the keyword parser answers.
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 9000);
     try {
-      const res = await fetch("/api/screener/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ q }) });
+      const res = await fetch("/api/screener/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ q }), signal: ctl.signal });
       r = res.ok ? ((await res.json()) as ParsedScreen) : parseScreenOffline(q);
     } catch {
       r = parseScreenOffline(q);
+    } finally {
+      clearTimeout(timer);
     }
     setAsking(false);
     setExplain(r);
     push({ filters: r.filters, signal: r.signal ?? "", sort: r.sort ?? sort });
   };
+
+  // "Screen for …" from the search box arrives as ?ask=.
+  const asked = useRef("");
+  useEffect(() => {
+    const a = params.get("ask")?.trim();
+    if (!a || asked.current === a) return;
+    asked.current = a;
+    setAsk(a);
+    void buildFromText(a);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   const colIds = view === "custom" ? ["ticker", ...custom] : (VIEWS.find((v) => v.id === view)?.cols ?? []).length ? VIEWS.find((v) => v.id === view)!.cols : VIEWS[0].cols;
   const cols = colIds.map((c) => getColumn(c)).filter((c): c is NonNullable<typeof c> => !!c);

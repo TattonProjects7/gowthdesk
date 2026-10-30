@@ -141,7 +141,7 @@ ${catalogue}`;
     output_config: { effort: "low", format: { type: "json_schema", schema: SCREEN_SCHEMA } },
     system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: q }],
-  });
+  }, { timeout: 8000, maxRetries: 0 }); // the page falls back to the keyword parser rather than wait
   if (res.stop_reason === "refusal" || res.stop_reason === "max_tokens") return null;
   const text = res.content.find((b) => b.type === "text");
   if (!text || text.type !== "text") return null;
