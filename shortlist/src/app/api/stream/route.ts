@@ -3,15 +3,18 @@ import { isInstrument } from "@/lib/instruments";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300;
+// 60 seconds is the longest every Vercel plan allows; a longer value fails the
+// whole deployment on plans that cap it.
+export const maxDuration = 60;
 
 // Real-time prices as Server-Sent Events. The browser opens one stream and
 // gets `ticks` (changed prices, coalesced) and `status` (which feeds are up).
 // `?focus=AAPL,TSLA` names what the viewer is looking at, so those get the
 // limited US streaming slots first.
 //
-// Each response ends shortly before the platform's time limit with a `bye`
-// event; EventSource reconnects by itself, so the viewer never notices.
+// Each response ends shortly before the platform's time limit (every 45
+// seconds) with a `bye` event; EventSource reconnects by itself and gets the
+// latest prices straight away, so the viewer never notices.
 
 const enc = new TextEncoder();
 
