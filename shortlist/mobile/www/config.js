@@ -1,0 +1,1 @@
+window.SHORTLIST_URL = "";

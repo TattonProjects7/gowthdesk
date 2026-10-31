@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Shortlist — offline</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0d0f1a; color: #e8eaf4; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .wrap { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; box-sizing: border-box; }
+    .logo { width: 64px; height: 64px; border-radius: 18px; background: #252a47; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    p { color: #a0a9cc; font-size: 14px; line-height: 1.5; max-width: 300px; margin: 0 0 24px; }
+    button { appearance: none; border: 0; border-radius: 14px; background: #e11d48; color: #fff; font-weight: 600; font-size: 15px; padding: 14px 28px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a0a9cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 13a10 10 0 0 1 5.24-2.76"/><line x1="2" x2="22" y1="2" y2="22"/></svg></div>
+    <h1>You're offline</h1>
+    <p>Shortlist needs a connection for live prices and your portfolio. Check your signal or Wi-Fi and try again.</p>
+    <button onclick="retry()">Try again</button>
+  </div>
+  <script src="config.js"></script>
+  <script>
+    function retry() {
+      if (window.SHORTLIST_URL) location.replace(window.SHORTLIST_URL + "/portfolio");
+      else location.reload();
+    }
+    window.addEventListener("online", retry);
+  </script>
+</body>
+</html>
