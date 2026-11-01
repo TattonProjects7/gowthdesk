@@ -39,7 +39,10 @@ jobs:
       # The live site the app opens. Set the repository variable APP_URL to
       # change it (for example to a custom domain).
       NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL || 'https://gowthdesk-jpim.vercel.app' }}
-      HAS_ASC: ${{ secrets.ASC_KEY_ID != '' && secrets.ASC_ISSUER_ID != '' && secrets.ASC_KEY_P8 != '' && secrets.APPLE_TEAM_ID != '' }}
+      HAS_ASC: ${{ secrets.ASC_KEY_ID != '' && secrets.ASC_ISSUER_ID != '' && secrets.ASC_KEY_P8 != '' }}
+      # Tatton Projects' Apple Developer team (not a secret: it's in every signed app).
+      # The APPLE_TEAM_ID secret overrides it.
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID || 'UJ6WA4G6H9' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -79,7 +82,7 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_TEAM_ID: ${{ env.TEAM_ID }}
         run: |
           KEY="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
           printf '%s' "$ASC_KEY_P8" > "$KEY"

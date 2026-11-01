@@ -109,7 +109,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.shortlist.app
+          packageName: uk.co.tattonprojects.shortlist
           releaseFiles: shortlist/android/app/build/outputs/bundle/release/*.aab
           track: ${{ inputs.track || vars.PLAY_TRACK || 'internal' }}
           status: draft

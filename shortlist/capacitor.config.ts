@@ -23,7 +23,7 @@ function envFromFile(key: string): string | undefined {
 const serverUrl = (process.env.NEXT_PUBLIC_APP_URL || envFromFile("NEXT_PUBLIC_APP_URL") || "").replace(/\/$/, "");
 
 const config: CapacitorConfig = {
-  appId: "com.shortlist.app",
+  appId: "uk.co.tattonprojects.shortlist",
   appName: "Shortlist",
   webDir: "mobile/www",
   backgroundColor: "#0d0f1a",
