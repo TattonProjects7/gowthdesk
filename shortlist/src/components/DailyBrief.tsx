@@ -49,7 +49,7 @@ export default function DailyBrief({ now, priceFor, closesFor, dayChange }: { no
           </li>
         )}
       </ul>
-      <button onClick={() => coach.open(`Why is ${up.i.symbol} up and ${down.i.symbol} down today? Keep it simple.`)} className="mt-3 inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2.5 py-1 text-xs font-semibold text-violet-200 hover:bg-violet-500/25">
+      <button onClick={() => coach.open(`Why is ${up.i.symbol} up and ${down.i.symbol} down today? Keep it simple.`)} className="mt-3 inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2.5 py-1 text-xs font-semibold text-blue-200 hover:bg-blue-500/25">
         <Sparkles className="h-3.5 w-3.5" /> Explain today&apos;s moves
       </button>
     </section>

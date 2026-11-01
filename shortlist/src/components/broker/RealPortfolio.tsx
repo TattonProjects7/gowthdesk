@@ -12,7 +12,7 @@ import { fmtGbp, fmtNative, getInstrument } from "@/lib/instruments";
 export default function RealPortfolio() {
   const { account, status, loading, error } = useBroker();
   const live = status?.env === "live";
-  const accent = live ? "from-amber-400 to-orange-500" : "from-violet-400 to-sky-400";
+  const accent = live ? "from-amber-400 to-orange-500" : "from-blue-400 to-sky-400";
 
   useEffect(() => {
     void broker.refreshAccount();

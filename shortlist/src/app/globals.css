@@ -4,7 +4,7 @@
 
 html, body { height: 100%; }
 
-html { background: rgb(7 8 13); color-scheme: dark; }
+html { background: rgb(5 11 26); color-scheme: dark; }
 
 body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -15,7 +15,7 @@ body {
   background: transparent;
 }
 
-/* Aurora: soft brand-coloured light behind every screen. */
+/* Aurora: soft navy-blue light behind every screen, with a hint of the red accent. */
 body::before {
   content: "";
   position: fixed;
@@ -23,14 +23,14 @@ body::before {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(60rem 38rem at 8% -12%, rgba(244, 63, 94, 0.14), transparent 62%),
-    radial-gradient(52rem 40rem at 105% -6%, rgba(139, 92, 246, 0.16), transparent 60%),
-    radial-gradient(60rem 46rem at 50% 115%, rgba(16, 185, 129, 0.09), transparent 62%),
-    rgb(7 8 13);
+    radial-gradient(60rem 38rem at 8% -12%, rgba(37, 99, 235, 0.22), transparent 62%),
+    radial-gradient(52rem 40rem at 105% -6%, rgba(255, 59, 59, 0.10), transparent 60%),
+    radial-gradient(60rem 46rem at 50% 115%, rgba(30, 64, 175, 0.18), transparent 62%),
+    rgb(5 11 26);
 }
-::selection { background: rgba(139, 92, 246, 0.35); color: #fff; }
+::selection { background: rgba(59, 130, 246, 0.4); color: #fff; }
 
-:focus-visible { outline: 2px solid rgba(167, 139, 250, 0.7); outline-offset: 2px; border-radius: 8px; }
+:focus-visible { outline: 2px solid rgba(96, 165, 250, 0.75); outline-offset: 2px; border-radius: 8px; }
 
 h1, h2, h3 { letter-spacing: -0.02em; }
 
@@ -44,8 +44,8 @@ h1, h2, h3 { letter-spacing: -0.02em; }
 .num { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 
 /* Gradient text and glass surfaces. */
-.text-gradient { background: linear-gradient(135deg, #fda4af 0%, #f0abfc 45%, #a78bfa 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.glass { background: rgba(12, 14, 22, 0.78); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }
+.text-gradient { background: linear-gradient(135deg, #ffffff 0%, #c7d7ff 55%, #ff8a80 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.glass { background: rgba(7, 15, 34, 0.8); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }
 
 /* Pages ease in: each block in <main> fades up, slightly staggered. */
 /* Fixed overlays (sheets, trade bars) are excluded so they appear instantly. */

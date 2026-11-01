@@ -27,8 +27,8 @@ export default function HousePromo({ seed, adFreeBilling, compact = false }: { s
   const p = pick(seed, adFreeBilling);
   const Icon = p.icon;
   return (
-    <Link href={p.href} className={`flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-gradient-to-r from-violet-500/[0.08] via-ink-900/70 to-sky-500/[0.06] ${compact ? "p-3" : "p-4"} hover:border-white/15`}>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-violet-200">
+    <Link href={p.href} className={`flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-gradient-to-r from-blue-500/[0.08] via-ink-900/70 to-sky-500/[0.06] ${compact ? "p-3" : "p-4"} hover:border-white/15`}>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-blue-200">
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">

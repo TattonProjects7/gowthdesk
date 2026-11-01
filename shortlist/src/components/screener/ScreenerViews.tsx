@@ -95,7 +95,7 @@ export function StatsPanel({ rows }: { rows: Snapshot[] }) {
             <div key={k} className="grid grid-cols-[9rem_1fr_2rem] items-center gap-2 text-xs">
               <span className="truncate text-ink-300">{k}</span>
               <span className="h-2 overflow-hidden rounded-full bg-ink-800">
-                <span className="block h-full rounded-full bg-gradient-to-r from-violet-400 to-sky-400" style={{ width: `${(n / st.n) * 100}%` }} />
+                <span className="block h-full rounded-full bg-gradient-to-r from-blue-400 to-sky-400" style={{ width: `${(n / st.n) * 100}%` }} />
               </span>
               <span className="num text-right font-mono text-ink-400">{n}</span>
             </div>
@@ -144,7 +144,7 @@ export function ColumnPicker({ value, onChange }: { value: string[]; onChange: (
       <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-4 lg:grid-cols-6">
         {choices.map((c) => (
           <label key={c.id} className="flex items-center gap-2 text-xs text-ink-200">
-            <input type="checkbox" checked={value.includes(c.id)} onChange={(e) => onChange(e.target.checked ? [...value, c.id] : value.filter((x) => x !== c.id))} className="accent-violet-400" />
+            <input type="checkbox" checked={value.includes(c.id)} onChange={(e) => onChange(e.target.checked ? [...value, c.id] : value.filter((x) => x !== c.id))} className="accent-blue-400" />
             {c.label}
           </label>
         ))}

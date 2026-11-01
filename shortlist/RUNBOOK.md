@@ -173,7 +173,7 @@ npm run cap:sync
 
 # generate every icon + splash size from resources/
 npm i -D @capacitor/assets
-npx capacitor-assets generate --iconBackgroundColor '#0d0f1a' --splashBackgroundColor '#0d0f1a'
+npm run cap:assets   # navy #08173a backgrounds; source art lives in brand/
 ```
 
 Run it:

@@ -39,7 +39,7 @@ export default function AdSlot({ placement, kind = "banner", className = "" }: {
       <div className="mb-1 flex items-center justify-between px-1 text-[10px] font-semibold uppercase tracking-wider text-ink-500">
         <span>{network === "adsense" ? "Advertisement" : "From Shortlist"}</span>
         {adFreeBilling && (
-          <Link href="/pricing#ad-free" className="normal-case tracking-normal text-violet-300 hover:underline">
+          <Link href="/pricing#ad-free" className="normal-case tracking-normal text-blue-300 hover:underline">
             Remove ads
           </Link>
         )}

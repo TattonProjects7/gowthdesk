@@ -146,7 +146,7 @@ export default function ChartsPage() {
         </div>
         <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-ink-500">
           <span>
-            <span className="mr-1 inline-block h-0.5 w-3 bg-violet-400 align-middle" />
+            <span className="mr-1 inline-block h-0.5 w-3 bg-blue-400 align-middle" />
             SMA 20
           </span>
           <span>

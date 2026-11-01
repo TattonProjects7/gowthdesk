@@ -98,7 +98,7 @@ export default function Nav() {
       <header className="glass border-b border-white/[0.06] px-4 sm:px-8 py-2.5 flex items-center gap-2 sm:gap-3 pt-[max(0.625rem,env(safe-area-inset-top))]">
         <Link href="/portfolio" className="flex items-center gap-2.5" aria-label="Shortlist home">
           <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
-          <span className="hidden sm:inline font-bold text-lg tracking-tight text-white">Shortlist</span>
+          <span className="hidden sm:inline font-brand font-bold text-[1.2rem] tracking-[-0.035em] text-white">Shortlist</span>
         </Link>
         <ModeSwitch className="ml-1 sm:ml-3" />
 
@@ -155,7 +155,7 @@ export default function Nav() {
                   <div className="flex items-center justify-between border-b border-ink-800 px-4 py-2.5">
                     <p className="text-sm font-semibold text-white">Alerts</p>
                     <div className="flex items-center gap-2">
-                      <button onClick={enableNotifications} className="text-ink-400 hover:text-violet-300" title="Enable notifications">
+                      <button onClick={enableNotifications} className="text-ink-400 hover:text-blue-300" title="Enable notifications">
                         <BellRing className="h-3.5 w-3.5" />
                       </button>
                       {alerts.length > 0 && (
@@ -183,10 +183,10 @@ export default function Nav() {
               tapHaptic();
               coach.open();
             }}
-            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-rose-500/20 to-violet-500/20 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-violet-500/30 hover:from-rose-500/30 hover:to-violet-500/30"
+            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-500/20 to-blue-700/20 px-3 py-1.5 text-sm font-semibold text-white ring-1 ring-blue-500/30 hover:from-blue-500/30 hover:to-blue-700/30"
             aria-label="Ask the AI coach"
           >
-            <Sparkles className="h-4 w-4 text-violet-300" />
+            <Sparkles className="h-4 w-4 text-blue-300" />
             <span className="hidden md:inline">Coach</span>
           </button>
 
@@ -254,7 +254,7 @@ export default function Nav() {
             const active = (l.match ?? [l.href]).some((m) => path.startsWith(m));
             return (
               <Link key={l.href} href={l.href} onClick={() => tapHaptic()} className={`flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-semibold transition-colors ${active ? "text-white" : "text-ink-500"}`}>
-                <span className={`flex h-8 w-14 items-center justify-center rounded-full transition-all duration-200 ${active ? "bg-gradient-to-r from-rose-500/30 to-violet-500/30 text-white ring-1 ring-white/10 shadow-[0_6px_20px_-8px_rgba(217,70,239,0.6)]" : ""}`}>
+                <span className={`flex h-8 w-14 items-center justify-center rounded-full transition-all duration-200 ${active ? "bg-gradient-to-r from-blue-500/35 to-blue-600/35 text-white ring-1 ring-white/10 shadow-[0_6px_20px_-8px_rgba(217,70,239,0.6)]" : ""}`}>
                   <Icon className="h-5 w-5" />
                 </span>
                 {l.label}
@@ -280,11 +280,11 @@ async function openPortal() {
 const ICONS: Record<Alert["type"], { icon: React.ElementType; color: string }> = {
   target: { icon: Target, color: "text-emerald-400" },
   stop: { icon: ShieldX, color: "text-rose-400" },
-  agrade: { icon: Sparkles, color: "text-violet-400" },
+  agrade: { icon: Sparkles, color: "text-blue-400" },
   price: { icon: BellRing, color: "text-amber-400" },
   order: { icon: Receipt, color: "text-sky-400" },
   protection: { icon: Shield, color: "text-rose-300" },
-  plan: { icon: Repeat, color: "text-violet-300" },
+  plan: { icon: Repeat, color: "text-blue-300" },
   income: { icon: Coins, color: "text-emerald-300" },
   screen: { icon: SlidersHorizontal, color: "text-sky-300" },
 };

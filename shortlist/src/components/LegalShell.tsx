@@ -8,7 +8,7 @@ export default function LegalShell({ title, updated, children }: { title: string
       <header className="border-b border-ink-800 px-5 sm:px-8 py-3.5 flex items-center">
         <Link href="/" className="flex items-center gap-2.5">
           <BrandMark size={32} className="rounded-[9px]" />
-          <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
+          <span className="font-brand font-bold text-[1.2rem] tracking-[-0.035em] text-white">Shortlist</span>
         </Link>
       </header>
 

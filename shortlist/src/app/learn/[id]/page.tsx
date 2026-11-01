@@ -87,7 +87,7 @@ export default function LessonPage() {
               <span key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < step || done ? "bg-gradient-to-r from-amber-400 to-rose-500" : i === step ? "bg-ink-500" : "bg-ink-800"}`} />
             ))}
           </div>
-          <button onClick={() => coach.open(`Help me understand “${lesson.title}”`)} className="rounded-full p-1.5 text-violet-300 hover:bg-ink-800" aria-label="Ask the coach about this lesson" title="Ask the coach">
+          <button onClick={() => coach.open(`Help me understand “${lesson.title}”`)} className="rounded-full p-1.5 text-blue-300 hover:bg-ink-800" aria-label="Ask the coach about this lesson" title="Ask the coach">
             <Sparkles className="h-5 w-5" />
           </button>
         </div>

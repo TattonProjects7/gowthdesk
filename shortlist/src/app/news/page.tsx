@@ -179,10 +179,10 @@ export default function NewsPage() {
             {tab !== "pulse" && (
               <Card className="!p-0">
                 <p className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-2.5 text-sm font-semibold text-white">
-                  <Activity className="h-4 w-4 text-violet-300" /> Market pulse
+                  <Activity className="h-4 w-4 text-blue-300" /> Market pulse
                 </p>
                 <PulseList notes={pulse.slice(0, 6)} mounted={mounted} compact />
-                <button onClick={() => setTab("pulse")} className="w-full border-t border-white/[0.06] px-4 py-2 text-left text-xs font-semibold text-violet-300 hover:bg-white/[0.03]">
+                <button onClick={() => setTab("pulse")} className="w-full border-t border-white/[0.06] px-4 py-2 text-left text-xs font-semibold text-blue-300 hover:bg-white/[0.03]">
                   See the full pulse
                 </button>
               </Card>

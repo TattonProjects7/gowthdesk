@@ -28,7 +28,7 @@ export default function ModeSwitch({ className = "" }: { className?: string }) {
                   ? "bg-white text-ink-950 shadow-[0_4px_14px_-4px_rgba(255,255,255,0.45)]"
                   : live
                     ? "bg-gradient-to-r from-amber-400 to-orange-500 text-ink-950 shadow-[0_4px_16px_-4px_rgba(251,146,60,0.7)]"
-                    : "bg-gradient-to-r from-violet-400 to-sky-400 text-ink-950 shadow-[0_4px_16px_-4px_rgba(139,92,246,0.7)]"
+                    : "bg-gradient-to-r from-blue-400 to-sky-400 text-ink-950 shadow-[0_4px_16px_-4px_rgba(59,130,246,0.7)]"
                 : "text-ink-300 hover:text-white"
             }`}
           >

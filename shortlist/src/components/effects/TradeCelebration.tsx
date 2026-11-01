@@ -117,7 +117,7 @@ export default function TradeCelebration() {
 
 function CelebrationCard({ t, onClose }: { t: Active; onClose: () => void }) {
   const tone = t.kind === "sell" ? "gold" : t.kind === "working" ? "violet" : "emerald";
-  const ring = tone === "gold" ? "from-amber-300 via-yellow-200 to-emerald-300" : tone === "violet" ? "from-violet-400 via-sky-300 to-violet-400" : "from-emerald-300 via-teal-200 to-sky-300";
+  const ring = tone === "gold" ? "from-amber-300 via-yellow-200 to-emerald-300" : tone === "violet" ? "from-blue-400 via-sky-300 to-blue-400" : "from-emerald-300 via-teal-200 to-sky-300";
   const label = t.kind === "buy" ? "Order filled" : t.kind === "sell" ? "Cash in!" : t.kind === "rebalance" ? "Rebalanced" : "Order placed";
   const headline =
     t.kind === "buy"
@@ -144,7 +144,7 @@ function CelebrationCard({ t, onClose }: { t: Active; onClose: () => void }) {
 
         <div className="relative">
           <Badge tone={tone} kind={t.kind} />
-          <p className={`mt-3 text-[11px] font-bold uppercase tracking-[0.22em] ${tone === "gold" ? "text-amber-300" : tone === "violet" ? "text-violet-300" : "text-emerald-300"}`}>
+          <p className={`mt-3 text-[11px] font-bold uppercase tracking-[0.22em] ${tone === "gold" ? "text-amber-300" : tone === "violet" ? "text-blue-300" : "text-emerald-300"}`}>
             {label}
             {t.real && <span className="ml-2 rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] tracking-wider text-amber-200">Real money</span>}
           </p>

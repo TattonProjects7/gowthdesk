@@ -26,19 +26,19 @@ const config: CapacitorConfig = {
   appId: "uk.co.tattonprojects.shortlist",
   appName: "Shortlist",
   webDir: "mobile/www",
-  backgroundColor: "#0d0f1a",
+  backgroundColor: "#050b1a",
   server: serverUrl.startsWith("https://") ? { url: serverUrl, cleartext: false, errorPath: "offline.html" } : undefined,
   ios: {
     contentInset: "never",
-    backgroundColor: "#0d0f1a",
+    backgroundColor: "#050b1a",
   },
   android: {
-    backgroundColor: "#0d0f1a",
+    backgroundColor: "#050b1a",
   },
   plugins: {
-    SplashScreen: { launchShowDuration: 600, backgroundColor: "#0d0f1a", showSpinner: false },
+    SplashScreen: { launchShowDuration: 600, backgroundColor: "#08173a", showSpinner: false },
     PushNotifications: { presentationOptions: ["badge", "sound", "alert"] },
-    LocalNotifications: { smallIcon: "ic_stat_icon", iconColor: "#e11d48" },
+    LocalNotifications: { smallIcon: "ic_stat_icon", iconColor: "#ff3b3b" },
   },
 };
 

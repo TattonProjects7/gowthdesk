@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { GeistSans } from "geist/font/sans";
+import localFont from "next/font/local";
 import AlertEngine from "@/components/AlertEngine";
 import AppLock from "@/components/AppLock";
 import CloudSync from "@/components/CloudSync";
@@ -16,6 +17,9 @@ import ScreenAlertEngine from "@/components/screener/ScreenAlertEngine";
 import NativeAdBanner from "@/components/ads/NativeAdBanner";
 import { AuthProvider } from "@/lib/auth";
 
+// Sora Bold for the "Shortlist" wordmark (Latin subset, 7 KB).
+const brandFont = localFont({ src: "./fonts/Sora-Bold.woff2", weight: "700", variable: "--font-brand", display: "swap" });
+
 export const metadata: Metadata = {
   title: "Shortlist — invest, trade and short with defined risk",
   description: "Learn to invest with £10,000 of practice money: UK and US shares, ETFs and crypto, bite-size lessons that pay practice cash, an AI coach, and the asymmetric short-finder.",
@@ -24,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07080d",
+  themeColor: "#050b1a",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -32,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en" className={`${GeistSans.variable} ${brandFont.variable}`}>
       <body className="font-sans text-ink-100 antialiased">
         <AuthProvider>
           <NativeBridge />

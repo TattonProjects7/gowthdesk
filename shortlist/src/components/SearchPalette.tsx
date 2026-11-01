@@ -267,7 +267,7 @@ function Palette({ onClose }: { onClose: () => void }) {
                 header,
                 <li key="screen" id={`search-opt-${idx}`} role="option" aria-selected={on} data-idx={idx}>
                   <button className={base} onMouseEnter={() => setActive(idx)} onClick={() => go(it)}>
-                    <SlidersHorizontal className="h-4 w-4 text-violet-300" />
+                    <SlidersHorizontal className="h-4 w-4 text-blue-300" />
                     <span className="min-w-0 flex-1 truncate text-sm text-ink-100">
                       Screen for &ldquo;<span className="text-white">{it.q}</span>&rdquo;
                     </span>

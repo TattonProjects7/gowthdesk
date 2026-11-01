@@ -85,7 +85,7 @@ export default function MarketPulse() {
         <Card className="!p-4">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">Market breadth · {breadth.n} shares</p>
-            <Link href="/maps" className="inline-flex items-center gap-1 text-xs font-semibold text-violet-300 hover:underline">
+            <Link href="/maps" className="inline-flex items-center gap-1 text-xs font-semibold text-blue-300 hover:underline">
               <LayoutGrid className="h-3.5 w-3.5" /> Heatmap
             </Link>
           </div>
@@ -160,7 +160,7 @@ export default function MarketPulse() {
               </tbody>
             </table>
           )}
-          <Link href={`/screener?s=${tab}`} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-violet-300 hover:underline">
+          <Link href={`/screener?s=${tab}`} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-blue-300 hover:underline">
             See all in the screener <ArrowRight className="h-3 w-3" />
           </Link>
         </Card>

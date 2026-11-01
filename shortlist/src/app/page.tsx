@@ -31,7 +31,7 @@ export default function Landing() {
       <header className="glass sticky top-0 z-30 border-b border-white/[0.06] px-5 sm:px-8 py-3 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-2.5">
           <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
-          <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
+          <span className="font-brand font-bold text-[1.2rem] tracking-[-0.035em] text-white">Shortlist</span>
         </Link>
         <nav className="ml-auto flex items-center gap-1.5">
           <Link href="/markets" className="hidden sm:inline rounded-full px-3 py-1.5 text-sm font-medium text-ink-300 hover:text-white hover:bg-white/[0.05]">
@@ -98,10 +98,10 @@ export default function Landing() {
       </section>
 
       {/* Learn + AI coach */}
-      <section className="border-t border-ink-800 bg-gradient-to-b from-violet-950/30 to-transparent">
+      <section className="border-t border-ink-800 bg-gradient-to-b from-blue-950/30 to-transparent">
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-16 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-violet-300 mb-2">Learn by doing</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-blue-300 mb-2">Learn by doing</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-white">An academy and an AI coach in your pocket</h2>
             <p className="mt-4 text-ink-300 leading-relaxed max-w-xl">
               Two-minute lessons, quizzes and live calculators teach you as you go. Ask the AI coach about anything on screen
@@ -117,7 +117,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="mx-auto w-full max-w-[300px]">
-            <div className="rounded-[2.6rem] border border-ink-700 bg-ink-950 p-2.5 shadow-2xl shadow-violet-950/50">
+            <div className="rounded-[2.6rem] border border-ink-700 bg-ink-950 p-2.5 shadow-2xl shadow-blue-950/50">
               <div className="overflow-hidden rounded-[2.1rem] border border-ink-800">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/screenshots/mobile-learn.webp" alt="Shortlist Academy on iPhone: level, streak, next lesson and AI coach" className="block w-full" loading="lazy" />
@@ -281,7 +281,7 @@ export default function Landing() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2.5">
               <BrandMark size={28} className="rounded-lg" />
-              <span className="font-bold text-white">Shortlist</span>
+              <span className="font-brand font-bold tracking-[-0.035em] text-white">Shortlist</span>
             </Link>
             <div className="flex flex-wrap items-center gap-5 text-sm text-ink-400">
               <Link href="/scan" className="hover:text-white">Scanner</Link>
@@ -315,9 +315,9 @@ function Shot({ src, alt, caption }: { src: string; alt: string; caption: string
 function PhoneMock() {
   return (
     <div className="relative mx-auto w-[280px] sm:w-[300px]">
-      <div className="absolute -inset-12 rounded-full bg-gradient-to-br from-rose-500/30 via-fuchsia-500/20 to-violet-600/30 blur-3xl" aria-hidden />
+      <div className="absolute -inset-12 rounded-full bg-gradient-to-br from-blue-500/35 via-blue-700/20 to-red-500/20 blur-3xl" aria-hidden />
       <div className="relative animate-float">
-        <div className="relative rounded-[3rem] border border-white/15 bg-black p-2.5 shadow-[0_40px_120px_-30px_rgba(139,92,246,0.55)]">
+        <div className="relative rounded-[3rem] border border-white/15 bg-black p-2.5 shadow-[0_40px_120px_-30px_rgba(37,99,235,0.55)]">
           <div className="overflow-hidden rounded-[2.4rem] bg-ink-950">
             {/* status bar with the camera island */}
             <div className="relative flex h-9 items-center justify-between px-7 text-[11px] font-semibold text-white">

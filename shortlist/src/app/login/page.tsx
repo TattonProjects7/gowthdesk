@@ -63,7 +63,7 @@ export default function Login() {
     <div className="min-h-screen flex flex-col items-center justify-center px-6">
       <Link href="/" className="flex items-center gap-2.5 mb-8">
         <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
-        <span className="font-bold text-xl text-white">Shortlist</span>
+        <span className="font-brand font-bold text-2xl tracking-[-0.035em] text-white">Shortlist</span>
       </Link>
 
       <div className="w-full max-w-sm rounded-2xl border border-white/[0.07] bg-ink-900/70 shadow-card p-6">

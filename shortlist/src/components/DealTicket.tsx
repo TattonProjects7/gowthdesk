@@ -114,10 +114,10 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
 
   return (
     <div className={`relative overflow-hidden rounded-3xl border bg-ink-900/80 shadow-card ${side === "buy" ? "border-emerald-400/20" : "border-rose-400/20"} ${compact ? "p-4" : "p-5"}`}>
-      <div className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${side === "buy" ? "from-emerald-400 to-teal-400" : "from-rose-500 to-pink-500"}`} />
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${side === "buy" ? "from-emerald-400 to-teal-400" : "from-red-500 to-rose-600"}`} />
       <div className="mb-3 flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-300 ring-1 ring-white/10">
-          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-rose-400 to-violet-400" /> Demo money
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-red-400 to-rose-500" /> Demo money
         </span>
         <span className="text-xs text-ink-400">{fmtGbp(account.cash)} cash</span>
       </div>
@@ -132,7 +132,7 @@ export default function DealTicket({ symbol, pricer, defaultSide = "buy", compac
               if (s === "sell") setType((t) => (t === "limit" ? "limit" : "market"));
             }}
             className={`rounded-2xl py-2.5 text-sm font-bold uppercase tracking-wide transition-all ${
-              side === s ? (s === "buy" ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald" : "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-glow-rose") : "bg-white/[0.04] text-ink-300 hover:text-white"
+              side === s ? (s === "buy" ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald" : "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-glow-rose") : "bg-white/[0.04] text-ink-300 hover:text-white"
             }`}
           >
             {s}

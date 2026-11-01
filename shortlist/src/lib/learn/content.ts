@@ -47,10 +47,10 @@ export interface Track {
 export const TRACKS: Track[] = [
   { id: "basics", title: "Investing 101", emoji: "🌱", blurb: "Shares, markets, risk and the magic of compounding.", level: "Beginner", gradient: "from-emerald-500/25 to-emerald-900/10" },
   { id: "funds", title: "Funds & ETFs", emoji: "🧺", blurb: "Own hundreds of companies in one trade — and keep fees low.", level: "Beginner", gradient: "from-sky-500/25 to-sky-900/10" },
-  { id: "uk", title: "ISAs, SIPPs & tax", emoji: "🇬🇧", blurb: "The UK wrappers that keep more of your returns.", level: "Beginner", gradient: "from-violet-500/25 to-violet-900/10" },
+  { id: "uk", title: "ISAs, SIPPs & tax", emoji: "🇬🇧", blurb: "The UK wrappers that keep more of your returns.", level: "Beginner", gradient: "from-blue-500/25 to-blue-900/10" },
   { id: "charts", title: "Reading charts", emoji: "📈", blurb: "Trends, momentum and volatility — the indicators on every chart.", level: "Intermediate", gradient: "from-amber-500/25 to-amber-900/10" },
   { id: "risk", title: "Risk & orders", emoji: "🛡️", blurb: "Order types, stop-losses, position sizing and your own biases.", level: "Intermediate", gradient: "from-rose-500/25 to-rose-900/10" },
-  { id: "shorts", title: "Shorting & squeezes", emoji: "📉", blurb: "Profit from falls — and avoid the traps that wipe shorts out.", level: "Advanced", gradient: "from-fuchsia-500/25 to-fuchsia-900/10" },
+  { id: "shorts", title: "Shorting & squeezes", emoji: "📉", blurb: "Profit from falls — and avoid the traps that wipe shorts out.", level: "Advanced", gradient: "from-teal-500/25 to-teal-900/10" },
 ];
 
 export const LESSONS: Lesson[] = [

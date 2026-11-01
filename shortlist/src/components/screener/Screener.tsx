@@ -210,22 +210,22 @@ export default function Screener() {
               Describe a screen
             </label>
             <div className="relative flex-1">
-              <Sparkles className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-violet-300" />
+              <Sparkles className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-300" />
               <input
                 id="ask"
                 value={ask}
                 onChange={(e) => setAsk(e.target.value)}
                 placeholder="Describe it: “profitable UK dividend payers near their 52-week lows”"
-                className="w-full rounded-2xl border border-white/10 bg-ink-950/60 py-3 pl-9 pr-3 text-sm text-white placeholder-ink-500 focus:border-violet-400/60 focus:outline-none"
+                className="w-full rounded-2xl border border-white/10 bg-ink-950/60 py-3 pl-9 pr-3 text-sm text-white placeholder-ink-500 focus:border-blue-400/60 focus:outline-none"
               />
             </div>
-            <button type="submit" disabled={asking || !ask.trim()} className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-400 to-sky-400 px-5 py-3 text-sm font-bold text-ink-950 disabled:opacity-50">
+            <button type="submit" disabled={asking || !ask.trim()} className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-400 to-sky-400 px-5 py-3 text-sm font-bold text-ink-950 disabled:opacity-50">
               {asking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />} Build screen
             </button>
           </form>
           {explain && (
-            <p className="mt-2 flex items-start gap-2 text-sm text-violet-100/90">
-              <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" />
+            <p className="mt-2 flex items-start gap-2 text-sm text-blue-100/90">
+              <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-300" />
               <span>
                 {explain.explanation} <span className="text-xs text-ink-400">{explain.source === "ai" ? "Built by AI." : "Matched by keywords."}</span>
               </span>
@@ -255,7 +255,7 @@ export default function Screener() {
               <label htmlFor="signal" className="text-xs font-semibold uppercase tracking-wider text-ink-400">
                 Signal
               </label>
-              <select id="signal" value={signal} onChange={(e) => push({ signal: e.target.value })} className="rounded-xl border border-white/10 bg-ink-950/60 px-3 py-2 text-sm text-white focus:border-violet-400/60 focus:outline-none">
+              <select id="signal" value={signal} onChange={(e) => push({ signal: e.target.value })} className="rounded-xl border border-white/10 bg-ink-950/60 px-3 py-2 text-sm text-white focus:border-blue-400/60 focus:outline-none">
                 <option value="">None</option>
                 {SIGNALS.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -274,7 +274,7 @@ export default function Screener() {
               <label htmlFor="tickers" className="text-xs font-semibold uppercase tracking-wider text-ink-400">
                 Tickers
               </label>
-              <input id="tickers" value={tickerText} onChange={(e) => setTickerText(e.target.value)} placeholder="e.g. AAPL, LLOY, NVDA" className="w-44 rounded-xl border border-white/10 bg-ink-950/60 px-3 py-2 text-sm text-white placeholder-ink-500 focus:border-violet-400/60 focus:outline-none sm:w-56" />
+              <input id="tickers" value={tickerText} onChange={(e) => setTickerText(e.target.value)} placeholder="e.g. AAPL, LLOY, NVDA" className="w-44 rounded-xl border border-white/10 bg-ink-950/60 px-3 py-2 text-sm text-white placeholder-ink-500 focus:border-blue-400/60 focus:outline-none sm:w-56" />
             </form>
             <div className="flex items-center gap-1.5">
               <label htmlFor="order" className="text-xs font-semibold uppercase tracking-wider text-ink-400">
@@ -300,11 +300,11 @@ export default function Screener() {
               const cur = filters.find((t) => t.startsWith(`${d.id}:`))?.split(":")[1] ?? "";
               return (
                 <label key={d.id} className="block min-w-0" title={d.help}>
-                  <span className={`mb-1 block truncate text-[11px] font-medium ${cur ? "text-violet-200" : "text-ink-400"}`}>{d.label}</span>
+                  <span className={`mb-1 block truncate text-[11px] font-medium ${cur ? "text-blue-200" : "text-ink-400"}`}>{d.label}</span>
                   <select
                     value={cur}
                     onChange={(e) => setFilter(d.id, e.target.value)}
-                    className={`w-full truncate rounded-xl border px-2.5 py-2 text-[13px] focus:outline-none ${cur ? "border-violet-400/50 bg-violet-500/10 text-white" : "border-white/10 bg-ink-950/60 text-ink-300"}`}
+                    className={`w-full truncate rounded-xl border px-2.5 py-2 text-[13px] focus:outline-none ${cur ? "border-blue-400/50 bg-blue-500/10 text-white" : "border-white/10 bg-ink-950/60 text-ink-300"}`}
                   >
                     <option value="">Any</option>
                     {d.options.map((o) => (
@@ -413,7 +413,7 @@ export default function Screener() {
 
 function Chip({ children, onRemove, tone = "violet" }: { children: React.ReactNode; onRemove: () => void; tone?: "violet" | "amber" }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full py-1 pl-2.5 pr-1 text-xs font-medium ring-1 ring-inset ${tone === "amber" ? "bg-amber-500/10 text-amber-100 ring-amber-400/25" : "bg-violet-500/10 text-violet-100 ring-violet-400/25"}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full py-1 pl-2.5 pr-1 text-xs font-medium ring-1 ring-inset ${tone === "amber" ? "bg-amber-500/10 text-amber-100 ring-amber-400/25" : "bg-blue-500/10 text-blue-100 ring-blue-400/25"}`}>
       {children}
       <button onClick={onRemove} aria-label={`Remove ${typeof children === "string" ? children : "filter"}`} className="rounded-full p-0.5 hover:bg-white/10">
         <X className="h-3 w-3" />
@@ -457,10 +457,10 @@ function ResultsTable({ rows, cols, sort, onSort, offset, selected, onToggle }: 
         </thead>
         <tbody>
           {rows.map((s, r) => (
-            <tr key={s.symbol} className={`border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] ${selected.includes(s.symbol) ? "bg-violet-500/[0.06]" : ""}`}>
+            <tr key={s.symbol} className={`border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] ${selected.includes(s.symbol) ? "bg-blue-500/[0.06]" : ""}`}>
               <td className="num px-2 py-2 text-right font-mono text-xs text-ink-500">{offset + r + 1}</td>
               <td className="px-1 py-2">
-                <input type="checkbox" checked={selected.includes(s.symbol)} onChange={() => onToggle(s.symbol)} aria-label={`Select ${s.symbol} to compare`} className="accent-violet-400" />
+                <input type="checkbox" checked={selected.includes(s.symbol)} onChange={() => onToggle(s.symbol)} aria-label={`Select ${s.symbol} to compare`} className="accent-blue-400" />
               </td>
               {cols.map((c, k) => {
                 const v = c.get(s);

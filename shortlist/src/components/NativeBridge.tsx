@@ -28,7 +28,7 @@ export default function NativeBridge() {
       try {
         const { StatusBar, Style } = await import("@capacitor/status-bar");
         await StatusBar.setStyle({ style: Style.Dark });
-        await StatusBar.setBackgroundColor({ color: "#0d0f1a" }).catch(() => {}); // Android only
+        await StatusBar.setBackgroundColor({ color: "#050b1a" }).catch(() => {}); // Android only
       } catch {
         /* status bar not available */
       }

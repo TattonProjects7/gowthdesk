@@ -13,7 +13,7 @@ export function Card({ children, className = "", tone = "default" }: { children:
       : tone === "emerald"
         ? "border-emerald-400/20 bg-gradient-to-br from-emerald-500/[0.12] to-ink-900/70"
         : tone === "violet"
-          ? "border-violet-400/20 bg-gradient-to-br from-violet-500/[0.12] to-ink-900/70"
+          ? "border-blue-400/20 bg-gradient-to-br from-blue-500/[0.12] to-ink-900/70"
           : tone === "sky"
             ? "border-sky-400/20 bg-gradient-to-br from-sky-500/[0.12] to-ink-900/70"
             : tone === "amber"
@@ -53,7 +53,7 @@ export function Pill({ children, tone = "ink" }: { children: ReactNode; tone?: "
     emerald: "bg-emerald-500/10 text-emerald-300 ring-emerald-400/20",
     amber: "bg-amber-500/10 text-amber-300 ring-amber-400/20",
     sky: "bg-sky-500/10 text-sky-300 ring-sky-400/20",
-    violet: "bg-violet-500/10 text-violet-300 ring-violet-400/20",
+    violet: "bg-blue-500/10 text-blue-300 ring-blue-400/20",
   };
   return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${t[tone]}`}>{children}</span>;
 }
@@ -90,7 +90,7 @@ export function Stat({ label, value, sub, tone = "white" }: { label: ReactNode; 
 export function Empty({ icon: Icon, title, body, cta }: { icon: React.ElementType; title: string; body: string; cta?: { href: string; label: string } }) {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-dashed border-white/10 bg-ink-900/60 p-8 text-center">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/20 blur-3xl" />
       <div className="relative mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.05] ring-1 ring-white/10">
         <Icon className="h-6 w-6 text-ink-300" />
       </div>
@@ -109,7 +109,7 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white placeholder-ink-500 transition-colors focus:border-violet-400/60 focus:outline-none focus:ring-2 focus:ring-violet-400/20 ${props.className ?? ""}`}
+      className={`w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white placeholder-ink-500 transition-colors focus:border-blue-400/60 focus:outline-none focus:ring-2 focus:ring-blue-400/20 ${props.className ?? ""}`}
     />
   );
 }
@@ -118,7 +118,7 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white transition-colors focus:border-violet-400/60 focus:outline-none focus:ring-2 focus:ring-violet-400/20 ${props.className ?? ""}`}
+      className={`w-full rounded-xl border border-white/10 bg-ink-950/60 px-3.5 py-2.5 text-sm text-white transition-colors focus:border-blue-400/60 focus:outline-none focus:ring-2 focus:ring-blue-400/20 ${props.className ?? ""}`}
     />
   );
 }
@@ -127,7 +127,7 @@ export function Button({ children, variant = "primary", className = "", ...rest 
   const v: Record<string, string> = {
     primary: "bg-brand text-white shadow-glow-rose hover:brightness-110",
     buy: "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald hover:brightness-105",
-    sell: "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-glow-rose hover:brightness-110",
+    sell: "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-glow-rose hover:brightness-110",
     ghost: "border border-white/10 bg-white/[0.03] text-ink-100 hover:bg-white/[0.07]",
     danger: "border border-rose-400/30 bg-rose-500/[0.06] text-rose-300 hover:bg-rose-500/[0.12]",
   };

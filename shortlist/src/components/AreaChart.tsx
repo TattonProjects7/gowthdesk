@@ -105,12 +105,12 @@ export default function AreaChart({
           {hover == null ? (
             <g>
               <circle cx={x(n - 1)} cy={y(points[n - 1])} r="9" fill={color} className="chart-pulse" />
-              <circle cx={x(n - 1)} cy={y(points[n - 1])} r="4" fill={color} stroke="#07080d" strokeWidth="2" />
+              <circle cx={x(n - 1)} cy={y(points[n - 1])} r="4" fill={color} stroke="#050b1a" strokeWidth="2" />
             </g>
           ) : (
             <g>
               <line x1={x(hover)} x2={x(hover)} y1={0} y2={height} stroke="#d6dae6" strokeOpacity="0.45" strokeDasharray="3 3" />
-              <circle cx={x(hover)} cy={y(points[hover])} r="5" fill={color} stroke="#07080d" strokeWidth="2.5" />
+              <circle cx={x(hover)} cy={y(points[hover])} r="5" fill={color} stroke="#050b1a" strokeWidth="2.5" />
             </g>
           )}
         </svg>

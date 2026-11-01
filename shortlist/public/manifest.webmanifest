@@ -1,5 +1,5 @@
 {
-  "background_color": "#0d0f1a",
+  "background_color": "#08173a",
   "icons": [
     {
       "src": "/icons/icon-48.webp",
@@ -48,6 +48,6 @@
   "short_name": "Shortlist",
   "start_url": "/portfolio",
   "display": "standalone",
-  "theme_color": "#0d0f1a",
+  "theme_color": "#050b1a",
   "description": "UK & US shares, ETFs and crypto: portfolio, watchlists, price alerts, savings plans and the asymmetric short-finder."
 }

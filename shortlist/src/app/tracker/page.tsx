@@ -113,9 +113,9 @@ function EdgePanel({ stats }: { stats: TrackerStats }) {
   const positive = stats.expectancyR > 0.05;
   const tone = positive ? "text-emerald-300" : stats.expectancyR < -0.05 ? "text-rose-300" : "text-ink-200";
   return (
-    <div className="mb-7 rounded-2xl border border-violet-900 bg-violet-950/20 p-5">
+    <div className="mb-7 rounded-2xl border border-blue-900 bg-blue-950/20 p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold uppercase tracking-wide text-violet-300">Your edge — in R</p>
+        <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">Your edge — in R</p>
         <span className="text-xs text-ink-500">{stats.closed} closed · {stats.open} open</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">

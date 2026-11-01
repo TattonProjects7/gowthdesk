@@ -70,7 +70,7 @@ export default function SettingsPage() {
           {mounted && brokerState.status?.connected ? (
             <div className="space-y-3">
               <p className="text-sm text-white">
-                Connected to Trading 212 <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${brokerState.status.env === "live" ? "bg-amber-400/15 text-amber-200" : "bg-violet-400/15 text-violet-200"}`}>{brokerState.status.env === "live" ? "Live" : "Practice"}</span>
+                Connected to Trading 212 <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${brokerState.status.env === "live" ? "bg-amber-400/15 text-amber-200" : "bg-blue-400/15 text-blue-200"}`}>{brokerState.status.env === "live" ? "Live" : "Practice"}</span>
               </p>
               <p className="text-xs text-ink-400">
                 Account {brokerState.status.accountId} · {brokerState.status.currency}. You&apos;re in {mode === "real" ? "real" : "demo"} mode.

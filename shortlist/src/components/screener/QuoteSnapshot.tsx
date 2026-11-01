@@ -132,7 +132,7 @@ export default function QuoteSnapshot({ symbol }: { symbol: string }) {
         <MiniCandles bars={s.bars} pattern={s.pattern} level={s.srLevel} height={200} count={110} />
         <div className="mt-1 flex flex-wrap gap-3 text-[11px] text-ink-500">
           <span>
-            <span className="mr-1 inline-block h-0.5 w-3 bg-violet-400 align-middle" />
+            <span className="mr-1 inline-block h-0.5 w-3 bg-blue-400 align-middle" />
             20-day average
           </span>
           <span>
@@ -175,7 +175,7 @@ export default function QuoteSnapshot({ symbol }: { symbol: string }) {
           <H2
             right={
               s.i.industry ? (
-                <Link href={`/screener?f=ind:${s.i.industry.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="text-xs font-semibold text-violet-300 hover:underline">
+                <Link href={`/screener?f=ind:${s.i.industry.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`} className="text-xs font-semibold text-blue-300 hover:underline">
                   Screen the industry
                 </Link>
               ) : undefined

@@ -51,7 +51,7 @@ export default function ExplainTerm({ term, children }: { term: string; children
                 setOpen(false);
                 coach.open(`Explain ${t.term} using the instrument I'm looking at as an example`);
               }}
-              className="inline-flex items-center gap-1 font-medium text-violet-300 hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-blue-300 hover:underline"
             >
               <Sparkles className="h-3 w-3" /> Ask the coach
             </button>

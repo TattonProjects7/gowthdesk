@@ -132,7 +132,7 @@ export default function InstrumentPage() {
           </div>
           <div className="max-w-md">
             <p className="text-sm text-ink-400">{i.description}</p>
-            <button onClick={() => coach.open(`Explain ${i.name} (${i.symbol}) to me like I'm new to investing`)} className="mt-2 inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2.5 py-1 text-xs font-semibold text-violet-200 hover:bg-violet-500/25">
+            <button onClick={() => coach.open(`Explain ${i.name} (${i.symbol}) to me like I'm new to investing`)} className="mt-2 inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2.5 py-1 text-xs font-semibold text-blue-200 hover:bg-blue-500/25">
               <Sparkles className="h-3.5 w-3.5" /> Ask the coach about {i.symbol}
             </button>
           </div>

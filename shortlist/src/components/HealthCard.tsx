@@ -36,7 +36,7 @@ export default function HealthCard({ state, pricer, closesFor }: { state: Portfo
           </p>
           <p className="mt-0.5 text-sm text-white">{h.summary}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <button onClick={() => coach.open("Explain my portfolio health score and what I could improve first")} className="inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2.5 py-1 text-xs font-semibold text-violet-200 hover:bg-violet-500/25">
+            <button onClick={() => coach.open("Explain my portfolio health score and what I could improve first")} className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2.5 py-1 text-xs font-semibold text-blue-200 hover:bg-blue-500/25">
               <Sparkles className="h-3.5 w-3.5" /> Explain with AI
             </button>
             <button onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-1 rounded-full border border-ink-700 px-2.5 py-1 text-xs text-ink-300 hover:bg-ink-800">

@@ -49,7 +49,7 @@ export default function ThesisPanel({ c }: { c: ShortCandidate }) {
       <button
         onClick={generate}
         disabled={loading}
-        className="w-full rounded-xl border border-violet-800 bg-violet-950/40 px-4 py-3.5 text-sm font-semibold text-violet-200 hover:bg-violet-950 transition-colors inline-flex items-center justify-center gap-2"
+        className="w-full rounded-xl border border-blue-800 bg-blue-950/40 px-4 py-3.5 text-sm font-semibold text-blue-200 hover:bg-blue-950 transition-colors inline-flex items-center justify-center gap-2"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {loading ? "Building both sides of the trade…" : "Generate AI bear case + steel-manned bull case"}
