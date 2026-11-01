@@ -104,7 +104,7 @@ export default function Markets() {
             <button onClick={() => setShown((n) => n + 30)} className="rounded-full border border-white/10 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-ink-200 hover:bg-white/[0.08]">
               Show more ({rows.length - shown})
             </button>
-            <Link href="/screener" className="rounded-full px-4 py-2 text-sm font-semibold text-violet-300 hover:underline">
+            <Link href="/screener" className="rounded-full px-4 py-2 text-sm font-semibold text-blue-300 hover:underline">
               Open the screener
             </Link>
           </div>
@@ -199,7 +199,7 @@ function SearchHint({ q, empty }: { q: string; empty: boolean }) {
           <>No share, fund or coin matches &ldquo;{q.trim()}&rdquo;. Check the spelling or try the ticker.</>
         )}
       </p>
-      <Link href={`/screener?ask=${encodeURIComponent(q.trim())}`} className="mt-1.5 inline-block text-sm font-semibold text-violet-300 hover:underline">
+      <Link href={`/screener?ask=${encodeURIComponent(q.trim())}`} className="mt-1.5 inline-block text-sm font-semibold text-blue-300 hover:underline">
         Screen for &ldquo;{q.trim()}&rdquo; instead
       </Link>
     </div>

@@ -192,14 +192,14 @@ function PortfolioHero({ summary, closesFor, now, showChart }: { summary: Return
 
   return (
     <section className="relative mb-5 overflow-hidden rounded-[28px] border border-white/[0.08] bg-ink-900/70 p-5 shadow-card sm:p-6">
-      <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-rose-500/30 via-fuchsia-500/20 to-violet-600/30 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-blue-500/35 via-blue-700/20 to-red-500/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 -left-16 h-56 w-56 rounded-full bg-emerald-500/10 blur-3xl" />
       <div className="relative flex items-center justify-between">
         <p className="flex items-center gap-1.5 text-xs font-medium text-ink-300">
           <Wallet className="h-3.5 w-3.5" /> Total value
         </p>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-300 ring-1 ring-white/10">
-          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-rose-400 to-violet-400" /> Demo money
+          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-red-400 to-rose-500" /> Demo money
         </span>
       </div>
       <p className="relative mt-2 font-mono text-[44px] leading-none font-bold tracking-tight text-white sm:text-[54px]">{scrub != null ? fmtGbp(shown) : <AnimatedNumber value={shown} format={(x) => fmtGbp(x)} />}</p>
@@ -384,10 +384,10 @@ function LearnStrip() {
   const next = suggestedLesson(s, START_TRACK[s.profile.experience ?? "beginner"]);
   const streak = now ? liveStreak(s.streak, now) : 0;
   return (
-    <Link href={next ? `/learn/${next.id}` : "/learn"} className="mt-4 flex items-center gap-3 rounded-3xl border border-violet-900/60 bg-gradient-to-r from-violet-950/50 to-ink-900 p-4 transition-colors hover:border-violet-700">
+    <Link href={next ? `/learn/${next.id}` : "/learn"} className="mt-4 flex items-center gap-3 rounded-3xl border border-blue-900/60 bg-gradient-to-r from-blue-950/50 to-ink-900 p-4 transition-colors hover:border-blue-700">
       <LevelRing level={lvl.level} pct={lvl.pct} size={52} />
       <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-violet-300">
+        <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-blue-300">
           {lvl.title}
           {streak > 0 && (
             <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-500/15 px-1.5 text-orange-300">
@@ -398,7 +398,7 @@ function LearnStrip() {
         <span className="block truncate font-semibold text-white">{next ? `Next lesson: ${next.title}` : "All lessons complete 🎉"}</span>
         <span className="block text-xs text-ink-400">{next ? `${next.minutes} min · +${next.xp} XP · +£${next.reward} practice cash` : "Keep your streak with the daily question"}</span>
       </span>
-      <ChevronRight className="h-5 w-5 text-violet-300" />
+      <ChevronRight className="h-5 w-5 text-blue-300" />
     </Link>
   );
 }
@@ -898,7 +898,7 @@ function Automate({ state, pricer }: { state: PortfolioState; pricer: Pricer }) 
 
         <Card>
           <p className="text-sm font-semibold text-white inline-flex items-center gap-1.5">
-            <Repeat className="h-4 w-4 text-violet-400" /> AutoInvest
+            <Repeat className="h-4 w-4 text-blue-400" /> AutoInvest
           </p>
           <p className="text-xs text-ink-400 mt-1 mb-3">Automatically puts spare cash — deposits, dividends, savings-plan contributions — to work at your target weights, keeping a buffer back.</p>
           <div className="flex flex-wrap items-center gap-3">
@@ -1000,7 +1000,7 @@ function SavingsPlans({ state, account }: { state: PortfolioState; account: Port
         <div className="mt-3 space-y-2">
           {plans.map((p) => (
             <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.07] bg-ink-900/70 shadow-card px-3.5 py-3">
-              <Repeat className={`h-4 w-4 ${p.active ? "text-violet-400" : "text-ink-600"}`} />
+              <Repeat className={`h-4 w-4 ${p.active ? "text-blue-400" : "text-ink-600"}`} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-white">
                   {fmtGbp(p.amount)} {freqLabel[p.frequency].toLowerCase()} → {p.target.kind === "symbol" ? p.target.symbol : "target weights"}

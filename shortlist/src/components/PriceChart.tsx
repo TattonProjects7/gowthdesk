@@ -174,7 +174,7 @@ export default function PriceChart({ closes, currency, now, height = 220 }: Prop
           {h != null && (
             <g>
               <line x1={x(h)} x2={x(h)} y1={padY} y2={height - padY} stroke="#a0a9cc" strokeDasharray="2 3" />
-              <circle cx={x(h)} cy={y(closes[h])} r="3.5" fill={color} stroke="#0d0f1a" strokeWidth="1.5" />
+              <circle cx={x(h)} cy={y(closes[h])} r="3.5" fill={color} stroke="#050b1a" strokeWidth="1.5" />
             </g>
           )}
         </svg>
@@ -232,7 +232,7 @@ export default function PriceChart({ closes, currency, now, height = 220 }: Prop
               <span><i className="inline-block h-0.5 w-3 bg-amber-400 align-middle mr-1" />MA30</span>
             </>
           )}
-          {show.bb && <span><i className="inline-block h-2 w-3 bg-violet-500/40 align-middle mr-1" />Bollinger 20, 2σ</span>}
+          {show.bb && <span><i className="inline-block h-2 w-3 bg-blue-500/40 align-middle mr-1" />Bollinger 20, 2σ</span>}
         </div>
       )}
     </div>

@@ -101,7 +101,7 @@ export default function CoachSheet({ onClose, pending, onConsumed }: { onClose: 
         className="sheet-up relative flex h-[86vh] flex-col rounded-t-3xl border-t border-ink-700 bg-ink-950 lg:h-full lg:w-[420px] lg:rounded-none lg:border-l lg:border-t-0"
       >
         <header className="flex items-center gap-3 border-b border-ink-800 px-4 py-3 lg:pt-[max(0.75rem,env(safe-area-inset-top))]">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose-500 to-violet-600 text-white">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white">
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">

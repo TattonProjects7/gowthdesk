@@ -113,7 +113,7 @@ export default function Calendar() {
                                 {it.s.symbol} <span className="font-normal text-ink-400">{it.s.i.name}</span>
                               </p>
                               <p className="flex items-center gap-1 text-xs text-ink-400">
-                                {it.s.earnings?.timing === "Before open" ? <Sun className="h-3 w-3 text-amber-300" /> : <Moon className="h-3 w-3 text-violet-300" />}
+                                {it.s.earnings?.timing === "Before open" ? <Sun className="h-3 w-3 text-amber-300" /> : <Moon className="h-3 w-3 text-blue-300" />}
                                 {it.s.earnings?.timing} · {fmtBig(it.s.marketCapUsd, "$")} · moves ±{it.s.atrPct.toFixed(1)}% on a normal day
                               </p>
                             </div>

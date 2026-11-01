@@ -38,11 +38,11 @@ export default function LearnHub() {
       <Nav />
       <main className="mx-auto max-w-5xl px-4 sm:px-8 py-5 sm:py-8">
         {/* Hero: level, XP, streak, Learn & Earn */}
-        <section className="overflow-hidden rounded-3xl border border-ink-800 bg-gradient-to-br from-violet-950/50 via-ink-900 to-ink-950 p-5 sm:p-6">
+        <section className="overflow-hidden rounded-3xl border border-ink-800 bg-gradient-to-br from-blue-950/50 via-ink-900 to-ink-950 p-5 sm:p-6">
           <div className="flex items-center gap-4">
             <LevelRing level={lvl.level} pct={lvl.pct} size={72} />
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-1.5 text-xs font-medium text-violet-300">
+              <p className="flex items-center gap-1.5 text-xs font-medium text-blue-300">
                 <GraduationCap className="h-4 w-4" /> Shortlist Academy
               </p>
               <h1 className="text-2xl font-semibold tracking-tight text-white">{lvl.title}</h1>
@@ -80,7 +80,7 @@ export default function LearnHub() {
             </Card>
           )}
           <button onClick={() => coach.open()} className="flex items-center gap-3 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card p-4 text-left hover:border-ink-600">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-violet-600 text-white">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white">
               <Sparkles className="h-6 w-6" />
             </span>
             <span>
@@ -115,7 +115,7 @@ export default function LearnHub() {
                       Take the lesson →
                     </Link>
                   )}
-                  <button onClick={() => coach.open(`Explain ${t.term} with an example`)} className="text-violet-300 hover:underline">
+                  <button onClick={() => coach.open(`Explain ${t.term} with an example`)} className="text-blue-300 hover:underline">
                     Ask the coach
                   </button>
                 </div>

@@ -32,7 +32,7 @@ export default function RealDealTicket({ symbol, pricer, defaultSide = "buy", pr
   const q = parseFloat(qty) || 0;
   const px = pricer.price(i.symbol);
   const est = useMemo(() => previewOrder({ symbol: i.symbol, side, qty: q }, pricer), [i.symbol, side, q, pricer]);
-  const accent = live ? "from-amber-400 to-orange-500" : "from-violet-400 to-sky-400";
+  const accent = live ? "from-amber-400 to-orange-500" : "from-blue-400 to-sky-400";
 
   if (!realTradable(i.symbol)) {
     return (
@@ -69,7 +69,7 @@ export default function RealDealTicket({ symbol, pricer, defaultSide = "buy", pr
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl border bg-ink-900/80 p-4 shadow-card sm:p-5 ${live ? "border-amber-400/30" : "border-violet-400/30"}`}>
+    <div className={`relative overflow-hidden rounded-3xl border bg-ink-900/80 p-4 shadow-card sm:p-5 ${live ? "border-amber-400/30" : "border-blue-400/30"}`}>
       <div className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${accent}`} />
       <div className="mb-3 flex items-center justify-between">
         <span className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r ${accent} px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink-950`}>
@@ -88,7 +88,7 @@ export default function RealDealTicket({ symbol, pricer, defaultSide = "buy", pr
                   setSide(s);
                   setMsg(null);
                 }}
-                className={`rounded-2xl py-2.5 text-sm font-bold uppercase tracking-wide transition-all ${side === s ? (s === "buy" ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald" : "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-glow-rose") : "bg-white/[0.04] text-ink-300 hover:text-white"}`}
+                className={`rounded-2xl py-2.5 text-sm font-bold uppercase tracking-wide transition-all ${side === s ? (s === "buy" ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-ink-950 shadow-glow-emerald" : "bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-glow-rose") : "bg-white/[0.04] text-ink-300 hover:text-white"}`}
               >
                 {s}
               </button>

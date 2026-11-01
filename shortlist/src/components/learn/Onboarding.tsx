@@ -22,7 +22,7 @@ export default function Onboarding({ onDone }: { onDone?: () => void }) {
     <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center">
       <div className="absolute inset-0 bg-black/75 fade-in" />
       <div className="sheet-up relative w-full max-w-md rounded-t-3xl border border-ink-700 bg-gradient-to-b from-ink-900 to-ink-950 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:rounded-3xl">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-violet-600 text-3xl shadow-lg">👋</div>
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-3xl shadow-lg">👋</div>
         <h2 className="mt-4 text-center text-2xl font-semibold tracking-tight text-white">Welcome to Shortlist</h2>
         <p className="mt-1 text-center text-sm text-ink-400">The investing app that teaches you as you go.</p>
 
@@ -34,7 +34,7 @@ export default function Onboarding({ onDone }: { onDone?: () => void }) {
             </span>
           </li>
           <li className="flex gap-3">
-            <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-violet-300" />
+            <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-blue-300" />
             <span className="text-ink-200">
               <b className="text-white">2-minute lessons</b> that pay practice cash, plus streaks, missions and badges.
             </span>

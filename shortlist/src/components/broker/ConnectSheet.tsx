@@ -56,7 +56,7 @@ export default function ConnectSheet() {
         aria-label="Connect Trading 212"
         className="sheet-up relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] border border-white/10 bg-ink-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-2xl sm:rounded-[28px] sm:pb-5"
       >
-        <div className="pointer-events-none absolute -top-24 right-0 h-56 w-56 rounded-full bg-gradient-to-br from-sky-500/30 to-violet-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 right-0 h-56 w-56 rounded-full bg-gradient-to-br from-sky-500/30 to-blue-500/20 blur-3xl" />
         <div className="relative flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 text-white shadow-lg shadow-sky-900/40">
@@ -83,7 +83,7 @@ export default function ConnectSheet() {
           <div className="grid grid-cols-2 gap-2">
             {(
               [
-                { id: "demo", title: "Practice", body: "Trading 212's free practice money. Test everything safely.", tone: "from-violet-400 to-sky-400" },
+                { id: "demo", title: "Practice", body: "Trading 212's free practice money. Test everything safely.", tone: "from-blue-400 to-sky-400" },
                 { id: "live", title: "Live", body: "Real money in your Invest or Stocks ISA account.", tone: "from-amber-400 to-orange-500" },
               ] as const
             ).map((o) => (
@@ -153,7 +153,7 @@ export default function ConnectSheet() {
         <button
           type="submit"
           disabled={notConfigured || busy || key.trim().length < 8 || (env === "live" && !accept)}
-          className={`relative mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r py-3.5 text-sm font-bold text-ink-950 transition-transform active:scale-[0.98] disabled:opacity-40 ${env === "live" ? "from-amber-400 to-orange-500" : "from-violet-400 to-sky-400"}`}
+          className={`relative mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r py-3.5 text-sm font-bold text-ink-950 transition-transform active:scale-[0.98] disabled:opacity-40 ${env === "live" ? "from-amber-400 to-orange-500" : "from-blue-400 to-sky-400"}`}
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
           {env === "live" ? "Connect live account" : "Connect practice account"}

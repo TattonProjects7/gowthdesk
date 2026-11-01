@@ -74,6 +74,25 @@ jobs:
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO build
 
+      # Says which App Store Connect secrets this run can see (never their values),
+      # and stops a requested upload with a clear message if one is missing.
+      - name: Check the App Store Connect secrets
+        env:
+          HAS_KEY_ID: ${{ secrets.ASC_KEY_ID != '' }}
+          HAS_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID != '' }}
+          HAS_KEY_P8: ${{ secrets.ASC_KEY_P8 != '' }}
+          WANT_UPLOAD: ${{ (github.event_name == 'workflow_dispatch' && inputs.upload) || vars.TESTFLIGHT_AUTO_UPLOAD == 'true' }}
+        run: |
+          for pair in "ASC_KEY_ID:$HAS_KEY_ID" "ASC_ISSUER_ID:$HAS_ISSUER_ID" "ASC_KEY_P8:$HAS_KEY_P8"; do
+            name="${pair%%:*}"; ok="${pair##*:}"
+            if [ "$ok" = "true" ]; then echo "$name: set"; else echo "$name: MISSING"; fi
+          done
+          echo "Upload requested: $WANT_UPLOAD"
+          if [ "$WANT_UPLOAD" = "true" ] && [ "$HAS_ASC" != "true" ]; then
+            echo "::error::TestFlight upload was requested but an App Store Connect secret is missing. Add it under Settings > Secrets and variables > Actions > Repository secrets (exact names above)."
+            exit 1
+          fi
+
       - name: Archive and upload to TestFlight
         # Manual "Run workflow" (once this file is on main), or any run while the
         # repository variable TESTFLIGHT_AUTO_UPLOAD is "true".

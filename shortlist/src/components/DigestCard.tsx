@@ -60,9 +60,9 @@ export default function DigestCard({ input }: { input: DigestInput | null }) {
   if (!input || !digest) return <div className="mt-4 h-40 rounded-3xl border border-white/[0.07] bg-ink-900/70 shadow-card animate-pulse" />;
 
   return (
-    <section className="mt-4 rounded-3xl border border-violet-900/60 bg-gradient-to-br from-violet-950/40 to-ink-900 p-4 sm:p-5">
+    <section className="mt-4 rounded-3xl border border-blue-900/60 bg-gradient-to-br from-blue-950/40 to-ink-900 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2">
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-violet-300">
+        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-300">
           <Sparkles className="h-4 w-4" /> Why it&apos;s moving
         </p>
         <span className="flex items-center gap-2 text-[10px] text-ink-500">
@@ -77,14 +77,14 @@ export default function DigestCard({ input }: { input: DigestInput | null }) {
       <ul className="mt-2 space-y-1.5 text-sm text-ink-300">
         {digest.bullets.map((b, i) => (
           <li key={i} className="flex gap-2">
-            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-violet-400" />
+            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-blue-400" />
             <span>{b}</span>
           </li>
         ))}
       </ul>
       <p className="mt-2 text-sm text-ink-400">{digest.takeaway}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button onClick={() => coach.open(`Tell me more about why ${input.symbol} is moving and what it means for a long-term investor`)} className="inline-flex items-center gap-1 rounded-full bg-violet-500/15 px-2.5 py-1 text-xs font-semibold text-violet-200 hover:bg-violet-500/25">
+        <button onClick={() => coach.open(`Tell me more about why ${input.symbol} is moving and what it means for a long-term investor`)} className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2.5 py-1 text-xs font-semibold text-blue-200 hover:bg-blue-500/25">
           <Sparkles className="h-3.5 w-3.5" /> Ask a follow-up
         </button>
         <span className="text-[10px] text-ink-600">Educational summary, not advice.</span>

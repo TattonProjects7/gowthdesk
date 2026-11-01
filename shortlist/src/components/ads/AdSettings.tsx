@@ -68,13 +68,13 @@ export default function AdSettings() {
               <p className="text-sm font-semibold text-white">Free, with adverts</p>
               <p className="text-xs text-ink-400">Adverts appear on research and learning screens, never on trading, account or real-money screens. Remove them everywhere for {AD_FREE_PRICE} a month.</p>
             </div>
-            <Link href="/pricing#ad-free" className="rounded-xl bg-gradient-to-r from-violet-400 to-sky-400 px-4 py-2 text-sm font-bold text-ink-950">
+            <Link href="/pricing#ad-free" className="rounded-xl bg-gradient-to-r from-blue-400 to-sky-400 px-4 py-2 text-sm font-bold text-ink-950">
               {adFreeBilling ? `Go ad-free · ${AD_FREE_PRICE}` : "See plans"}
             </Link>
           </div>
         )}
         {native && (AD_CONFIG.admobBannerIos || AD_CONFIG.admobBannerAndroid) && (
-          <button onClick={privacy} className="mt-3 text-xs font-semibold text-violet-300 hover:underline">
+          <button onClick={privacy} className="mt-3 text-xs font-semibold text-blue-300 hover:underline">
             Ad privacy choices
           </button>
         )}

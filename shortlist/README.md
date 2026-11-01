@@ -121,7 +121,7 @@ competitor study and how each feature maps to this app.
   sell, and a sparkle for working orders. There's an order-filled card with an
   animated tick, sounds and haptics, and a switch in Settings to turn it all
   off. Reduced-motion settings are respected.
-- **Modern look**: Geist type, glass surfaces, brand gradients, a glowing chart
+- **Modern look**: navy and red brand (logo in `brand/`), Sora wordmark, Geist type, glass surfaces, a glowing chart
   that draws itself in, rolling numbers and smooth page transitions.
 
 **Learn and AI coach**

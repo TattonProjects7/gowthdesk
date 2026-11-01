@@ -113,8 +113,8 @@ export default function Pricing() {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <Plan name="Free" price="£0" tagline="Everything you need to learn, invest and research, with adverts." features={FREE} cta={<Link href="/markets" className="block rounded-lg border border-ink-700 px-4 py-2.5 text-center text-sm font-semibold text-ink-200 hover:bg-ink-800">Explore markets</Link>} />
 
-          <div id="ad-free" className="relative scroll-mt-24 rounded-2xl border border-violet-500/40 bg-gradient-to-br from-violet-950/40 to-ink-900 p-6">
-            <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-violet-400 to-sky-400 px-3 py-0.5 text-xs font-bold text-ink-950">
+          <div id="ad-free" className="relative scroll-mt-24 rounded-2xl border border-blue-500/40 bg-gradient-to-br from-blue-950/40 to-ink-900 p-6">
+            <span className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-400 to-sky-400 px-3 py-0.5 text-xs font-bold text-ink-950">
               <ShieldOff className="h-3 w-3" /> AD-FREE
             </span>
             <h2 className="text-lg font-bold text-white">Ad-free</h2>
@@ -126,7 +126,7 @@ export default function Pricing() {
             <ul className="mt-4 space-y-2">
               {AD_FREE.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm text-ink-200">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" /> {f}
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-300" /> {f}
                 </li>
               ))}
             </ul>
@@ -137,7 +137,7 @@ export default function Pricing() {
                 <button
                   onClick={goAdFree}
                   disabled={busy || !adFreeBilling}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-400 to-sky-400 px-4 py-2.5 text-sm font-bold text-ink-950 hover:brightness-105 disabled:opacity-60"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-400 to-sky-400 px-4 py-2.5 text-sm font-bold text-ink-950 hover:brightness-105 disabled:opacity-60"
                 >
                   {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                   {!adFreeBilling ? "Coming soon" : native ? `Go ad-free · ${AD_FREE_PRICE}/mo` : !user ? "Sign in to go ad-free" : `Go ad-free · ${AD_FREE_PRICE}/mo`}
