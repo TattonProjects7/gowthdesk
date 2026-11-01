@@ -6,7 +6,8 @@ name: Shortlist iOS
 #   - With the App Store Connect secrets set: archives, signs (automatic signing
 #     via the API key) and uploads to TestFlight when run manually with "upload"
 #     ticked, or on any run while the variable TESTFLIGHT_AUTO_UPLOAD is "true".
-# Set the repository variable APP_URL to your live https site first (GO-LIVE.md).
+# Opens https://gowthdesk-jpim.vercel.app unless the repository variable APP_URL
+# says otherwise (GO-LIVE.md).
 
 on:
   push:
@@ -35,7 +36,9 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 45
     env:
-      NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL }}
+      # The live site the app opens. Set the repository variable APP_URL to
+      # change it (for example to a custom domain).
+      NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL || 'https://gowthdesk-jpim.vercel.app' }}
       HAS_ASC: ${{ secrets.ASC_KEY_ID != '' && secrets.ASC_ISSUER_ID != '' && secrets.ASC_KEY_P8 != '' && secrets.APPLE_TEAM_ID != '' }}
     steps:
       - uses: actions/checkout@v4

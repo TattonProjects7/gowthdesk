@@ -141,8 +141,10 @@ Without this, everything still works and each user's data stays on their device.
 
 1. Create a Google Play developer account (one-off fee) and a new app with the
    package name `com.shortlist.app`.
-2. GitHub → repo **Settings → Secrets and variables → Actions → Variables** →
-   add `APP_URL` = your live address from step 1.
+2. The apps open `https://gowthdesk-jpim.vercel.app` (the Shortlist Vercel
+   project's address) out of the box. To point them somewhere else, such as
+   a custom domain, set the GitHub repository variable `APP_URL` (repo
+   **Settings → Secrets and variables → Actions → Variables**).
 3. Create an upload key on your computer and keep it safe. Losing it locks you
    out of updates:
 
