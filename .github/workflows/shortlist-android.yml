@@ -6,7 +6,8 @@ name: Shortlist Android
 #   - With PLAY_SERVICE_ACCOUNT_JSON set, uploads the bundle to Google Play as a
 #     draft release when run manually with "upload" ticked, or on any run while
 #     the repository variable PLAY_AUTO_UPLOAD is "true".
-# Set the repository variable APP_URL to your live https site first (GO-LIVE.md).
+# Opens https://gowthdesk-jpim.vercel.app unless the repository variable APP_URL
+# says otherwise (GO-LIVE.md).
 
 on:
   push:
@@ -40,7 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL }}
+      # The live site the app opens. Set the repository variable APP_URL to
+      # change it (for example to a custom domain).
+      NEXT_PUBLIC_APP_URL: ${{ vars.APP_URL || 'https://gowthdesk-jpim.vercel.app' }}
       VERSION_CODE: ${{ github.run_number }}
       VERSION_NAME: "1.0.${{ github.run_number }}"
       # AdMob app ID (repository variable). Unset: Google's sample ID, no live ads.
