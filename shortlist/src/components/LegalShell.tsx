@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TrendingDown } from "lucide-react";
+import BrandMark from "@/components/BrandMark";
 
 // Lightweight server-rendered wrapper for legal pages (no client hooks).
 export default function LegalShell({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
@@ -7,9 +7,7 @@ export default function LegalShell({ title, updated, children }: { title: string
     <div className="min-h-screen text-ink-100">
       <header className="border-b border-ink-800 px-5 sm:px-8 py-3.5 flex items-center">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose">
-            <TrendingDown className="h-5 w-5" />
-          </div>
+          <BrandMark size={32} className="rounded-[9px]" />
           <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
         </Link>
       </header>

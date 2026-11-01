@@ -1,6 +1,6 @@
+import BrandMark from "@/components/BrandMark";
 import Link from "next/link";
 import {
-  TrendingDown,
   ArrowRight,
   ShieldAlert,
   ShieldCheck,
@@ -30,9 +30,7 @@ export default function Landing() {
       {/* Header */}
       <header className="glass sticky top-0 z-30 border-b border-white/[0.06] px-5 sm:px-8 py-3 flex items-center gap-3">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-white shadow-glow-rose">
-            <TrendingDown className="h-5 w-5" />
-          </div>
+          <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
           <span className="font-bold text-lg tracking-tight text-white">Shortlist</span>
         </Link>
         <nav className="ml-auto flex items-center gap-1.5">
@@ -282,9 +280,7 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose">
-                <TrendingDown className="h-4 w-4" />
-              </div>
+              <BrandMark size={28} className="rounded-lg" />
               <span className="font-bold text-white">Shortlist</span>
             </Link>
             <div className="flex flex-wrap items-center gap-5 text-sm text-ink-400">

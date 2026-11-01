@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  TrendingDown,
   Radar,
   Bell,
   Target,
@@ -37,6 +36,7 @@ import { liveStreak } from "@/lib/learn/progress";
 import ModeSwitch from "@/components/broker/ModeSwitch";
 import RealBanner from "@/components/broker/RealBanner";
 import SearchPalette from "@/components/SearchPalette";
+import BrandMark from "@/components/BrandMark";
 
 // Primary navigation: Markets · Portfolio · Watchlist · Shorts, plus the alert
 // bell, account menu and settings. On phones the same destinations become a
@@ -97,9 +97,7 @@ export default function Nav() {
       <div className="sticky top-0 z-30">
       <header className="glass border-b border-white/[0.06] px-4 sm:px-8 py-2.5 flex items-center gap-2 sm:gap-3 pt-[max(0.625rem,env(safe-area-inset-top))]">
         <Link href="/portfolio" className="flex items-center gap-2.5" aria-label="Shortlist home">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-white shadow-glow-rose">
-            <TrendingDown className="h-5 w-5" />
-          </div>
+          <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
           <span className="hidden sm:inline font-bold text-lg tracking-tight text-white">Shortlist</span>
         </Link>
         <ModeSwitch className="ml-1 sm:ml-3" />

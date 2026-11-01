@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { TrendingDown, Loader2, Mail } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
+import BrandMark from "@/components/BrandMark";
 import { useAuth } from "@/lib/auth";
 
 export default function Login() {
@@ -61,9 +62,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6">
       <Link href="/" className="flex items-center gap-2.5 mb-8">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-white shadow-glow-rose">
-          <TrendingDown className="h-5 w-5" />
-        </div>
+        <BrandMark size={36} className="shadow-glow-violet rounded-[10px]" />
         <span className="font-bold text-xl text-white">Shortlist</span>
       </Link>
 
