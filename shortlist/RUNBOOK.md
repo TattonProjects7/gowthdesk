@@ -187,7 +187,7 @@ npm run cap:android   # opens Android Studio → pick an emulator → ▶
 ## Phase 7 — Push notifications 🔑💻
 
 - **iOS**: in Xcode select the project → **Signing & Capabilities → + Capability** → add **Push Notifications** and **Background Modes** (tick *Remote notifications*). In the Apple Developer portal create an **APNs Auth Key**.
-- **Android**: create a Firebase project (console.firebase.google.com), add an Android app with package `com.shortlist.app`, download **`google-services.json`** and drop it into `android/app/`.
+- **Android**: create a Firebase project (console.firebase.google.com), add an Android app with package `uk.co.tattonprojects.shortlist`, download **`google-services.json`** and drop it into `android/app/`.
 
 The app already asks permission and registers; pushes appear in the in-app alert feed. Send them from your backend / FCM using the device token.
 

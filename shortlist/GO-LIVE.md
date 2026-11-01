@@ -140,7 +140,7 @@ Without this, everything still works and each user's data stays on their device.
 ## 5. Android (Google Play)
 
 1. Create a Google Play developer account (one-off fee) and a new app with the
-   package name `com.shortlist.app`.
+   package name `uk.co.tattonprojects.shortlist`.
 2. The apps open `https://gowthdesk-jpim.vercel.app` (the Shortlist Vercel
    project's address) out of the box. To point them somewhere else, such as
    a custom domain, set the GitHub repository variable `APP_URL` (repo
@@ -195,13 +195,14 @@ any Android phone to test straight away.
    Apps that offer real-money trading must be submitted by a legal entity
    (App Review Guideline 5.1.1(ix)).
 2. In the developer portal, **Certificates, Identifiers & Profiles →
-   Identifiers → +** → App ID `com.shortlist.app`, with Push Notifications
+   Identifiers → +** → App ID `uk.co.tattonprojects.shortlist`, with Push Notifications
    ticked. Then, in App Store Connect, create the app with that bundle ID.
 3. **Users and Access → Integrations → App Store Connect API** → generate a key
    with the **Admin** role, so the build can create its own signing
-   certificate. Add repository secrets: `ASC_KEY_ID`,
-   `ASC_ISSUER_ID`, `ASC_KEY_P8` (the full contents of the .p8 file) and
-   `APPLE_TEAM_ID` (from your Membership page).
+   certificate. Add three repository secrets: `ASC_KEY_ID`,
+   `ASC_ISSUER_ID` and `ASC_KEY_P8` (the full contents of the .p8 file). The
+   Tatton Projects team ID (`UJ6WA4G6H9`) is already in the workflow; an
+   `APPLE_TEAM_ID` secret overrides it.
 4. Add the repository variable `TESTFLIGHT_AUTO_UPLOAD` = `true`. Then
    GitHub → **Actions → Shortlist iOS** → open the latest run → **Re-run all jobs**. The
    build appears in TestFlight after processing.

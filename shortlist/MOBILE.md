@@ -57,7 +57,7 @@ iOS uses Swift Package Manager, so CocoaPods is not needed.
 
 ## 3. Identity, icons and splash
 
-- **Bundle id / package**: `com.shortlist.app`, set in `capacitor.config.ts`.
+- **Bundle id / package**: `uk.co.tattonprojects.shortlist`, set in `capacitor.config.ts`.
   Change it before the first store upload, then re-run `cap sync`.
 - **Icons and splash screens** are already generated for both platforms from
   `resources/icon.png` (1024 × 1024) and `resources/splash.png` (2732 × 2732).
@@ -75,7 +75,7 @@ closed, needs:
   **Background Modes → Remote notifications**. Create an APNs key in the Apple
   Developer portal.
 - **Android**: create a Firebase project, add the Android app
-  (`com.shortlist.app`), and put `google-services.json` in `android/app/`.
+  (`uk.co.tattonprojects.shortlist`), and put `google-services.json` in `android/app/`.
 
 ## 5. In-app purchases (required for paid Pro)
 

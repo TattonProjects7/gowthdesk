@@ -4,7 +4,7 @@ android {
     namespace = "com.shortlist.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.shortlist.app"
+        applicationId "uk.co.tattonprojects.shortlist"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // CI sets these per build (see .github/workflows/android.yml).
