@@ -1,0 +1,77 @@
+require "securerandom"
+
+default_platform(:ios)
+
+# Builds Shortlist for the App Store and uploads it to TestFlight.
+#
+# Apple's automatic "cloud" signing won't issue a distribution certificate for
+# this account through CI, so we use fastlane match: it creates the
+# distribution certificate and App Store profile once, stores them encrypted in
+# a git branch (MATCH_PASSWORD), and reuses them on every run. No Mac needed.
+#
+# Expects in the environment: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8,
+# APPLE_TEAM_ID, MATCH_PASSWORD, MATCH_GIT_URL, BUILD_NUMBER.
+platform :ios do
+  APP_ID = "uk.co.tattonprojects.shortlist"
+
+  lane :beta do
+    key = app_store_connect_api_key(
+      key_id: ENV["ASC_KEY_ID"],
+      issuer_id: ENV["ASC_ISSUER_ID"],
+      key_content: ENV["ASC_KEY_P8"],
+      is_key_content_base64: false,
+      in_house: false
+    )
+
+    kc_pass = SecureRandom.base64(16)
+    create_keychain(
+      name: "ci.keychain",
+      password: kc_pass,
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: APP_ID,
+      api_key: key,
+      storage_mode: "git",
+      git_url: ENV["MATCH_GIT_URL"],
+      git_branch: "match-certs",
+      readonly: false,
+      keychain_name: "ci.keychain",
+      keychain_password: kc_pass
+    )
+
+    profile = ENV["sigh_#{APP_ID}_appstore_profile-name"] || "match AppStore #{APP_ID}"
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "App.xcodeproj",
+      team_id: ENV["APPLE_TEAM_ID"],
+      code_sign_identity: "Apple Distribution",
+      profile_name: profile,
+      targets: ["App"]
+    )
+
+    build_app(
+      project: "App.xcodeproj",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: ENV["RUNNER_TEMP"],
+      output_name: "Shortlist.ipa",
+      export_options: {
+        provisioningProfiles: { APP_ID => profile }
+      },
+      xcargs: "CURRENT_PROJECT_VERSION=#{ENV['BUILD_NUMBER']}"
+    )
+
+    upload_to_testflight(
+      api_key: key,
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
+    )
+  end
+end

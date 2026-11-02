@@ -35,6 +35,8 @@ jobs:
   build:
     runs-on: macos-15
     timeout-minutes: 45
+    permissions:
+      contents: write # fastlane match stores the encrypted signing certs on a branch
     env:
       # The live site the app opens. Set the repository variable APP_URL to
       # change it (for example to a custom domain).
@@ -166,42 +168,29 @@ jobs:
           print("--- end ---")
           PY
 
-      - name: Archive and upload to TestFlight
+      # Build, sign and upload to TestFlight with fastlane match. Apple's
+      # automatic cloud signing won't issue a distribution certificate for this
+      # account in CI, so match creates the certificate and App Store profile
+      # itself, stores them encrypted on the "match-certs" branch (MATCH_PASSWORD),
+      # and reuses them every run. Needs the MATCH_PASSWORD secret.
+      - name: Build and upload to TestFlight
         # Manual "Run workflow" (once this file is on main), or any run while the
         # repository variable TESTFLIGHT_AUTO_UPLOAD is "true".
         if: env.HAS_ASC == 'true' && ((github.event_name == 'workflow_dispatch' && inputs.upload) || vars.TESTFLIGHT_AUTO_UPLOAD == 'true')
+        working-directory: shortlist/ios/App
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
           APPLE_TEAM_ID: ${{ env.TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+          MATCH_GIT_BASIC_AUTHORIZATION: ""
+          BUILD_NUMBER: ${{ github.run_number }}
+          FASTLANE_HIDE_CHANGELOG: "true"
         run: |
-          # Rebuild the .p8 tolerantly: if the line breaks were lost when the
-          # secret was pasted, re-wrap the key body so xcodebuild can read it.
-          KEY="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
-          python3 -c 'import os,re,sys,textwrap; raw=os.environ["ASC_KEY_P8"].strip(); m=re.search(r"-----BEGIN PRIVATE KEY-----(.*?)-----END PRIVATE KEY-----", raw, re.S); body=re.sub(r"\s+","", m.group(1) if m else raw); open(sys.argv[1],"w").write("-----BEGIN PRIVATE KEY-----\n"+"\n".join(textwrap.wrap(body,64))+"\n-----END PRIVATE KEY-----\n")' "$KEY"
-          AUTH="-allowProvisioningUpdates -authenticationKeyPath $KEY -authenticationKeyID $ASC_KEY_ID -authenticationKeyIssuerID $ASC_ISSUER_ID"
-          # Archive WITHOUT signing. Signing during archive makes Xcode create a
-          # development profile, which needs a registered device the team may not
-          # have. The App Store signing happens at export (below), where only a
-          # distribution cert and an App Store profile are needed — both created
-          # automatically from the API key, with no device required.
-          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
-            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/App.xcarchive" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Manual \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE_SPECIFIER="" \
-            CURRENT_PROJECT_VERSION=${{ github.run_number }} archive
-          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>upload</string>
-            <key>teamID</key><string>$APPLE_TEAM_ID</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadSymbols</key><true/>
-          </dict></plist>
-          PLIST
-          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/App.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" $AUTH
-          rm -f "$KEY"
+          if [ -z "$MATCH_PASSWORD" ]; then
+            echo "::error::The MATCH_PASSWORD secret is not set. Add any password as a repository secret named MATCH_PASSWORD (it encrypts the stored signing certificate); use the same value every time."
+            exit 1
+          fi
+          fastlane beta
