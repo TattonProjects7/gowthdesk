@@ -158,3 +158,84 @@ ${catalogue}`;
     return null;
   }
 }
+
+/** One Today's Shortlist pick, as sent to the analyst write-up. Evidence only. */
+export interface BriefInput {
+  symbol: string;
+  name: string;
+  why: string;
+  evidence: string[];
+  triggers: string[];
+  against: string[];
+  squeeze: string;
+  results: string | null;
+  rewardRisk: number;
+}
+
+export interface BriefNote {
+  symbol: string;
+  why: string;
+  thesis: string;
+  against: string;
+}
+
+const BRIEF_SCHEMA = {
+  type: "object",
+  properties: {
+    notes: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          symbol: { type: "string" },
+          why: { type: "string", description: "One plain-English line, under 110 characters, on why this share made the list." },
+          thesis: { type: "string", description: "Two short sentences: the case that the price could fall, from the evidence given." },
+          against: { type: "string", description: "One sentence: the strongest reason the short could go wrong." },
+        },
+        required: ["symbol", "why", "thesis", "against"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["notes"],
+  additionalProperties: false,
+};
+
+const BRIEF_SYSTEM = `You write the notes for "Today's Shortlist" in Shortlist, a UK app where people learn investing and practise short selling with virtual money. Each morning a rules-based screen picks up to ten shares that look weak and have a fresh trigger. For each one you write a short, plain-English note for a learner.
+
+Rules:
+- Use only the evidence given for that share. Never add news, numbers, dates or events you were not given.
+- Describe the evidence; don't recommend. Never tell the reader to short, sell, buy or hold, and never predict a price. Write "the case for a fall is…", not "you should short".
+- Always give a fair, specific reason the short could go wrong, taken from the case against when one is provided.
+- UK English, no jargon without a quick explanation, no hype, no emojis.
+- Return one note per share, with the same symbol you were given.`;
+
+/** Plain-English notes for the day's shortlist. Returns null on any failure; callers keep the rules-based text. */
+export async function aiShortlistBrief(items: BriefInput[]): Promise<BriefNote[] | null> {
+  if (!items.length) return [];
+  const res = await anthropic().beta.messages.create(
+    {
+      model: MODEL,
+      max_tokens: 4096,
+      betas: [FALLBACK_BETA],
+      fallbacks: "default",
+      output_config: { effort: "low", format: { type: "json_schema", schema: BRIEF_SCHEMA } },
+      system: [{ type: "text", text: BRIEF_SYSTEM, cache_control: { type: "ephemeral" } }],
+      messages: [{ role: "user", content: `Today's picks (JSON):\n${JSON.stringify(items)}` }],
+    },
+    { timeout: 25_000, maxRetries: 1 },
+  );
+  if (res.stop_reason === "refusal" || res.stop_reason === "max_tokens") return null;
+  const text = res.content.find((b) => b.type === "text");
+  if (!text || text.type !== "text") return null;
+  try {
+    const j = JSON.parse(text.text) as { notes?: Partial<BriefNote>[] };
+    if (!Array.isArray(j.notes)) return null;
+    const wanted = new Set(items.map((i) => i.symbol));
+    return j.notes
+      .filter((n): n is BriefNote => typeof n.symbol === "string" && wanted.has(n.symbol) && typeof n.why === "string" && typeof n.thesis === "string" && typeof n.against === "string")
+      .map((n) => ({ symbol: n.symbol, why: n.why.slice(0, 160), thesis: n.thesis.slice(0, 400), against: n.against.slice(0, 280) }));
+  } catch {
+    return null;
+  }
+}

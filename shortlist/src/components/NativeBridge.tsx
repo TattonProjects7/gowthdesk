@@ -73,12 +73,13 @@ export default function NativeBridge() {
         /* push not available (e.g. no APNs/FCM config yet) */
       }
 
-      // Tapping a notification opens the relevant instrument.
+      // Tapping a notification opens the page it names, or the relevant instrument.
       try {
         const { LocalNotifications } = await import("@capacitor/local-notifications");
         const h = await LocalNotifications.addListener("localNotificationActionPerformed", (a) => {
+          const href = a.notification.extra?.href as string | undefined;
           const symbol = a.notification.extra?.symbol as string | undefined;
-          router.push(symbol ? `/i/${symbol}` : "/portfolio");
+          router.push(href && href.startsWith("/") && !href.startsWith("//") ? href : symbol ? `/i/${symbol}` : "/portfolio");
         });
         cleanups.push(() => h.remove());
       } catch {

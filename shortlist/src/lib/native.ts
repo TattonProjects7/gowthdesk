@@ -63,10 +63,45 @@ export async function nativeNotify(title: string, body: string, extra?: Record<s
     if (notifPermission !== "granted") return;
     const { LocalNotifications } = await import("@capacitor/local-notifications");
     await LocalNotifications.schedule({
-      notifications: [{ id: nextId++, title, body, extra, smallIcon: "ic_stat_icon", iconColor: "#e11d48" }],
+      notifications: [{ id: nextId++, title, body, extra, smallIcon: "ic_stat_icon", iconColor: "#ff3b3b" }],
     });
   } catch {
     /* notifications unavailable */
+  }
+}
+
+// --- Daily reminders ----------------------------------------------------------
+
+const SHORTLIST_REMINDER_ID = 730_001;
+
+/**
+ * A repeating local notification each morning that opens Today's Shortlist.
+ * Native apps only (the web has no background notifications). Returns whether
+ * the reminder is now on.
+ */
+export async function setShortlistReminder(on: boolean, hour = 7, minute = 30): Promise<boolean> {
+  if (!isNative()) return false;
+  try {
+    const { LocalNotifications } = await import("@capacitor/local-notifications");
+    await LocalNotifications.cancel({ notifications: [{ id: SHORTLIST_REMINDER_ID }] }).catch(() => {});
+    if (!on) return false;
+    if (!(await requestNotificationPermission())) return false;
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: SHORTLIST_REMINDER_ID,
+          title: "Today's Shortlist is ready",
+          body: "Ten shares that look weak today, each with the case for and against.",
+          schedule: { on: { hour, minute }, allowWhileIdle: true },
+          extra: { href: "/shortlist" },
+          smallIcon: "ic_stat_icon",
+          iconColor: "#ff3b3b",
+        },
+      ],
+    });
+    return true;
+  } catch {
+    return false;
   }
 }
 

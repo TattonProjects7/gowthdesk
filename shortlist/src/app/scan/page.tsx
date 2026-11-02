@@ -53,6 +53,17 @@ export default function Scanner() {
           </div>
         </section>
 
+        <Link
+          href="/shortlist"
+          className="group mb-6 flex items-center justify-between gap-4 rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-600/20 to-ink-900 p-4 sm:p-5 hover:border-blue-400/50 transition-colors"
+        >
+          <span>
+            <span className="block text-xs font-semibold uppercase tracking-wide text-blue-300">New · Today&apos;s Shortlist</span>
+            <span className="mt-1 block text-base font-semibold text-white">The ten weakest shares today, UK and US, each with a fresh trigger and the case against.</span>
+          </span>
+          <ArrowRight className="h-5 w-5 shrink-0 text-blue-200 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+
         {mounted && best && (
           <Link
             href={`/short/${best.symbol}`}

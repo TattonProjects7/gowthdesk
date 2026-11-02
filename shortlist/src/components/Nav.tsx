@@ -50,7 +50,7 @@ const LINKS: { href: string; label: string; icon: React.ElementType; match?: str
   { href: "/screener", label: "Screener", icon: SlidersHorizontal, match: ["/screener"], desktopOnly: true },
   { href: "/learn", label: "Learn", icon: GraduationCap },
   { href: "/watchlist", label: "Watchlist", icon: Star },
-  { href: "/scan", label: "Shorts", icon: Radar, match: ["/scan", "/short", "/tracker"] },
+  { href: "/shortlist", label: "Shorts", icon: Radar, match: ["/shortlist", "/scan", "/short", "/tracker"] },
 ];
 
 export default function Nav() {
