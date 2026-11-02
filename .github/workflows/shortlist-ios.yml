@@ -107,7 +107,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/ascvenv"
           "$RUNNER_TEMP/ascvenv/bin/pip" install --quiet --disable-pip-version-check PyJWT cryptography
           "$RUNNER_TEMP/ascvenv/bin/python" <<'PY'
-          import os, re, sys, time, textwrap, urllib.request, urllib.error
+          import os, re, sys, time, json, textwrap, urllib.request, urllib.error
           import jwt
           kid = os.environ["ASC_KEY_ID"].strip()
           iss = os.environ["ASC_ISSUER_ID"].strip()
@@ -141,6 +141,29 @@ jobs:
               print("::warning::Unexpected HTTP %d from Apple; continuing to the build." % e.code)
           except Exception as e:
               print("::warning::Could not reach Apple to pre-check the key (%s); continuing to the build." % e)
+          # Report what the account actually has, so a signing failure at export
+          # points to the real cause (unregistered bundle ID, no distribution
+          # certificate slot, or no App Store profile). All read-only; never fatal.
+          def get(path):
+              try:
+                  rq = urllib.request.Request("https://api.appstoreconnect.apple.com" + path, headers={"Authorization": "Bearer " + tok})
+                  return json.load(urllib.request.urlopen(rq, timeout=25)).get("data", [])
+              except Exception as ex:
+                  print("  (could not read %s: %s)" % (path, ex)); return []
+          print("--- Account signing state ---")
+          certs = get("/v1/certificates?limit=200")
+          dist = [c for c in certs if "DISTRIBUTION" in (c.get("attributes", {}).get("certificateType") or "")]
+          print("Distribution certificates: %d (Apple allows a limited number; 'Cloud signing permission error' often means the slots are full)" % len(dist))
+          for c in dist:
+              a = c.get("attributes", {}); print("  - %s | %s | expires %s" % (a.get("certificateType"), a.get("displayName"), a.get("expirationDate")))
+          bid = get("/v1/bundleIds?filter%5Bidentifier%5D=uk.co.tattonprojects.shortlist&limit=1")
+          print("Bundle ID uk.co.tattonprojects.shortlist registered as an App ID: %s" % ("yes" if bid else "NO - this alone blocks signing; create the app in App Store Connect"))
+          profs = get("/v1/profiles?limit=200")
+          appstore = [p for p in profs if (p.get("attributes", {}).get("profileType") or "").startswith("IOS_APP_STORE")]
+          print("App Store provisioning profiles on the account: %d" % len(appstore))
+          apps = get("/v1/apps?filter%5BbundleId%5D=uk.co.tattonprojects.shortlist&limit=1")
+          print("App record for the bundle exists in App Store Connect: %s" % ("yes" if apps else "NO - create it under Apps > +"))
+          print("--- end ---")
           PY
 
       - name: Archive and upload to TestFlight
