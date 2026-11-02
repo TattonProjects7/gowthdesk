@@ -98,23 +98,28 @@ function scoreShort(s: Signals, sq: Squeeze): { score: number; reasons: Reason[]
   return { score: Math.max(3, Math.min(98, Math.round(score))), reasons };
 }
 
-function structure(s: Signals): ShortStructure {
+// `toGbp` converts a per-share amount in the share's own currency into pounds,
+// so the fixed £ risk budget sizes correctly for pence and dollar prices. The
+// original scanner passes nothing and treats prices as pounds.
+export function structureFor(s: Signals, toGbp: (perShare: number) => number = (x) => x): ShortStructure {
   const entry = s.price;
   const stopPct = Math.min(0.06, Math.max(0.025, s.volatility * 1.4));
   const stop = round2(entry * (1 + stopPct));
   const targetPct = Math.min(0.32, Math.max(0.08, s.volatility * 4 + Math.max(0, s.zscore) * 0.03));
   const target = round2(entry * (1 - targetPct));
 
-  const riskPerShare = stop - entry;
+  const riskPerShare = toGbp(stop - entry);
   const shares = Math.max(1, Math.floor(RISK_BUDGET / riskPerShare));
   const maxLoss = round2(riskPerShare * shares);
-  const maxGain = round2((entry - target) * shares);
+  const maxGain = round2(toGbp(entry - target) * shares);
   const rewardRisk = round2(maxGain / maxLoss);
 
   return { entry, stop, target, shares, maxLoss, maxGain, rewardRisk, stopPct, targetPct };
 }
 
-function gradeFor(score: number): string {
+const structure = (s: Signals) => structureFor(s);
+
+export function gradeFor(score: number): string {
   if (score >= 85) return "A";
   if (score >= 75) return "A−";
   if (score >= 66) return "B+";

@@ -44,8 +44,8 @@ its own Vercel project, pointed at the `shortlist/` folder:
 | --- | --- |
 | `NEXT_PUBLIC_APP_URL` | Your live address, e.g. `https://shortlist.vercel.app`. The apps load this. |
 | `BROKER_SECRET` | A long random string, needed for real mode. Mac: `openssl rand -base64 48`. Windows: see below. |
-| `ANTHROPIC_API_KEY` | Turns on the live AI coach and digests. Optional. |
-| `FINNHUB_API_KEY` | Real-time US share prices, delayed quotes and live company fundamentals. Strongly recommended before real mode. |
+| `ANTHROPIC_API_KEY` | Turns on the live AI coach, digests and Today's Shortlist notes. Optional. |
+| `FINNHUB_API_KEY` | Real-time US share prices, delayed quotes, live company fundamentals, and the news, insider and analyst triggers in Today's Shortlist. Strongly recommended before real mode. |
 | `TWELVEDATA_API_KEY` | Real daily price history for US shares and ETFs (charts and indicators). Optional. |
 | `ALPHAVANTAGE_API_KEY` | Daily price history for the short-scanner names. Optional. |
 
@@ -306,10 +306,10 @@ subscriptions.
 | --- | --- | --- |
 | Vercel | `NEXT_PUBLIC_APP_URL` | Live address, also loaded by the apps |
 | Vercel | `BROKER_SECRET` | Encrypting Trading 212 keys (real mode) |
-| Vercel | `FINNHUB_API_KEY` | Real-time US prices, delayed quotes and screener fundamentals |
+| Vercel | `FINNHUB_API_KEY` | Real-time US prices, delayed quotes, screener fundamentals and Today's Shortlist triggers |
 | Vercel | `TWELVEDATA_API_KEY`, `ALPHAVANTAGE_API_KEY` | Real daily price history |
 | Vercel | `FINNHUB_WS_SYMBOLS` (optional, default 50), `LIVE_STREAM=off` (optional) | Streaming slots on a paid plan, or turning streaming off |
-| Vercel | `ANTHROPIC_API_KEY` | AI coach and digests |
+| Vercel | `ANTHROPIC_API_KEY` | AI coach, digests and Today's Shortlist notes |
 | GitHub variable | `APP_URL` | Address the native apps open |
 | GitHub variable | `PLAY_AUTO_UPLOAD`, `PLAY_TRACK`, `TESTFLIGHT_AUTO_UPLOAD` | Turning store uploads on |
 | GitHub secret | `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` | Signing the Play bundle |

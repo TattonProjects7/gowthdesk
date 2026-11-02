@@ -150,6 +150,15 @@ Celebrations reward learning and good habits, never trading more often.
 
 **Short-finder**
 
+- **Today's Shortlist** (`/shortlist`, the Shorts tab) — six checks run over
+  every UK and US share each day (Finder, Analyst, Signal hunter, Enricher,
+  Qualifier, Prioritiser) and keep the ten weakest with a fresh trigger. Each
+  pick shows the case for a fall, what triggered it, the case against and a
+  defined-risk practice plan; near misses say which check stopped them. News,
+  insider-selling and analyst-downgrade triggers need `FINNHUB_API_KEY`;
+  plain-English notes need `ANTHROPIC_API_KEY`. Without them the list runs on
+  the chart and company figures. Native apps can remind users each morning.
+  Code: `src/lib/shortlist/`.
 - **Live scanner** — the market ranked best-short-first from RSI, z-score,
   momentum, volatility and trend.
 - **Squeeze-risk radar** — short interest, days-to-cover and borrow fee, framed

@@ -54,7 +54,11 @@ export function squeezeFor(symbol: string, override?: Partial<SqueezeMetrics>): 
   const feePts = clamp((m.borrowFeePct / 15) * 20, 0, 20);
 
   const score = Math.round(clamp(siPts + dtcPts + feePts, 0, 100));
-  const level: Squeeze["level"] = score >= 70 ? "extreme" : score >= 45 ? "high" : score >= 22 ? "moderate" : "low";
+  const byScore: Squeeze["level"] = score >= 70 ? "extreme" : score >= 45 ? "high" : score >= 22 ? "moderate" : "low";
+  // Crowding alone sets a floor, whatever days-to-cover and borrow say: over
+  // 20% of float short is extreme, over 10% at least high (the desk rule of thumb).
+  const level: Squeeze["level"] =
+    m.shortInterestPctFloat > 20 ? "extreme" : m.shortInterestPctFloat > 10 && (byScore === "low" || byScore === "moderate") ? "high" : byScore;
   const hardToBorrow = m.borrowFeePct >= 5 || m.shortInterestPctFloat >= 10;
 
   return { ...m, score, level, hardToBorrow, verdict: verdictFor(level, m) };

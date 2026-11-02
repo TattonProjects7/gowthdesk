@@ -178,3 +178,54 @@ export async function fetchMarketNews(category: "general" | "forex" | "crypto" |
     return [];
   }
 }
+
+// Insider transactions (Form 4 filings) for the last ~90 days via Finnhub.
+// US companies only on the free tier. Empty when unconfigured or on error.
+export async function fetchInsiderTransactions(
+  providerSymbol: string,
+): Promise<{ name: string; change: number; transactionCode: string; transactionPrice: number; transactionDate: string }[]> {
+  if (!FINNHUB) return [];
+  const to = new Date();
+  const from = new Date(to.getTime() - 90 * 86400_000);
+  const d = (x: Date) => x.toISOString().slice(0, 10);
+  const res = await withTimeout(
+    `${FH}/stock/insider-transactions?symbol=${encodeURIComponent(providerSymbol)}&from=${d(from)}&to=${d(to)}&token=${FINNHUB}`,
+    6000,
+  );
+  if (!res) return [];
+  try {
+    const j = (await res.json()) as { data?: { name?: string; change?: number; transactionCode?: string; transactionPrice?: number; transactionDate?: string }[] };
+    if (!Array.isArray(j.data)) return [];
+    return j.data
+      .filter((t) => t.name && typeof t.change === "number" && t.transactionCode && t.transactionDate)
+      .slice(0, 200)
+      .map((t) => ({
+        name: t.name as string,
+        change: t.change as number,
+        transactionCode: t.transactionCode as string,
+        transactionPrice: typeof t.transactionPrice === "number" ? t.transactionPrice : 0,
+        transactionDate: t.transactionDate as string,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+// Monthly analyst recommendation counts, newest first, via Finnhub (free tier).
+export async function fetchRecommendationTrend(
+  providerSymbol: string,
+): Promise<{ period: string; strongBuy: number; buy: number; hold: number; sell: number; strongSell: number }[]> {
+  if (!FINNHUB) return [];
+  const res = await withTimeout(`${FH}/stock/recommendation?symbol=${encodeURIComponent(providerSymbol)}&token=${FINNHUB}`, 6000);
+  if (!res) return [];
+  try {
+    const j = (await res.json()) as { period?: string; strongBuy?: number; buy?: number; hold?: number; sell?: number; strongSell?: number }[];
+    if (!Array.isArray(j)) return [];
+    return j
+      .filter((r) => r.period)
+      .slice(0, 6)
+      .map((r) => ({ period: r.period as string, strongBuy: r.strongBuy ?? 0, buy: r.buy ?? 0, hold: r.hold ?? 0, sell: r.sell ?? 0, strongSell: r.strongSell ?? 0 }));
+  } catch {
+    return [];
+  }
+}
